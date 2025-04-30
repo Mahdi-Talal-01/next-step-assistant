@@ -1,29 +1,27 @@
 import { createBrowserRouter } from "react-router-dom";
-import MainLayout from "./layouts/MainLayout.jsx";
-import Dashboard from "./pages/Dashboard/Dashboard.jsx";
 import React from "react";
-import GmailTracker from "./pages/GmailTracker/GmailTracker.jsx";
+import GmailTracker from "./pages/EmailTracker";
+import MainLayout from "./layouts/MainLayout.jsx";
+
 
 // Lazy load other pages
 const Applications = React.lazy(() =>
-  import("./pages/Applications/Applications.jsx")
+  import("./pages/Application")
 );
-const SkillsTrends = React.lazy(() =>
-  import("./pages/SkillsTrends/SkillsTrends.jsx")
-);
-const Roadmaps = React.lazy(() => import("./pages/Roadmaps/Roadmaps.jsx"));
-const AIChat = React.lazy(() => import("./pages/AIChat/AIChat.jsx"));
-const Settings = React.lazy(() => import("./pages/Settings/Settings.jsx"));
+const SkillsTrends = React.lazy(() => import("./pages/SkillsTrends"));
+const Roadmaps = React.lazy(() => import("./pages/Roadmap"));
+const AIChat = React.lazy(() => import("./pages/AIChat"));
+// const Settings = React.lazy(() => import("./pages/Settings"));
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      {
-        index: true,
-        element: <Dashboard />,
-      },
+      // {
+      //   index: true,
+      //   element: <Dashboard />,
+      // },
       {
         path: "gmail-tracker",
         element: (
@@ -64,14 +62,14 @@ export const router = createBrowserRouter([
           </React.Suspense>
         ),
       },
-      {
-        path: "settings",
-        element: (
-          <React.Suspense fallback={<div>Loading...</div>}>
-            <Settings />
-          </React.Suspense>
-        ),
-      },
+      // {
+      //   path: "settings",
+      //   element: (
+      //     <React.Suspense fallback={<div>Loading...</div>}>
+      //       <Settings />
+      //     </React.Suspense>
+      //   ),
+      // },
     ],
   },
 ]);
