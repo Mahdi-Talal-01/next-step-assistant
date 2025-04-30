@@ -1,3 +1,5 @@
+import { Icon } from "@iconify/react";
+
 const SidebarHeader = ({ isCollapsed, onToggle }) => {
   return (
     <div className="sidebar-header">
