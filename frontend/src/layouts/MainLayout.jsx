@@ -36,7 +36,7 @@ const MainLayout = () => {
     <div className="app-container">
       <Sidebar isCollapsed={isSidebarOpen} onToggle={toggleSidebar} />
 
-      <div className={`main-content ${isSidebarOpen ? "sidebar-collapsed" : ""}`}>
+      <div className={`main-container ${isSidebarOpen ? "sidebar-collapsed" : ""}`}>
         <Navbar />
 
         <main className="main-content">
