@@ -3,6 +3,7 @@ import React from "react";
 import GmailTracker from "./pages/EmailTracker";
 import MainLayout from "./layouts/MainLayout.jsx";
 import Dashboard from "./pages/Dashboard";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 
 // Lazy load other pages
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
