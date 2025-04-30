@@ -5,9 +5,7 @@
 <!-- project overview -->
 <img src="./readme/title2.svg"/>
 
-> Description here.
->
-> Description here.
+> NextStep AI application is an AI-powered platform linking individuals seeking career acceleration with smart tools and personalized insights. Upon accessing the platform, users can utilize integrated features like job aggregation, automated application tracking (via email integration), market skill analysis, AI-generated learning roadmaps, and a personalized AI career assistant within a unified dashboard.
 
 <br><br>
 
