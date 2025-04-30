@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import React from "react";
 import GmailTracker from "./pages/EmailTracker";
 import MainLayout from "./layouts/MainLayout.jsx";
+import Dashboard from "./pages/Dashboard";
 
 
 // Lazy load other pages
@@ -18,10 +19,10 @@ export const router = createBrowserRouter([
     path: "/",
     element: <MainLayout />,
     children: [
-      // {
-      //   index: true,
-      //   element: <Dashboard />,
-      // },
+      {
+        index: true,
+        element: <Dashboard />,
+      },
       {
         path: "gmail-tracker",
         element: (
