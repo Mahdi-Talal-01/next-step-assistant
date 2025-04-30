@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import '../Sidebar.css';
 const UserProfile = ({ isCollapsed, username }) => {
   return (
     <div className="sidebar-footer">

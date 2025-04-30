@@ -1,3 +1,4 @@
+import '../Sidebar.css';
 const SidebarOverlay = ({ isVisible, onClose }) => {
   if (!isVisible) return null;
 
