@@ -6,6 +6,8 @@
     padding: 0;
     
     display: flex;
+    position:sticky;
+    top:0;
     flex-direction: column;
     transition: width 0.3s ease;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
