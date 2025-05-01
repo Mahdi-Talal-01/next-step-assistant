@@ -12,6 +12,8 @@ const useRoadmap = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [roadmapToEdit, setRoadmapToEdit] = useState(null);
 
   useEffect(() => {
     // Load saved progress from localStorage
@@ -25,8 +27,12 @@ const useRoadmap = () => {
         // In a real app, this would be an API call
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // Merge mock data with saved progress
-        const roadmapsWithProgress = mockRoadmaps.map(roadmap => {
+        // Get roadmaps from localStorage or use mock data
+        const savedRoadmaps = localStorage.getItem('roadmaps');
+        const initialRoadmaps = savedRoadmaps ? JSON.parse(savedRoadmaps) : mockRoadmaps;
+        
+        // Merge with saved progress
+        const roadmapsWithProgress = initialRoadmaps.map(roadmap => {
           const savedRoadmap = progressData[roadmap.id];
           if (savedRoadmap) {
             return {
@@ -56,6 +62,7 @@ const useRoadmap = () => {
   }, []);
 
   const calculateProgress = (topics) => {
+    if (!topics || topics.length === 0) return 0;
     const completedCount = topics.filter(t => t.status === 'completed').length;
     const inProgressCount = topics.filter(t => t.status === 'in-progress').length;
     const totalCount = topics.length;
@@ -102,8 +109,47 @@ const useRoadmap = () => {
         }
       }
 
+      // Save updated roadmaps to localStorage
+      localStorage.setItem('roadmaps', JSON.stringify(updatedRoadmaps));
+
       return updatedRoadmaps;
     });
+  };
+
+  const handleCreateRoadmap = (newRoadmapData) => {
+    const newId = Math.max(...roadmaps.map(r => r.id), 0) + 1;
+    const roadmapToAdd = {
+      ...newRoadmapData,
+      id: newId,
+      progress: 0
+    };
+
+    setRoadmaps(prev => {
+      const updatedRoadmaps = [...prev, roadmapToAdd];
+      // Save to localStorage
+      localStorage.setItem('roadmaps', JSON.stringify(updatedRoadmaps));
+      return updatedRoadmaps;
+    });
+    setShowCreateModal(false);
+  };
+
+  const handleEditRoadmap = (updatedRoadmap) => {
+    setRoadmaps(prev => {
+      const updatedRoadmaps = prev.map(r => 
+        r.id === updatedRoadmap.id ? { ...updatedRoadmap } : r
+      );
+      // Save to localStorage
+      localStorage.setItem('roadmaps', JSON.stringify(updatedRoadmaps));
+      return updatedRoadmaps;
+    });
+    setShowEditModal(false);
+    setRoadmapToEdit(null);
+  };
+
+  const handleEditClick = (roadmap, e) => {
+    e.stopPropagation(); // Prevent opening the details modal
+    setRoadmapToEdit(roadmap);
+    setShowEditModal(true);
   };
 
   const filteredRoadmaps = roadmaps.filter(roadmap => {
@@ -155,18 +201,6 @@ const useRoadmap = () => {
     setSortOrder(value);
   };
 
-  const handleCreateRoadmap = (newRoadmapData) => {
-    const newId = Math.max(...roadmaps.map(r => r.id)) + 1;
-    const roadmapToAdd = {
-      ...newRoadmapData,
-      id: newId,
-      progress: 0,
-      topics: []
-    };
-    setRoadmaps(prev => [...prev, roadmapToAdd]);
-    setShowCreateModal(false);
-  };
-
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case 'completed':
@@ -202,6 +236,8 @@ const useRoadmap = () => {
     sortOrder,
     isLoading,
     showCreateModal,
+    showEditModal,
+    roadmapToEdit,
     handleRoadmapClick,
     handleCloseDetails,
     handleSearchChange,
@@ -209,10 +245,14 @@ const useRoadmap = () => {
     handleSortChange,
     handleSortOrderChange,
     handleCreateRoadmap,
+    handleEditRoadmap,
+    handleEditClick,
     handleTopicStatusChange,
     getStatusBadgeClass,
     getStatusLabel,
-    setShowCreateModal
+    setShowCreateModal,
+    setShowEditModal,
+    setRoadmapToEdit
   };
 };
 
