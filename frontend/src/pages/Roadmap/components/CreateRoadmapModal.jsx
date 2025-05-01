@@ -85,8 +85,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate, initialData = null }) =
     }));
   };
 
-  const handleAddTopic = (e) => {
-    e.preventDefault();
+  const handleAddTopic = () => {
     if (!newTopic.name.trim()) {
       alert('Please enter a topic name');
       return;
@@ -99,7 +98,6 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate, initialData = null }) =
     const topicId = Date.now() + Math.random();
     setNewRoadmap(prev => ({
       ...prev,
-      topics: [...prev.topics, { 
       topics: [...prev.topics, { ...newTopic, id: topicId }]
     }));
     setNewTopic({
