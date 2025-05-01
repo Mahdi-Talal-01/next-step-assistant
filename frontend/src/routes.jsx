@@ -5,11 +5,8 @@ import MainLayout from "./layouts/MainLayout.jsx";
 import Dashboard from "./pages/Dashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
 
-
 // Lazy load other pages
-const Applications = React.lazy(() =>
-  import("./pages/Application")
-);
+const Applications = React.lazy(() => import("./pages/Application"));
 const SkillsTrends = React.lazy(() => import("./pages/SkillsTrends"));
 const Roadmaps = React.lazy(() => import("./pages/Roadmap"));
 const AIChat = React.lazy(() => import("./pages/AIChat"));
