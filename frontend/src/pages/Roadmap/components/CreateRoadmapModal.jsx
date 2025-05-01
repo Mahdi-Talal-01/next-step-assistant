@@ -49,13 +49,24 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
 
   const handleAddResource = (e) => {
     e.preventDefault();
-    if (newResource.name && newResource.url) {
-      setNewTopic(prev => ({
-        ...prev,
-        resources: [...prev.resources, { ...newResource }]
-      }));
-      setNewResource({ name: '', url: '' });
+    if (!newResource.name.trim() || !newResource.url.trim()) {
+      alert('Please fill in both resource name and URL');
+      return;
     }
+    
+    // Validate URL format
+    try {
+      new URL(newResource.url);
+    } catch (err) {
+      alert('Please enter a valid URL (e.g., https://example.com)');
+      return;
+    }
+
+    setNewTopic(prev => ({
+      ...prev,
+      resources: [...prev.resources, { ...newResource }]
+    }));
+    setNewResource({ name: '', url: '' });
   };
 
   const handleRemoveResource = (index) => {
@@ -67,17 +78,25 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
 
   const handleAddTopic = (e) => {
     e.preventDefault();
-    if (newTopic.name && newTopic.resources.length > 0) {
-      setNewRoadmap(prev => ({
-        ...prev,
-        topics: [...prev.topics, { ...newTopic, id: Date.now() }]
-      }));
-      setNewTopic({
-        name: '',
-        status: 'pending',
-        resources: []
-      });
+    if (!newTopic.name.trim()) {
+      alert('Please enter a topic name');
+      return;
     }
+    if (newTopic.resources.length === 0) {
+      alert('Please add at least one resource to the topic');
+      return;
+    }
+
+    const topicId = Date.now();
+    setNewRoadmap(prev => ({
+      ...prev,
+      topics: [...prev.topics, { ...newTopic, id: topicId }]
+    }));
+    setNewTopic({
+      name: '',
+      status: 'pending',
+      resources: []
+    });
   };
 
   const handleRemoveTopic = (index) => {
@@ -89,11 +108,38 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newRoadmap.topics.length === 0) {
-      alert('Please add at least one topic with resources before creating the roadmap.');
+    
+    // Validate required fields
+    if (!newRoadmap.title.trim()) {
+      alert('Please enter a roadmap title');
       return;
     }
-    onCreate(newRoadmap);
+    if (!newRoadmap.description.trim()) {
+      alert('Please enter a roadmap description');
+      return;
+    }
+    if (!newRoadmap.estimatedTime.trim()) {
+      alert('Please enter estimated time');
+      return;
+    }
+    if (newRoadmap.topics.length === 0) {
+      alert('Please add at least one topic with resources');
+      return;
+    }
+
+    // Create the roadmap with initial progress
+    const roadmapToCreate = {
+      ...newRoadmap,
+      progress: 0, // Initial progress
+      topics: newRoadmap.topics.map(topic => ({
+        ...topic,
+        status: 'pending' // Initial status for all topics
+      }))
+    };
+
+    onCreate(roadmapToCreate);
+    
+    // Reset all form states
     setNewRoadmap({
       title: '',
       description: '',
@@ -112,12 +158,14 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
       name: '',
       url: ''
     });
+    
+    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title">
@@ -139,6 +187,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
               className="form-control"
               value={newRoadmap.title}
               onChange={handleInputChange}
+              placeholder="Enter roadmap title"
               required
             />
           </div>
@@ -151,6 +200,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
               className="form-control"
               value={newRoadmap.description}
               onChange={handleInputChange}
+              placeholder="Enter roadmap description"
               required
             />
           </div>
@@ -165,6 +215,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
                 className="form-control"
                 value={newRoadmap.estimatedTime}
                 onChange={handleInputChange}
+                placeholder="e.g., 3 months"
                 required
               />
             </div>
@@ -199,7 +250,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
           </div>
 
           <div className="form-group">
-            <label>Topics</label>
+            <label>Topics ({newRoadmap.topics.length})</label>
             <div className="topics-list">
               {newRoadmap.topics.map((topic, index) => (
                 <div key={topic.id} className="topic-item">
@@ -237,6 +288,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
                   className="form-control"
                   value={newTopic.name}
                   onChange={handleTopicInputChange}
+                  placeholder="Enter topic name"
                 />
               </div>
 
@@ -251,6 +303,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
                       className="form-control"
                       value={newResource.name}
                       onChange={handleResourceInputChange}
+                      placeholder="Enter resource name"
                     />
                   </div>
                   <div className="form-group">
@@ -262,6 +315,7 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
                       className="form-control"
                       value={newResource.url}
                       onChange={handleResourceInputChange}
+                      placeholder="https://example.com"
                     />
                   </div>
                 </div>
