@@ -132,7 +132,7 @@ const Applications = () => {
       >
         {applications.map(application => (
           <ApplicationCard
-            key={application.id}
+                  key={application.id}
             application={application}
             onDelete={deleteApplication}
             onView={handleViewApplication}
