@@ -121,7 +121,15 @@ const useRoadmap = () => {
     const roadmapToAdd = {
       ...newRoadmapData,
       id: newId,
-      progress: 0
+      progress: 0,
+      topics: newRoadmapData.topics.map(topic => ({
+        ...topic,
+        id: Date.now() + Math.random(), // Generate unique ID for each topic
+        resources: topic.resources.map(resource => ({
+          ...resource,
+          id: Date.now() + Math.random() // Generate unique ID for each resource
+        }))
+      }))
     };
 
     setRoadmaps(prev => {
@@ -136,7 +144,17 @@ const useRoadmap = () => {
   const handleEditRoadmap = (updatedRoadmap) => {
     setRoadmaps(prev => {
       const updatedRoadmaps = prev.map(r => 
-        r.id === updatedRoadmap.id ? { ...updatedRoadmap } : r
+        r.id === updatedRoadmap.id ? {
+          ...updatedRoadmap,
+          topics: updatedRoadmap.topics.map(topic => ({
+            ...topic,
+            id: topic.id || Date.now() + Math.random(), // Ensure topic has ID
+            resources: topic.resources.map(resource => ({
+              ...resource,
+              id: resource.id || Date.now() + Math.random() // Ensure resource has ID
+            }))
+          }))
+        } : r
       );
       // Save to localStorage
       localStorage.setItem('roadmaps', JSON.stringify(updatedRoadmaps));
