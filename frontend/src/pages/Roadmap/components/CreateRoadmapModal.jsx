@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 
-const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
+const CreateRoadmapModal = ({ isOpen, onClose, onCreate, initialData = null }) => {
   const [newRoadmap, setNewRoadmap] = useState({
     title: '',
     description: '',
@@ -22,6 +22,12 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
     name: '',
     url: ''
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setNewRoadmap(initialData);
+    }
+  }, [initialData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,7 +70,10 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
 
     setNewTopic(prev => ({
       ...prev,
-      resources: [...prev.resources, { ...newResource }]
+      resources: [...prev.resources, { 
+        ...newResource,
+        id: Date.now() + Math.random() // Generate unique ID for the resource
+      }]
     }));
     setNewResource({ name: '', url: '' });
   };
@@ -87,9 +96,10 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
       return;
     }
 
-    const topicId = Date.now();
+    const topicId = Date.now() + Math.random();
     setNewRoadmap(prev => ({
       ...prev,
+      topics: [...prev.topics, { 
       topics: [...prev.topics, { ...newTopic, id: topicId }]
     }));
     setNewTopic({
@@ -127,17 +137,8 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
       return;
     }
 
-    // Create the roadmap with initial progress
-    const roadmapToCreate = {
-      ...newRoadmap,
-      progress: 0, // Initial progress
-      topics: newRoadmap.topics.map(topic => ({
-        ...topic,
-        status: 'pending' // Initial status for all topics
-      }))
-    };
-
-    onCreate(roadmapToCreate);
+    // Create or update the roadmap
+    onCreate(newRoadmap);
     
     // Reset all form states
     setNewRoadmap({
@@ -169,8 +170,8 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title">
-            <Icon icon="mdi:plus-circle" className="me-2" />
-            <h2>Create New Roadmap</h2>
+            <Icon icon={initialData ? "mdi:pencil" : "mdi:plus-circle"} className="me-2" />
+            <h2>{initialData ? 'Edit Roadmap' : 'Create New Roadmap'}</h2>
           </div>
           <button className="modal-close" onClick={onClose}>
             <Icon icon="mdi:close" />
@@ -366,8 +367,8 @@ const CreateRoadmapModal = ({ isOpen, onClose, onCreate }) => {
               className="btn btn-primary"
               disabled={newRoadmap.topics.length === 0}
             >
-              <Icon icon="mdi:check" className="me-2" />
-              Create Roadmap
+              <Icon icon={initialData ? "mdi:content-save" : "mdi:check"} className="me-2" />
+              {initialData ? 'Save Changes' : 'Create Roadmap'}
             </button>
           </div>
         </form>
