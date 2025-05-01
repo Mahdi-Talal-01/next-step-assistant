@@ -24,6 +24,36 @@ export const useSkillsTrends = () => {
     });
   }, [selectedCategory]);
 
+  const stats = useMemo(() => {
+    if (filteredSkills.length === 0) {
+      return {
+        overallGrowth: '0%',
+        averageSalary: '$0',
+        jobDemand: '0%',
+        learningResources: '0'
+      };
+    }
+
+    // Calculate average growth
+    const avgGrowth = filteredSkills.reduce((sum, skill) => sum + skill.growth, 0) / filteredSkills.length;
+    
+    // Calculate average salary
+    const avgSalary = filteredSkills.reduce((sum, skill) => sum + skill.salary, 0) / filteredSkills.length;
+    
+    // Calculate average demand
+    const avgDemand = filteredSkills.reduce((sum, skill) => sum + skill.demand, 0) / filteredSkills.length;
+    
+    // Estimate learning resources based on demand and growth
+    const estimatedResources = Math.round((avgDemand + avgGrowth) * 2.5);
+
+    return {
+      overallGrowth: `+${Math.round(avgGrowth)}%`,
+      averageSalary: `$${Math.round(avgSalary).toLocaleString()}`,
+      jobDemand: `${Math.round(avgDemand)}%`,
+      learningResources: `${estimatedResources}+`
+    };
+  }, [filteredSkills]);
+
   const filteredMonthlyTrends = useMemo(() => {
     if (selectedCategory === 'all') {
       return mockSkillsData.monthlyTrends;
@@ -88,13 +118,6 @@ export const useSkillsTrends = () => {
       }]
     };
   }, [selectedCategory]);
-
-  const stats = useMemo(() => ({
-    overallGrowth: '+15%',
-    averageSalary: '$125K',
-    jobDemand: '85%',
-    learningResources: '250+'
-  }), []);
 
   return {
     timeRange,
