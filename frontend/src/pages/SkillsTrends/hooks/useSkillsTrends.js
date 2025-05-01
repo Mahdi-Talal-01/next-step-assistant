@@ -6,12 +6,22 @@ export const useSkillsTrends = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   const filteredSkills = useMemo(() => {
-    return selectedCategory === 'all'
-      ? mockSkillsData.trendingSkills
-      : mockSkillsData.trendingSkills.filter(skill => {
-          // Add category filtering logic here
-          return true;
-        });
+    const categorySkillsMap = {
+      frontend: ['react', 'vue', 'angular', 'javascript', 'typescript', 'html', 'css'],
+      backend: ['python', 'node.js', 'java', 'ruby', 'php', 'graphql'],
+      devops: ['aws', 'kubernetes', 'docker', 'jenkins', 'terraform'],
+      data: ['python', 'r', 'sql', 'tensorflow', 'pytorch']
+    };
+
+    if (selectedCategory === 'all') {
+      return mockSkillsData.trendingSkills;
+    }
+
+    return mockSkillsData.trendingSkills.filter(skill => {
+      const skillName = skill.name.toLowerCase();
+      const categorySkills = categorySkillsMap[selectedCategory] || [];
+      return categorySkills.some(keyword => skillName.includes(keyword));
+    });
   }, [selectedCategory]);
 
   const stats = useMemo(() => ({
@@ -32,4 +42,4 @@ export const useSkillsTrends = () => {
     salaryComparison: mockSkillsData.salaryComparison,
     skillCategories: mockSkillsData.skillCategories
   };
-}; 
+};
