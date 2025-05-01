@@ -74,6 +74,10 @@ const RoadmapDetails = ({
                       className={`status-btn ${topic.status === 'completed' ? 'active' : ''}`}
                       onClick={() => onTopicStatusChange(topic.id, 'completed')}
                       title="Mark as Completed"
+                      style={{ 
+                        backgroundColor: topic.status === 'completed' ? '#4CAF50' : 'transparent',
+                        color: topic.status === 'completed' ? 'white' : 'inherit'
+                      }}
                     >
                       <Icon icon="mdi:check-circle" />
                     </button>
@@ -81,6 +85,10 @@ const RoadmapDetails = ({
                       className={`status-btn ${topic.status === 'in-progress' ? 'active' : ''}`}
                       onClick={() => onTopicStatusChange(topic.id, 'in-progress')}
                       title="Mark as In Progress"
+                      style={{ 
+                        backgroundColor: topic.status === 'in-progress' ? '#FF9800' : 'transparent',
+                        color: topic.status === 'in-progress' ? 'white' : 'inherit'
+                      }}
                     >
                       <Icon icon="mdi:progress-clock" />
                     </button>
@@ -88,6 +96,10 @@ const RoadmapDetails = ({
                       className={`status-btn ${topic.status === 'pending' ? 'active' : ''}`}
                       onClick={() => onTopicStatusChange(topic.id, 'pending')}
                       title="Mark as Pending"
+                      style={{ 
+                        backgroundColor: topic.status === 'pending' ? '#9E9E9E' : 'transparent',
+                        color: topic.status === 'pending' ? 'white' : 'inherit'
+                      }}
                     >
                       <Icon icon="mdi:clock-outline" />
                     </button>
@@ -105,6 +117,7 @@ const RoadmapDetails = ({
                           target="_blank" 
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
+                          className="resource-link"
                         >
                           <Icon icon="mdi:link" />
                           {resource.name}
