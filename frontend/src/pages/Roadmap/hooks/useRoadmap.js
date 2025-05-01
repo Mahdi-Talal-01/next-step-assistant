@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { mockRoadmaps } from '../data/mockData';
 
+const STORAGE_KEY = 'roadmap_progress';
+
 const useRoadmap = () => {
   const [roadmaps, setRoadmaps] = useState([]);
   const [selectedRoadmap, setSelectedRoadmap] = useState(null);
@@ -12,13 +14,37 @@ const useRoadmap = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
+    // Load saved progress from localStorage
+    const savedProgress = localStorage.getItem(STORAGE_KEY);
+    const progressData = savedProgress ? JSON.parse(savedProgress) : {};
+
     // Simulate API call
     const fetchRoadmaps = async () => {
       setIsLoading(true);
       try {
         // In a real app, this would be an API call
         await new Promise(resolve => setTimeout(resolve, 1000));
-        setRoadmaps(mockRoadmaps);
+        
+        // Merge mock data with saved progress
+        const roadmapsWithProgress = mockRoadmaps.map(roadmap => {
+          const savedRoadmap = progressData[roadmap.id];
+          if (savedRoadmap) {
+            return {
+              ...roadmap,
+              topics: roadmap.topics.map(topic => ({
+                ...topic,
+                status: savedRoadmap.topics[topic.id] || topic.status
+              })),
+              progress: calculateProgress(roadmap.topics.map(topic => ({
+                ...topic,
+                status: savedRoadmap.topics[topic.id] || topic.status
+              })))
+            };
+          }
+          return roadmap;
+        });
+        
+        setRoadmaps(roadmapsWithProgress);
       } catch (error) {
         console.error('Error fetching roadmaps:', error);
       } finally {
@@ -28,6 +54,55 @@ const useRoadmap = () => {
 
     fetchRoadmaps();
   }, []);
+
+  const calculateProgress = (topics) => {
+    const completedCount = topics.filter(t => t.status === 'completed').length;
+    const inProgressCount = topics.filter(t => t.status === 'in-progress').length;
+    const totalCount = topics.length;
+    return Math.round(((completedCount + (inProgressCount * 0.5)) / totalCount) * 100);
+  };
+
+  const handleTopicStatusChange = (topicId, newStatus) => {
+    const updatedRoadmaps = roadmaps.map(roadmap => {
+      if (roadmap.topics.some(topic => topic.id === topicId)) {
+        const updatedTopics = roadmap.topics.map(topic =>
+          topic.id === topicId ? { ...topic, status: newStatus } : topic
+        );
+        
+        const updatedRoadmap = {
+          ...roadmap,
+          topics: updatedTopics,
+          progress: calculateProgress(updatedTopics)
+        };
+
+        // Save progress to localStorage
+        const savedProgress = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        const topicProgress = savedProgress[roadmap.id]?.topics || {};
+        topicProgress[topicId] = newStatus;
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          ...savedProgress,
+          [roadmap.id]: {
+            ...savedProgress[roadmap.id],
+            topics: topicProgress
+          }
+        }));
+
+        return updatedRoadmap;
+      }
+      return roadmap;
+    });
+
+    setRoadmaps(updatedRoadmaps);
+
+    // Update selected roadmap if it exists
+    if (selectedRoadmap) {
+      const updatedSelectedRoadmap = updatedRoadmaps.find(r => r.id === selectedRoadmap.id);
+      if (updatedSelectedRoadmap) {
+        setSelectedRoadmap(updatedSelectedRoadmap);
+      }
+    }
+  };
 
   const filteredRoadmaps = roadmaps.filter(roadmap => {
     const matchesSearch = roadmap.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,31 +151,6 @@ const useRoadmap = () => {
 
   const handleSortOrderChange = (value) => {
     setSortOrder(value);
-  };
-
-  const handleTopicStatusChange = (topicId, newStatus) => {
-    setRoadmaps(prevRoadmaps => 
-      prevRoadmaps.map(roadmap => {
-        if (roadmap.topics.some(topic => topic.id === topicId)) {
-          const updatedTopics = roadmap.topics.map(topic =>
-            topic.id === topicId ? { ...topic, status: newStatus } : topic
-          );
-          
-          // Recalculate progress
-          const completedCount = updatedTopics.filter(t => t.status === 'completed').length;
-          const inProgressCount = updatedTopics.filter(t => t.status === 'in-progress').length;
-          const totalCount = updatedTopics.length;
-          const newProgress = Math.round(((completedCount + (inProgressCount * 0.5)) / totalCount) * 100);
-          
-          return {
-            ...roadmap,
-            topics: updatedTopics,
-            progress: newProgress
-          };
-        }
-        return roadmap;
-      })
-    );
   };
 
   const handleCreateRoadmap = (newRoadmapData) => {
