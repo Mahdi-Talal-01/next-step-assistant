@@ -1,18 +1,25 @@
 import React from 'react';
 import { Icon } from '@iconify/react';
 
-const RoadmapCard = ({ roadmap, onClick }) => {
-  const { title, description, icon, color, progress, estimatedTime, difficulty } = roadmap;
+const RoadmapCard = ({ roadmap, onClick, onEdit }) => {
+  const { title, description, icon, color, progress, estimatedTime, difficulty, topics } = roadmap;
 
   return (
-    <div 
-      className="roadmap-card"
-      onClick={onClick}
-    >
-      <div className="roadmap-icon" style={{ backgroundColor: color }}>
-        <Icon icon={icon} />
+    <div className="roadmap-card">
+      <div className="roadmap-header">
+        <div className="roadmap-icon" style={{ backgroundColor: color }}>
+          <Icon icon={icon} />
+        </div>
+        <button 
+          className="btn-icon edit-button"
+          onClick={(e) => onEdit(roadmap, e)}
+          title="Edit Roadmap"
+        >
+          <Icon icon="mdi:pencil" />
+        </button>
       </div>
-      <div className="roadmap-content">
+      
+      <div className="roadmap-content" onClick={onClick}>
         <h3>{title}</h3>
         <p>{description}</p>
         <div className="roadmap-meta">
@@ -23,6 +30,10 @@ const RoadmapCard = ({ roadmap, onClick }) => {
           <div className="meta-item">
             <Icon icon="mdi:signal" />
             <span>{difficulty}</span>
+          </div>
+          <div className="meta-item">
+            <Icon icon="mdi:book-open" />
+            <span>{topics.length} Topics</span>
           </div>
         </div>
         <div className="roadmap-progress">
