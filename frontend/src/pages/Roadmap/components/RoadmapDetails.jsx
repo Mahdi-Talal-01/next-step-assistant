@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon } from '@iconify/react';
-import TopicItem from './TopicItem';
 
 const RoadmapDetails = ({ 
   roadmap, 
@@ -10,10 +9,37 @@ const RoadmapDetails = ({
   getStatusLabel 
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [localRoadmap, setLocalRoadmap] = useState(roadmap);
   
-  if (!roadmap) return null;
+  useEffect(() => {
+    setLocalRoadmap(roadmap);
+  }, [roadmap]);
 
-  const { title, description, icon, color, progress, estimatedTime, difficulty, topics } = roadmap;
+  if (!localRoadmap) return null;
+
+  const { title, description, icon, color, progress, estimatedTime, difficulty, topics } = localRoadmap;
+
+  const handleTopicStatusChange = (topicId, newStatus) => {
+    const updatedTopics = topics.map(topic =>
+      topic.id === topicId ? { ...topic, status: newStatus } : topic
+    );
+
+    const updatedRoadmap = {
+      ...localRoadmap,
+      topics: updatedTopics,
+      progress: calculateProgress(updatedTopics)
+    };
+
+    setLocalRoadmap(updatedRoadmap);
+    onTopicStatusChange(topicId, newStatus);
+  };
+
+  const calculateProgress = (topics) => {
+    const completedCount = topics.filter(t => t.status === 'completed').length;
+    const inProgressCount = topics.filter(t => t.status === 'in-progress').length;
+    const totalCount = topics.length;
+    return Math.round(((completedCount + (inProgressCount * 0.5)) / totalCount) * 100);
+  };
 
   const renderOverviewTab = () => (
     <div className="roadmap-overview">
@@ -72,7 +98,7 @@ const RoadmapDetails = ({
                   <div className="status-actions">
                     <button 
                       className={`status-btn ${topic.status === 'completed' ? 'active' : ''}`}
-                      onClick={() => onTopicStatusChange(topic.id, 'completed')}
+                      onClick={() => handleTopicStatusChange(topic.id, 'completed')}
                       title="Mark as Completed"
                       style={{ 
                         backgroundColor: topic.status === 'completed' ? '#4CAF50' : 'transparent',
@@ -83,7 +109,7 @@ const RoadmapDetails = ({
                     </button>
                     <button 
                       className={`status-btn ${topic.status === 'in-progress' ? 'active' : ''}`}
-                      onClick={() => onTopicStatusChange(topic.id, 'in-progress')}
+                      onClick={() => handleTopicStatusChange(topic.id, 'in-progress')}
                       title="Mark as In Progress"
                       style={{ 
                         backgroundColor: topic.status === 'in-progress' ? '#FF9800' : 'transparent',
@@ -94,7 +120,7 @@ const RoadmapDetails = ({
                     </button>
                     <button 
                       className={`status-btn ${topic.status === 'pending' ? 'active' : ''}`}
-                      onClick={() => onTopicStatusChange(topic.id, 'pending')}
+                      onClick={() => handleTopicStatusChange(topic.id, 'pending')}
                       title="Mark as Pending"
                       style={{ 
                         backgroundColor: topic.status === 'pending' ? '#9E9E9E' : 'transparent',
