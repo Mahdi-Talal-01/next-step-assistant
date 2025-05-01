@@ -64,32 +64,34 @@ const Roadmap = () => {
         </div>
       </div>
 
-      {roadmaps.length === 0 ? (
-        <div className="empty-state">
-          <Icon icon="mdi:book-search" className="empty-icon" />
-          <h3>No roadmaps found</h3>
-          <p>Try adjusting your search or filters</p>
-          <button 
-            className="btn btn-outline"
-            onClick={() => {
-              handleSearchChange('');
-              handleFilterChange('all');
-            }}
-          >
-            Clear Filters
-          </button>
-        </div>
-      ) : (
-        <div className="roadmaps-grid">
-          {roadmaps.map((roadmap) => (
-            <RoadmapCard
-              key={roadmap.id}
-              roadmap={roadmap}
-              onClick={() => handleRoadmapClick(roadmap)}
-            />
-          ))}
-        </div>
-      )}
+      <div className="roadmaps-content">
+        {roadmaps.length === 0 ? (
+          <div className="empty-state">
+            <Icon icon="mdi:book-search" className="empty-icon" />
+            <h3>No roadmaps found</h3>
+            <p>Try adjusting your search or filters</p>
+            <button 
+              className="btn btn-outline"
+              onClick={() => {
+                handleSearchChange('');
+                handleFilterChange('all');
+              }}
+            >
+              Clear Filters
+            </button>
+          </div>
+        ) : (
+          <div className="roadmaps-grid">
+            {roadmaps.map((roadmap) => (
+              <RoadmapCard
+                key={roadmap.id}
+                roadmap={roadmap}
+                onClick={() => handleRoadmapClick(roadmap)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {selectedRoadmap && (
         <RoadmapDetails
@@ -110,4 +112,4 @@ const Roadmap = () => {
   );
 };
 
-export default Roadmap;
+export default Roadmap; 
