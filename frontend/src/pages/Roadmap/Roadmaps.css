@@ -903,8 +903,8 @@ textarea.form-control {
 .roadmap-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
 .roadmap-header h1 {
@@ -1260,4 +1260,19 @@ textarea.form-control {
 .btn-sm {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
+}
+
+.edit-button {
+  background-color: var(--light-color) !important;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  transition: all 0.2s ease-in-out;
+}
+
+.edit-button:hover {
+  background-color: var(--primary-color) !important;
+  color: white;
+  transform: scale(1.1);
 } 
