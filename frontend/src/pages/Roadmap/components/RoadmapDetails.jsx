@@ -114,49 +114,14 @@ const RoadmapDetails = ({
                   <span className={`badge ${getStatusBadgeClass(topic.status)}`}>
                     {getStatusLabel(topic.status)}
                   </span>
-                  <div className="status-actions">
-                    <button 
-                      className={`status-btn ${topic.status === 'completed' ? 'active' : ''}`}
-                      onClick={() => handleTopicStatusChange(topic.id, 'completed')}
-                      title="Mark as Completed"
-                      style={{ 
-                        backgroundColor: topic.status === 'completed' ? '#4CAF50' : 'transparent',
-                        color: topic.status === 'completed' ? 'white' : 'inherit'
-                      }}
-                    >
-                      <Icon icon="mdi:check-circle" />
-                    </button>
-                    <button 
-                      className={`status-btn ${topic.status === 'in-progress' ? 'active' : ''}`}
-                      onClick={() => handleTopicStatusChange(topic.id, 'in-progress')}
-                      title="Mark as In Progress"
-                      style={{ 
-                        backgroundColor: topic.status === 'in-progress' ? '#FF9800' : 'transparent',
-                        color: topic.status === 'in-progress' ? 'white' : 'inherit'
-                      }}
-                    >
-                      <Icon icon="mdi:progress-clock" />
-                    </button>
-                    <button 
-                      className={`status-btn ${topic.status === 'pending' ? 'active' : ''}`}
-                      onClick={() => handleTopicStatusChange(topic.id, 'pending')}
-                      title="Mark as Pending"
-                      style={{ 
-                        backgroundColor: topic.status === 'pending' ? '#9E9E9E' : 'transparent',
-                        color: topic.status === 'pending' ? 'white' : 'inherit'
-                      }}
-                    >
-                      <Icon icon="mdi:clock-outline" />
-                    </button>
-                  </div>
                 </div>
               </div>
               {topic.resources && topic.resources.length > 0 && (
                 <div className="timeline-resources">
                   <h5>Resources:</h5>
                   <ul>
-                    {topic.resources.map((resource, idx) => (
-                      <li key={idx}>
+                    {topic.resources.map((resource) => (
+                      <li key={resource.id}>
                         <a 
                           href={resource.url} 
                           target="_blank" 
@@ -187,8 +152,8 @@ const RoadmapDetails = ({
           <div key={topic.id} className="resource-topic">
             <h4>{topic.name}</h4>
             <ul>
-              {topic.resources.map((resource, idx) => (
-                <li key={idx}>
+              {topic.resources.map((resource) => (
+                <li key={resource.id}>
                   <a 
                     href={resource.url} 
                     target="_blank" 
