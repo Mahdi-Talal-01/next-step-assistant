@@ -67,7 +67,25 @@ const chartOptions = {
         title: {
           display: true,
           text: 'Salary ($)'
+        },
+        ticks: {
+          callback: function(value) {
+            return '$' + value.toLocaleString();
+          }
         }
+      },
+      x: {
+        grid: {
+          display: false
+        }
+      }
+    },
+    elements: {
+      bar: {
+        borderRadius: 8,
+        borderSkipped: false,
+        barThickness: 'flex',
+        maxBarThickness: 50
       }
     }
   },
