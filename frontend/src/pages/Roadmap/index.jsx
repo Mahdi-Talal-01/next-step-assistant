@@ -17,6 +17,8 @@ const Roadmap = () => {
     sortOrder,
     isLoading,
     showCreateModal,
+    showEditModal,
+    roadmapToEdit,
     handleRoadmapClick,
     handleCloseDetails,
     handleSearchChange,
@@ -24,10 +26,14 @@ const Roadmap = () => {
     handleSortChange,
     handleSortOrderChange,
     handleCreateRoadmap,
+    handleEditRoadmap,
+    handleEditClick,
     handleTopicStatusChange,
     getStatusBadgeClass,
     getStatusLabel,
     setShowCreateModal,
+    setShowEditModal,
+    setRoadmapToEdit
   } = useRoadmap();
 
   if (isLoading) {
@@ -87,6 +93,7 @@ const Roadmap = () => {
                 key={roadmap.id}
                 roadmap={roadmap}
                 onClick={() => handleRoadmapClick(roadmap)}
+                onEdit={handleEditClick}
               />
             ))}
           </div>
@@ -108,6 +115,18 @@ const Roadmap = () => {
         onClose={() => setShowCreateModal(false)}
         onCreate={handleCreateRoadmap}
       />
+
+      {showEditModal && (
+        <CreateRoadmapModal
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setRoadmapToEdit(null);
+          }}
+          onCreate={handleEditRoadmap}
+          initialData={roadmapToEdit}
+        />
+      )}
     </div>
   );
 };
