@@ -37,10 +37,16 @@ const RoadmapDetails = ({
   };
 
   const handleSaveChanges = () => {
+    // Save all topic changes
     topics.forEach(topic => {
       onTopicStatusChange(topic.id, topic.status);
     });
+    
+    // Reset unsaved changes state
     setHasUnsavedChanges(false);
+    
+    // Close the modal after saving
+    onClose();
   };
 
   const handleStartLearning = () => {
@@ -94,7 +100,7 @@ const RoadmapDetails = ({
     <div className="roadmap-timeline">
       <h3>Learning Path</h3>
       <div className="timeline">
-        {topics.map((topic, index) => (
+        {topics.map((topic) => (
           <div key={topic.id} className={`timeline-item ${topic.status}`}>
             <div 
               className="timeline-indicator" 
@@ -188,6 +194,7 @@ const RoadmapDetails = ({
                     target="_blank" 
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
+                    className="resource-link"
                   >
                     <Icon icon="mdi:link" />
                     {resource.name}
