@@ -10,7 +10,7 @@ import RecentApplications from "./components/RecentApplications";
 import UpcomingInterviews from "./components/UpcomingInterviews";
 
 // Mock data
-import {
+import { 
   applicationData,
   statusData,
   recentApplications,
@@ -102,4 +102,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Dashboard; 
