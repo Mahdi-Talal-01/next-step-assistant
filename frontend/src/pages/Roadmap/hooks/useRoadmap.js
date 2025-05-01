@@ -63,45 +63,47 @@ const useRoadmap = () => {
   };
 
   const handleTopicStatusChange = (topicId, newStatus) => {
-    const updatedRoadmaps = roadmaps.map(roadmap => {
-      if (roadmap.topics.some(topic => topic.id === topicId)) {
-        const updatedTopics = roadmap.topics.map(topic =>
-          topic.id === topicId ? { ...topic, status: newStatus } : topic
-        );
-        
-        const updatedRoadmap = {
-          ...roadmap,
-          topics: updatedTopics,
-          progress: calculateProgress(updatedTopics)
-        };
+    setRoadmaps(prevRoadmaps => {
+      const updatedRoadmaps = prevRoadmaps.map(roadmap => {
+        if (roadmap.topics.some(topic => topic.id === topicId)) {
+          const updatedTopics = roadmap.topics.map(topic =>
+            topic.id === topicId ? { ...topic, status: newStatus } : topic
+          );
+          
+          const updatedRoadmap = {
+            ...roadmap,
+            topics: updatedTopics,
+            progress: calculateProgress(updatedTopics)
+          };
 
-        // Save progress to localStorage
-        const savedProgress = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-        const topicProgress = savedProgress[roadmap.id]?.topics || {};
-        topicProgress[topicId] = newStatus;
-        
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          ...savedProgress,
-          [roadmap.id]: {
-            ...savedProgress[roadmap.id],
-            topics: topicProgress
-          }
-        }));
+          // Save progress to localStorage
+          const savedProgress = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+          const topicProgress = savedProgress[roadmap.id]?.topics || {};
+          topicProgress[topicId] = newStatus;
+          
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            ...savedProgress,
+            [roadmap.id]: {
+              ...savedProgress[roadmap.id],
+              topics: topicProgress
+            }
+          }));
 
-        return updatedRoadmap;
+          return updatedRoadmap;
+        }
+        return roadmap;
+      });
+
+      // Update selected roadmap if it exists
+      if (selectedRoadmap) {
+        const updatedSelectedRoadmap = updatedRoadmaps.find(r => r.id === selectedRoadmap.id);
+        if (updatedSelectedRoadmap) {
+          setSelectedRoadmap(updatedSelectedRoadmap);
+        }
       }
-      return roadmap;
+
+      return updatedRoadmaps;
     });
-
-    setRoadmaps(updatedRoadmaps);
-
-    // Update selected roadmap if it exists
-    if (selectedRoadmap) {
-      const updatedSelectedRoadmap = updatedRoadmaps.find(r => r.id === selectedRoadmap.id);
-      if (updatedSelectedRoadmap) {
-        setSelectedRoadmap(updatedSelectedRoadmap);
-      }
-    }
   };
 
   const filteredRoadmaps = roadmaps.filter(roadmap => {
