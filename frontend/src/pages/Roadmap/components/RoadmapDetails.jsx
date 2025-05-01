@@ -10,9 +10,11 @@ const RoadmapDetails = ({
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [localRoadmap, setLocalRoadmap] = useState(roadmap);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   useEffect(() => {
     setLocalRoadmap(roadmap);
+    setHasUnsavedChanges(false);
   }, [roadmap]);
 
   if (!localRoadmap) return null;
@@ -31,7 +33,18 @@ const RoadmapDetails = ({
     };
 
     setLocalRoadmap(updatedRoadmap);
-    onTopicStatusChange(topicId, newStatus);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleSaveChanges = () => {
+    topics.forEach(topic => {
+      onTopicStatusChange(topic.id, topic.status);
+    });
+    setHasUnsavedChanges(false);
+  };
+
+  const handleStartLearning = () => {
+    setActiveTab('topics');
   };
 
   const calculateProgress = (topics) => {
@@ -234,13 +247,26 @@ const RoadmapDetails = ({
           <button className="btn btn-outline" onClick={onClose}>
             Close
           </button>
-          <button 
-            className="btn btn-primary"
-            style={{ backgroundColor: color }}
-          >
-            <Icon icon="mdi:play" className="me-2" />
-            Start Learning
-          </button>
+          {activeTab === 'overview' ? (
+            <button 
+              className="btn btn-primary"
+              style={{ backgroundColor: color }}
+              onClick={handleStartLearning}
+            >
+              <Icon icon="mdi:play" className="me-2" />
+              Start Learning
+            </button>
+          ) : (
+            <button 
+              className="btn btn-primary"
+              style={{ backgroundColor: color }}
+              onClick={handleSaveChanges}
+              disabled={!hasUnsavedChanges}
+            >
+              <Icon icon="mdi:content-save" className="me-2" />
+              Save Changes
+            </button>
+          )}
         </div>
       </div>
     </div>
