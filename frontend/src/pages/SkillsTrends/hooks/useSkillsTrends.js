@@ -12,6 +12,19 @@ export const useSkillsTrends = () => {
     data: ['python', 'r', 'sql', 'tensorflow', 'pytorch']
   };
 
+  const salaryChartColors = [
+    'rgba(255, 99, 132, 0.8)',    // Red
+    'rgba(54, 162, 235, 0.8)',   // Blue
+    'rgba(255, 206, 86, 0.8)',   // Yellow
+    'rgba(75, 192, 192, 0.8)',   // Teal
+    'rgba(153, 102, 255, 0.8)',  // Purple
+    'rgba(255, 159, 64, 0.8)',   // Orange
+    'rgba(201, 203, 207, 0.8)',  // Gray
+    'rgba(255, 99, 71, 0.8)',    // Tomato
+    'rgba(60, 179, 113, 0.8)',   // Medium Sea Green
+    'rgba(238, 130, 238, 0.8)'   // Violet
+  ];
+
   const filteredSkills = useMemo(() => {
     if (selectedCategory === 'all') {
       return mockSkillsData.trendingSkills;
@@ -73,7 +86,13 @@ export const useSkillsTrends = () => {
 
   const filteredSalaryComparison = useMemo(() => {
     if (selectedCategory === 'all') {
-      return mockSkillsData.salaryComparison;
+      return {
+        ...mockSkillsData.salaryComparison,
+        datasets: [{
+          ...mockSkillsData.salaryComparison.datasets[0],
+          backgroundColor: salaryChartColors.slice(0, mockSkillsData.salaryComparison.labels.length)
+        }]
+      };
     }
 
     const filteredLabels = mockSkillsData.salaryComparison.labels.filter(label => {
@@ -87,11 +106,14 @@ export const useSkillsTrends = () => {
       return mockSkillsData.salaryComparison.datasets[0].data[index];
     });
 
+    const filteredColors = filteredLabels.map((_, index) => salaryChartColors[index % salaryChartColors.length]);
+
     return {
       labels: filteredLabels,
       datasets: [{
         ...mockSkillsData.salaryComparison.datasets[0],
-        data: filteredData
+        data: filteredData,
+        backgroundColor: filteredColors
       }]
     };
   }, [selectedCategory]);
