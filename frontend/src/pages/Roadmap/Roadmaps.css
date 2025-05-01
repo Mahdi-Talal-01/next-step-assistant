@@ -6,7 +6,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
   flex-wrap: wrap;
   gap: 1rem;
 }
@@ -494,10 +494,15 @@
 .timeline-item {
   position: relative;
   padding-bottom: 2rem;
+  transition: all 0.3s ease-in-out;
 }
 
 .timeline-item:last-child {
   padding-bottom: 0;
+}
+
+.timeline-item:hover {
+  transform: translateX(5px);
 }
 
 .timeline-indicator {
@@ -513,6 +518,20 @@
   background-color: var(--light-color);
   padding: 1rem;
   border-radius: 0.375rem;
+  transition: all 0.3s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.timeline-item.completed .timeline-content {
+  border-left: 4px solid #4CAF50;
+}
+
+.timeline-item.in-progress .timeline-content {
+  border-left: 4px solid #FF9800;
+}
+
+.timeline-item.pending .timeline-content {
+  border-left: 4px solid #9E9E9E;
 }
 
 .timeline-header {
@@ -552,11 +571,12 @@
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  margin: 0 2px;
 }
 
 .status-btn:hover {
   background-color: rgba(0, 0, 0, 0.05);
-  color: var(--text-color);
+  transform: scale(1.1);
 }
 
 .status-btn.active {
@@ -1111,4 +1131,24 @@ textarea.form-control {
   .modal-content {
     width: 95%;
   }
+}
+
+.roadmaps-content {
+  margin-top: 2rem;
+}
+
+.resource-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+  padding: 0.25rem 0;
+}
+
+.resource-link:hover {
+  color: var(--primary-dark);
+  transform: translateX(5px);
 } 
