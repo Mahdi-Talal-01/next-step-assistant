@@ -36,7 +36,7 @@
 }
 
 .main-content {
-  padding: 2rem;
+  /* padding: 2rem; */
   min-height: calc(100vh - 70px); /* Full height minus navbar */
   width: 100%;
   box-sizing: border-box;

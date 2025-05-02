@@ -17,7 +17,7 @@ const Navbar = () => {
           <Icon icon="mdi:cog" className="nav-icon" />
         </div>
         <div className="user-profile">
-          <span className="user-name">John Doe</span>
+          <span className="user-name">Mahdi</span>
           <Icon icon="mdi:account" className="nav-icon user-icon" />
         </div>
       </div>
@@ -25,4 +25,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;

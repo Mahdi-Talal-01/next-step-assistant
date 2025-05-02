@@ -9,7 +9,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 const Applications = React.lazy(() => import("./pages/Application"));
 const SkillsTrends = React.lazy(() => import("./pages/SkillsTrends"));
 const Roadmaps = React.lazy(() => import("./pages/Roadmap"));
-const AIChat = React.lazy(() => import("./pages/AIChat"));
+const AIChat = React.lazy(() => import("./pages/AiChat"));
 // const Settings = React.lazy(() => import("./pages/Settings"));
 
 export const router = createBrowserRouter([
