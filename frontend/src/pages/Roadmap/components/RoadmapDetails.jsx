@@ -34,18 +34,11 @@ const RoadmapDetails = ({
 
     setLocalRoadmap(updatedRoadmap);
     setHasUnsavedChanges(true);
+    onTopicStatusChange(topicId, newStatus);
   };
 
   const handleSaveChanges = () => {
-    // Save all topic changes
-    topics.forEach(topic => {
-      onTopicStatusChange(topic.id, topic.status);
-    });
-    
-    // Reset unsaved changes state
     setHasUnsavedChanges(false);
-    
-    // Close the modal after saving
     onClose();
   };
 
@@ -58,6 +51,19 @@ const RoadmapDetails = ({
     const inProgressCount = topics.filter(t => t.status === 'in-progress').length;
     const totalCount = topics.length;
     return Math.round(((completedCount + (inProgressCount * 0.5)) / totalCount) * 100);
+  };
+
+  const getNextStatus = (currentStatus) => {
+    switch (currentStatus) {
+      case 'pending':
+        return 'in-progress';
+      case 'in-progress':
+        return 'completed';
+      case 'completed':
+        return 'pending';
+      default:
+        return 'pending';
+    }
   };
 
   const renderOverviewTab = () => (
@@ -111,9 +117,18 @@ const RoadmapDetails = ({
               <div className="timeline-header">
                 <h4>{topic.name}</h4>
                 <div className="timeline-actions">
-                  <span className={`badge ${getStatusBadgeClass(topic.status)}`}>
-                    {getStatusLabel(topic.status)}
-                  </span>
+                  <button
+                    className={`status-button ${getStatusBadgeClass(topic.status)}`}
+                    onClick={() => handleTopicStatusChange(topic.id, getNextStatus(topic.status))}
+                    title={`Mark as ${getNextStatus(topic.status)}`}
+                  >
+                    <Icon icon={
+                      topic.status === 'completed' ? 'mdi:refresh' :
+                      topic.status === 'in-progress' ? 'mdi:check' :
+                      'mdi:play'
+                    } />
+                    <span>{getStatusLabel(topic.status)}</span>
+                  </button>
                 </div>
               </div>
               {topic.resources && topic.resources.length > 0 && (
@@ -190,19 +205,19 @@ const RoadmapDetails = ({
 
         <div className="modal-tabs">
           <button 
-            className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
           >
             Overview
           </button>
           <button 
-            className={`tab-btn ${activeTab === 'topics' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'topics' ? 'active' : ''}`}
             onClick={() => setActiveTab('topics')}
           >
             Topics
           </button>
           <button 
-            className={`tab-btn ${activeTab === 'resources' ? 'active' : ''}`}
+            className={`tab-button ${activeTab === 'resources' ? 'active' : ''}`}
             onClick={() => setActiveTab('resources')}
           >
             Resources
@@ -215,31 +230,16 @@ const RoadmapDetails = ({
           {activeTab === 'resources' && renderResourcesTab()}
         </div>
 
-        <div className="modal-footer">
-          <button className="btn btn-outline" onClick={onClose}>
-            Close
-          </button>
-          {activeTab === 'overview' ? (
-            <button 
-              className="btn btn-primary"
-              style={{ backgroundColor: color }}
-              onClick={handleStartLearning}
-            >
-              <Icon icon="mdi:play" className="me-2" />
-              Start Learning
+        {hasUnsavedChanges && (
+          <div className="modal-actions">
+            <button className="cancel-button" onClick={onClose}>
+              Cancel
             </button>
-          ) : (
-            <button 
-              className="btn btn-primary"
-              style={{ backgroundColor: color }}
-              onClick={handleSaveChanges}
-              disabled={!hasUnsavedChanges}
-            >
-              <Icon icon="mdi:content-save" className="me-2" />
+            <button className="create-button" onClick={handleSaveChanges}>
               Save Changes
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
