@@ -393,7 +393,7 @@
   padding: 0 1.5rem;
 }
 
-.tab-btn {
+.tab-button {
   position: relative;
   padding: 0.75rem 1.5rem;
   background: none;
@@ -405,16 +405,16 @@
   transition: all 0.2s ease-in-out;
 }
 
-.tab-btn:hover {
+.tab-button:hover {
   color: var(--text-color);
 }
 
-.tab-btn.active {
+.tab-button.active {
   color: var(--primary-color);
   font-weight: 600;
 }
 
-.tab-btn.active::after {
+.tab-button.active::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -426,7 +426,7 @@
   transition: transform 0.2s ease-in-out;
 }
 
-.tab-btn:not(.active)::after {
+.tab-button:not(.active)::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -438,7 +438,7 @@
   transition: transform 0.2s ease-in-out;
 }
 
-.tab-btn:hover::after {
+.tab-button:hover::after {
   transform: scaleX(1);
 }
 
@@ -878,7 +878,7 @@ textarea.form-control {
     padding: 0 1rem;
   }
   
-  .tab-btn {
+  .tab-button {
     padding: 0.75rem 1rem;
     font-size: 0.8rem;
   }
@@ -1275,4 +1275,51 @@ textarea.form-control {
   background-color: var(--primary-color) !important;
   color: white;
   transform: scale(1.1);
+}
+
+/* Status Button Styles */
+.status-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.status-button.badge-success {
+  background-color: #4CAF50;
+}
+
+.status-button.badge-warning {
+  background-color: #FF9800;
+}
+
+.status-button.badge-secondary {
+  background-color: #9E9E9E;
+}
+
+.status-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.status-button:active {
+  transform: translateY(0);
+}
+
+.status-button .icon {
+  font-size: 1.25rem;
+}
+
+/* Timeline Actions */
+.timeline-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 } 
