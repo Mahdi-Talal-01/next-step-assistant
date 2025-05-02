@@ -95,6 +95,10 @@ const Applications = () => {
     handleCloseModal();
   };
 
+  const handleStatusUpdate = (id, newStatus) => {
+    updateApplicationStatus(id, newStatus);
+  };
+
   if (loading) {
     return (
       <div className="loading-container">
@@ -126,13 +130,12 @@ const Applications = () => {
       <ApplicationsContainer
         applications={applications}
         viewMode={viewMode}
-        onStatusUpdate={updateApplicationStatus}
         onDelete={deleteApplication}
         onView={handleViewApplication}
       >
         {applications.map(application => (
           <ApplicationCard
-                  key={application.id}
+            key={application.id}
             application={application}
             onDelete={deleteApplication}
             onView={handleViewApplication}
