@@ -30,8 +30,8 @@ export const navLinks = [
       icon: 'mdi:robot'
     },
     {
-      path: '/settings',
-      label: 'Settings',
-      icon: 'mdi:cog'
+      path: '/profile',
+      label: 'Profile',
+      icon: 'mdi:account'
     }
   ]; 
