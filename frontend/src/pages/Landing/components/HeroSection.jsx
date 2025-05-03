@@ -9,7 +9,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
   
   const handleGetStarted = () => {
-    navigate('/app');
+    navigate('/auth');
   };
 
   return (
