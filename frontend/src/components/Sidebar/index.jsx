@@ -8,28 +8,43 @@ import SidebarHeader from './components/SidebarHeader';
 import UserProfile from './components/UserProfile';
 
 import './Sidebar.css';
-const Sidebar = ({ username = "User Name" }) => {
-  const { isCollapsed, toggleSidebar } = useSidebarState();
+
+/**
+ * Sidebar component for the application
+ * @param {Object} props - Component props
+ * @param {string} props.username - Username to display
+ * @param {boolean} props.isCollapsed - Whether the sidebar is collapsed (controlled from parent)
+ * @param {function} props.onToggle - Function to toggle sidebar state
+ */
+const Sidebar = ({ username = "User Name", isCollapsed, onToggle }) => {
+  // Use internal state if props are not provided
+  const sidebarState = useSidebarState();
+  const isSidebarCollapsed = isCollapsed !== undefined ? isCollapsed : sidebarState.isCollapsed;
+  const toggleSidebar = onToggle || sidebarState.toggleSidebar;
+  
   const navigate = useNavigate();
+  
+  // Navigate to the landing page for logout
   const handleLogout = () => {
+    // Add any logout logic here (clear tokens, etc.)
     navigate('/');
   };
 
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>
       <SidebarHeader 
-        isCollapsed={isCollapsed} 
+        isCollapsed={isSidebarCollapsed} 
         onToggle={toggleSidebar} 
       />
       
       <SidebarNav 
         links={navLinks} 
-        isCollapsed={isCollapsed} 
+        isCollapsed={isSidebarCollapsed} 
       />
       
       <div className="sidebar-footer">
         <div className="logout-container">
-          {isCollapsed ? (
+          {isSidebarCollapsed ? (
             <button className="logout-icon-button" onClick={handleLogout} title="Logout">
               <Icon icon="mdi:logout" />
             </button>
