@@ -1,36 +1,36 @@
 export const navLinks = [
     {
-      path: '/',
+      path: '/app',
       label: 'Dashboard',
       icon: 'mdi:view-dashboard'
     },
     {
-      path: '/gmail-tracker',
+      path: '/app/gmail-tracker',
       label: 'Gmail Tracker',
       icon: 'mdi:email'
     },
     {
-      path: '/applications',
+      path: '/app/applications',
       label: 'Applications',
       icon: 'mdi:file-document-multiple'
     },
     {
-      path: '/skills-trends',
+      path: '/app/skills-trends',
       label: 'Skills Trends',
       icon: 'mdi:trending-up'
     },
     {
-      path: '/roadmaps',
+      path: '/app/roadmaps',
       label: 'Roadmaps',
       icon: 'mdi:map-marker-path'
     },
     {
-      path: '/ai-chat',
+      path: '/app/ai-chat',
       label: 'AI Chat',
       icon: 'mdi:robot'
     },
     {
-      path: '/profile',
+      path: '/app/profile',
       label: 'Profile',
       icon: 'mdi:account'
     }
