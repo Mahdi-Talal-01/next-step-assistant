@@ -19,7 +19,9 @@ const FeatureCard = ({ icon, title, description, index }) => (
       transition={{ duration: 0.5, delay: index * 0.1 + 0.2, type: "spring" }}
       viewport={{ once: true }}
     >
-      <Icon icon={icon} width="48" height="48" />
+      <div className={styles.iconBackground}>
+        <Icon icon={icon} width="32" height="32" />
+      </div>
     </motion.div>
     <motion.h3
       initial={{ opacity: 0 }}
