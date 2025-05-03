@@ -1,6 +1,29 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Icon } from '@iconify/react';
 import styles from '../Landing.module.css';
+
+const ClientAvatar = ({ name }) => {
+  // Generate initials from the name
+  const initials = name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase();
+  
+  // Generate a consistent color based on the name
+  const colors = ['#4f46e5', '#7c3aed', '#8b5cf6', '#6366f1', '#4338ca'];
+  const colorIndex = name.length % colors.length;
+  
+  return (
+    <div 
+      className={styles.clientAvatar}
+      style={{ backgroundColor: colors[colorIndex] }}
+    >
+      {initials}
+    </div>
+  );
+};
 
 const TestimonialCard = ({ quote, author, index }) => (
   <motion.div 
@@ -15,6 +38,8 @@ const TestimonialCard = ({ quote, author, index }) => (
       transition: { duration: 0.3 }
     }}
   >
+    <Icon icon="tabler:quote" className={styles.quoteIcon} />
+    
     <motion.p 
       className={styles.quote}
       initial={{ opacity: 0 }}
@@ -24,15 +49,19 @@ const TestimonialCard = ({ quote, author, index }) => (
     >
       {quote}
     </motion.p>
-    <motion.p 
-      className={styles.author}
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
-      viewport={{ once: true }}
-    >
-      {author}
-    </motion.p>
+    
+    <div className={styles.testimonialFooter}>
+      <ClientAvatar name={author} />
+      <motion.p 
+        className={styles.author}
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
+        viewport={{ once: true }}
+      >
+        {author}
+      </motion.p>
+    </div>
   </motion.div>
 );
 
@@ -40,7 +69,7 @@ const TestimonialsSection = () => {
   const testimonials = [
     {
       quote: '"NextStep Assistant helped me track 50+ job applications effortlessly."',
-      author: ' Software Engineer'
+      author: 'Software Engineer'
     },
     {
       quote: '"As a recruiter, writing job descriptions has never been easier with NextStep Assistant."',
