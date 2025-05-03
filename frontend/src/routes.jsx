@@ -13,6 +13,7 @@ const Roadmaps = React.lazy(() => import("./pages/Roadmap"));
 const AIChat = React.lazy(() => import("./pages/AiChat"));
 const Profile = React.lazy(() => import("./pages/Profile"));
 const Auth = React.lazy(() => import("./pages/Auth"));
+const JobDescriptionHelper = React.lazy(() => import("./pages/JobDescriptionHelper"));
 // const Settings = React.lazy(() => import("./pages/Settings"));
 
 export const router = createBrowserRouter([
@@ -76,6 +77,14 @@ export const router = createBrowserRouter([
         element: (
           <React.Suspense fallback={<div>Loading...</div>}>
             <AIChat />
+          </React.Suspense>
+        ),
+      },
+      {
+        path: "job-description-helper",
+        element: (
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <JobDescriptionHelper />
           </React.Suspense>
         ),
       },
