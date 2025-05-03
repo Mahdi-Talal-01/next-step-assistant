@@ -4,6 +4,7 @@ import GmailTracker from "./pages/EmailTracker";
 import MainLayout from "./layouts/MainLayout.jsx";
 import Dashboard from "./pages/Dashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
+import Landing from "./pages/Landing";
 
 // Lazy load other pages
 const Applications = React.lazy(() => import("./pages/Application"));
@@ -16,6 +17,11 @@ const Profile = React.lazy(() => import("./pages/Profile"));
 export const router = createBrowserRouter([
   {
     path: "/",
+    element: <Landing />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/app",
     element: <MainLayout />,
     errorElement: <ErrorBoundary />,
     children: [
