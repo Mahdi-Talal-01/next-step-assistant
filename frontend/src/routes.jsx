@@ -10,6 +10,7 @@ const Applications = React.lazy(() => import("./pages/Application"));
 const SkillsTrends = React.lazy(() => import("./pages/SkillsTrends"));
 const Roadmaps = React.lazy(() => import("./pages/Roadmap"));
 const AIChat = React.lazy(() => import("./pages/AiChat"));
+const Profile = React.lazy(() => import("./pages/Profile"));
 // const Settings = React.lazy(() => import("./pages/Settings"));
 
 export const router = createBrowserRouter([
@@ -62,14 +63,14 @@ export const router = createBrowserRouter([
           </React.Suspense>
         ),
       },
-      // {
-      //   path: "settings",
-      //   element: (
-      //     <React.Suspense fallback={<div>Loading...</div>}>
-      //       <Settings />
-      //     </React.Suspense>
-      //   ),
-      // },
+      {
+        path: "profile",
+        element: (
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <Profile />
+          </React.Suspense>
+        ),
+      },
     ],
   },
 ]);
