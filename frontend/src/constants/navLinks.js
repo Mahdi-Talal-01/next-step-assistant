@@ -30,6 +30,11 @@ export const navLinks = [
       icon: 'mdi:robot'
     },
     {
+      path: '/app/job-description-helper',
+      label: 'Job Description Helper',
+      icon: 'mdi:file-document-edit'
+    },
+    {
       path: '/app/profile',
       label: 'Profile',
       icon: 'mdi:account'
