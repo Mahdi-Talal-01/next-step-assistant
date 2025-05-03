@@ -1,0 +1,62 @@
+.status-manager {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--surface-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-options {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.status-option:hover {
+  background: var(--hover-color);
+  transform: translateY(-1px);
+}
+
+.status-option.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.status-option .icon {
+  font-size: 1.2rem;
+}
+
+/* Status-specific colors */
+.status-option[data-status="applied"] {
+  border-left: 3px solid var(--applied-color);
+}
+
+.status-option[data-status="interview"] {
+  border-left: 3px solid var(--interview-color);
+}
+
+.status-option[data-status="assessment"] {
+  border-left: 3px solid var(--assessment-color);
+}
+
+.status-option[data-status="offer"] {
+  border-left: 3px solid var(--offer-color);
+}
+
+.status-option[data-status="rejected"] {
+  border-left: 3px solid var(--rejected-color);
+} 

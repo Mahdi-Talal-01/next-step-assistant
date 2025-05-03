@@ -1,22 +1,45 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
-import { formatDate, getStatusBadgeClass, getStatusLabel } from '../utils/formatUtils';
 import '../Application.css';
 
-const ApplicationModal = ({ application, isNew, onClose, onUpdate, onDelete }) => {
+const STATUS_OPTIONS = [
+  { value: 'applied', label: 'Applied', icon: 'mdi:send' },
+  { value: 'interview', label: 'Interview', icon: 'mdi:calendar' },
+  { value: 'assessment', label: 'Assessment', icon: 'mdi:file-document' },
+  { value: 'offer', label: 'Offer', icon: 'mdi:handshake' },
+  { value: 'rejected', label: 'Rejected', icon: 'mdi:close' }
+];
+
+const ApplicationModal = ({
+  application,
+  isNew,
+  onClose,
+  onUpdate,
+  onDelete
+}) => {
+  const [formData, setFormData] = useState(application);
   const [isEditing, setIsEditing] = useState(isNew);
-  const [editedApplication, setEditedApplication] = useState({ ...application });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    setEditedApplication({ ...application });
-  }, [application]);
+    setFormData(application);
+    setIsEditing(isNew);
+  }, [application, isNew]);
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditedApplication(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleStatusChange = (newStatus) => {
+    setFormData(prev => ({
+      ...prev,
+      status: newStatus,
+      lastUpdated: new Date().toISOString().split('T')[0]
     }));
   };
 
@@ -28,30 +51,15 @@ const ApplicationModal = ({ application, isNew, onClose, onUpdate, onDelete }) =
       .filter(skill => skill.length > 0) // Remove empty strings
       .filter((skill, index, self) => self.indexOf(skill) === index); // Remove duplicates
 
-    setEditedApplication(prev => ({
+    setFormData(prev => ({
       ...prev,
       skills: skillsArray
     }));
   };
 
-  const handleSkillsInput = (e) => {
-    // Allow direct input of skills string
-    const { value } = e.target;
-    setEditedApplication(prev => ({
-      ...prev,
-      _skillsInput: value // Store raw input
-    }));
-
-    // Process skills only if there's a comma or space
-    if (value.includes(',') || value.includes(' ')) {
-      handleSkillsChange(e);
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUpdate(editedApplication);
-    onClose();
+    onUpdate(formData);
   };
 
   const handleDelete = () => {
@@ -67,25 +75,17 @@ const ApplicationModal = ({ application, isNew, onClose, onUpdate, onDelete }) =
     setShowDeleteConfirm(false);
   };
 
-  const handleCancel = () => {
-    if (isNew) {
-      onClose();
-    } else {
-      setIsEditing(false);
-      setEditedApplication({ ...application });
-    }
-  };
-
-  const handleClose = () => {
-    onClose();
-  };
-
   return (
-    <div className="modal-overlay" onClick={handleClose}>
+    <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{isNew ? 'Add New Application' : 'Application Details'}</h2>
-          <button className="modal-close" onClick={handleClose}>
+          {!isNew && !isEditing && (
+            <button className="btn btn-primary" onClick={() => setIsEditing(true)}>
+              Edit
+            </button>
+          )}
+          <button className="modal-close" onClick={onClose}>
             <Icon icon="mdi:close" />
           </button>
         </div>
@@ -104,144 +104,244 @@ const ApplicationModal = ({ application, isNew, onClose, onUpdate, onDelete }) =
               </div>
             </div>
           ) : (
-            <div className="modal-section">
-              {(isEditing || isNew) ? (
-                <form onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <label>Company</label>
-                    <input
-                      type="text"
-                      name="company"
-                      value={editedApplication.company}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Position</label>
-                    <input
-                      type="text"
-                      name="position"
-                      value={editedApplication.position}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Location</label>
-                    <input
-                      type="text"
-                      name="location"
-                      value={editedApplication.location}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Job Type</label>
-                    <select
-                      name="jobType"
-                      value={editedApplication.jobType}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      required
+            <form onSubmit={handleSubmit}>
+              <div className="modal-section">
+                <h3>Status</h3>
+                <div className="status-options">
+                  {STATUS_OPTIONS.map((status) => (
+                    <button
+                      key={status.value}
+                      type="button"
+                      className={`status-option ${formData.status === status.value ? 'active' : ''}`}
+                      onClick={() => handleStatusChange(status.value)}
+                      disabled={!isEditing}
+                      data-status={status.value}
                     >
-                      <option value="Full-time">Full Time</option>
-                      <option value="Part-time">Part Time</option>
-                      <option value="Contract">Contract</option>
-                      <option value="Internship">Internship</option>
-                    </select>
+                      <Icon icon={status.icon} />
+                      <span>{status.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="modal-section">
+                <h3>
+                  <Icon icon="mdi:building" />
+                  Company Information
+                </h3>
+                <div className="form-group">
+                  <label>Company</label>
+                  <input
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={!isEditing}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Position</label>
+                  <input
+                    type="text"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={!isEditing}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={!isEditing}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="modal-section">
+                <h3>
+                  <Icon icon="mdi:briefcase" />
+                  Job Details
+                </h3>
+                <div className="form-group">
+                  <label>Job Type</label>
+                  <select
+                    name="jobType"
+                    value={formData.jobType}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={!isEditing}
+                    required
+                  >
+                    <option value="Full-time">Full Time</option>
+                    <option value="Part-time">Part Time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Internship">Internship</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Applied Date</label>
+                  <input
+                    type="date"
+                    name="appliedDate"
+                    value={formData.appliedDate}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={!isEditing}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Salary Range (Optional)</label>
+                  <input
+                    type="text"
+                    name="salary"
+                    value={formData.salary || ''}
+                    onChange={handleChange}
+                    className="form-control"
+                    placeholder="e.g. $80,000 - $100,000"
+                    disabled={!isEditing}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Job URL (Optional)</label>
+                  <input
+                    type="url"
+                    name="jobUrl"
+                    value={formData.jobUrl || ''}
+                    onChange={handleChange}
+                    className="form-control"
+                    placeholder="https://..."
+                    disabled={!isEditing}
+                  />
+                </div>
+              </div>
+
+              <div className="modal-section">
+                <h3>
+                  <Icon icon="mdi:star" />
+                  Skills
+                </h3>
+                <div className="form-group">
+                  <label>Skills (comma separated)</label>
+                  <input
+                    type="text"
+                    name="skills"
+                    value={formData.skills.join(', ')}
+                    onChange={(e) => {
+                      const skills = e.target.value.split(',').map(skill => skill.trim()).filter(skill => skill);
+                      setFormData(prev => ({ ...prev, skills }));
+                    }}
+                    className="form-control"
+                    placeholder="React, JavaScript, Node.js"
+                    disabled={!isEditing}
+                  />
+                  <div className="skills-preview">
+                    {formData.skills.map((skill, index) => (
+                      <span key={index} className="skill-tag">
+                        {skill}
+                        {isEditing && (
+                          <button
+                            type="button"
+                            className="remove-skill"
+                            onClick={() => {
+                              const newSkills = [...formData.skills];
+                              newSkills.splice(index, 1);
+                              setFormData(prev => ({ ...prev, skills: newSkills }));
+                            }}
+                          >
+                            <Icon icon="mdi:close-circle" />
+                          </button>
+                        )}
+                      </span>
+                    ))}
                   </div>
-                  <div className="form-group">
-                    <label>Salary Range (Optional)</label>
-                    <input
-                      type="text"
-                      name="salary"
-                      value={editedApplication.salary}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      placeholder="e.g. $80,000 - $100,000"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Job URL (Optional)</label>
-                    <input
-                      type="url"
-                      name="jobUrl"
-                      value={editedApplication.jobUrl}
-                      onChange={handleInputChange}
-                      className="form-control"
-                      placeholder="https://..."
-                    />
-                  </div>
-                </form>
-              ) : (
-                <>
-                  <div className="detail-row">
-                    <span className="detail-label">Company</span>
-                    <span className="detail-value">{application.company}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Position</span>
-                    <span className="detail-value">{application.position}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Location</span>
-                    <span className="detail-value">{application.location}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Job Type</span>
-                    <span className="detail-value">{application.jobType}</span>
-                  </div>
-                  {application.salary && (
-                    <div className="detail-row">
-                      <span className="detail-label">Salary Range</span>
-                      <span className="detail-value">{application.salary}</span>
-                    </div>
-                  )}
-                  {application.jobUrl && (
-                    <div className="detail-row">
-                      <span className="detail-label">Job URL</span>
-                      <a href={application.jobUrl} target="_blank" rel="noopener noreferrer" className="job-link">
-                        {application.jobUrl}
-                      </a>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="modal-footer">
-          {!showDeleteConfirm && (
-            <>
-              <button className="btn btn-outline" onClick={handleCancel}>
-                {isEditing ? 'Cancel' : 'Close'}
-              </button>
-              {!isNew && (
-                <button className="btn btn-danger" onClick={handleDelete}>
-                  Delete
-                </button>
-              )}
+                </div>
+              </div>
+
+              <div className="modal-section">
+                <h3>
+                  <Icon icon="mdi:note-text" />
+                  Notes
+                </h3>
+                <div className="form-group">
+                  <textarea
+                    name="notes"
+                    value={formData.notes || ''}
+                    onChange={handleChange}
+                    className="form-control"
+                    placeholder="Add any additional notes about this application..."
+                    rows="4"
+                    disabled={!isEditing}
+                  ></textarea>
+                </div>
+              </div>
+              
               {isEditing && (
-                <button className="btn btn-primary" onClick={handleSubmit}>
-                  {isNew ? 'Add Application' : 'Save Changes'}
-                </button>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-outline" onClick={() => {
+                    if (isNew) {
+                      onClose();
+                    } else {
+                      setIsEditing(false);
+                      setFormData(application);
+                    }
+                  }}>
+                    Cancel
+                  </button>
+                  {!isNew && (
+                    <button type="button" className="btn btn-danger" onClick={handleDelete}>
+                      Delete
+                    </button>
+                  )}
+                  <button type="submit" className="btn btn-primary">
+                    {isNew ? 'Add Application' : 'Save Changes'}
+                  </button>
+                </div>
               )}
-              {!isEditing && !isNew && (
-                <button className="btn btn-primary" onClick={() => setIsEditing(true)}>
-                  Edit
-                </button>
+              
+              {!isEditing && (
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-outline" onClick={onClose}>
+                    Close
+                  </button>
+                </div>
               )}
-            </>
+            </form>
           )}
         </div>
       </div>
     </div>
   );
+};
+
+ApplicationModal.propTypes = {
+  application: PropTypes.shape({
+    id: PropTypes.number,
+    company: PropTypes.string.isRequired,
+    position: PropTypes.string.isRequired,
+    location: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    appliedDate: PropTypes.string.isRequired,
+    jobType: PropTypes.string.isRequired,
+    skills: PropTypes.arrayOf(PropTypes.string).isRequired,
+    notes: PropTypes.string,
+    jobUrl: PropTypes.string,
+    salary: PropTypes.string
+  }).isRequired,
+  isNew: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired
 };
 
 export default ApplicationModal; 
