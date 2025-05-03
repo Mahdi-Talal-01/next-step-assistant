@@ -25,7 +25,7 @@ const Navbar = () => {
   }, [scrolled]);
   
   const handleLogin = () => {
-    navigate('/app');
+    navigate('/auth');
   };
 
   const toggleMobileMenu = () => {
