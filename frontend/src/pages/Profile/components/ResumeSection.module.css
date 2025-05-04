@@ -1,0 +1,201 @@
+.resumeSection {
+  width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+  margin: 0;
+}
+
+.resumeContent {
+  width: 100%;
+}
+
+/* File Upload Section */
+.uploadSection {
+  width: 100%;
+  padding: 2rem;
+}
+
+.uploadBox {
+  border: 2px dashed var(--border-color, #ddd);
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--background-secondary, #f5f7fa);
+}
+
+.uploadBox:hover {
+  border-color: var(--primary-color, #3699ff);
+  background-color: rgba(54, 153, 255, 0.05);
+}
+
+.uploadIcon {
+  font-size: 3rem;
+  color: var(--primary-color, #3699ff);
+  margin-bottom: 1.5rem;
+}
+
+.uploadTitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary, #333);
+  margin: 0 0 1rem;
+}
+
+.uploadText {
+  font-size: 1rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 0.75rem;
+  text-align: center;
+}
+
+.uploadHelp {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Resume File Display */
+.resumeFile {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: var(--background-secondary, #f5f7fa);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.fileInfo {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color, #ddd);
+}
+
+.fileIcon {
+  font-size: 3rem;
+  color: #d14836;  /* PDF red color */
+}
+
+.pdfIcon {
+  font-size: 3rem;
+}
+
+.fileDetails {
+  flex: 1;
+}
+
+.fileName {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-primary, #333);
+}
+
+.fileDate {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+}
+
+.fileActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.viewButton, .replaceButton, .downloadButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.viewButton {
+  background-color: var(--primary-color, #3699ff);
+  color: white;
+  border: none;
+}
+
+.viewButton:hover {
+  background-color: var(--primary-dark, #1a86ff);
+  box-shadow: 0 4px 10px rgba(54, 153, 255, 0.3);
+}
+
+.replaceButton {
+  background: none;
+  border: 1px solid var(--border-color, #ddd);
+  color: var(--text-secondary, #666);
+}
+
+.replaceButton:hover {
+  background-color: var(--hover-color, #e9ecef);
+  color: var(--text-primary, #333);
+}
+
+.downloadButton {
+  background-color: var(--success-color, #4caf50);
+  color: white;
+  border: none;
+}
+
+.downloadButton:hover {
+  background-color: var(--success-dark, #3d8b40);
+  box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+}
+
+.actionIcon {
+  font-size: 1.2rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .fileInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .fileActions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .viewButton, .replaceButton, .downloadButton {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .uploadBox {
+    padding: 2rem 1rem;
+  }
+} 
