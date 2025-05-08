@@ -2,22 +2,53 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 class UserRepository {
-  async create(userData) {
-    return await prisma.user.create({
-      data: userData
-    });
+  async createUser(userData) {
+    try {
+      const user = await prisma.user.create({
+        data: {
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
+          profile: {
+            create: {} // This will create an empty profile
+          }
+        },
+        include: {
+          profile: true
+        }
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findByEmail(email) {
-    return await prisma.user.findUnique({
-      where: { email }
-    });
+    try {
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: {
+          profile: true
+        }
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findById(id) {
-    return await prisma.user.findUnique({
-      where: { id }
-    });
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id },
+        include: {
+          profile: true
+        }
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 
