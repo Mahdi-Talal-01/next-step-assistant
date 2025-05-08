@@ -1,19 +1,17 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
-// Create axios instance with default config
-const axiosInstance = axios.create({
-  baseURL: API_URL,
+const instance = axios.create({
+  baseURL: 'http://localhost:3000/api',
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
 // Request interceptor
-axiosInstance.interceptors.request.use(
+instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,57 +23,39 @@ axiosInstance.interceptors.request.use(
 );
 
 // Response interceptor
-axiosInstance.interceptors.response.use(
-  (response) => response,
+instance.interceptors.response.use(
+  (response) => {
+    // Return the entire response object
+    return response;
+  },
   (error) => {
-    // Handle 401 Unauthorized
     if (error.response?.status === 401) {
-      // Only redirect if we're not already on the auth page
-      if (!window.location.pathname.includes('/auth')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/auth';
-      }
+      // Handle unauthorized access
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      window.location.href = '/auth';
     }
     return Promise.reject(error);
   }
 );
 
-/**
- * Generic request function
- * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
- * @param {string} url - API endpoint
- * @param {object} data - Request body (for POST, PUT)
- * @param {object} params - URL parameters (for GET)
- * @returns {Promise} - Response data
- */
-const request = async ({ method = 'GET', url, data = null, params = null }) => {
+const request = async (method, url, data = null, config = {}) => {
   try {
-    const response = await axiosInstance({
+    const response = await instance({
       method,
       url,
       data,
-      params,
+      ...config,
     });
-
     return response.data;
   } catch (error) {
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    if (error.message) {
-      throw new Error(error.message);
-    }
-    throw new Error('An unexpected error occurred');
+    throw error.response?.data || error;
   }
 };
 
-// Convenience methods
-const BaseApi = {
-  get: (url, params) => request({ method: 'GET', url, params }),
-  post: (url, data) => request({ method: 'POST', url, data }),
-  put: (url, data) => request({ method: 'PUT', url, data }),
-  delete: (url) => request({ method: 'DELETE', url }),
+export default {
+  get: (url, config) => request('get', url, null, config),
+  post: (url, data, config) => request('post', url, data, config),
+  put: (url, data, config) => request('put', url, data, config),
+  delete: (url, config) => request('delete', url, null, config),
 };
-
-export default BaseApi;
