@@ -1,13 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Icon } from '@iconify/react';
-import { useSidebarState } from './hooks/useSidebarState';
-import { navLinks } from '../../constants/navLinks';
-import SidebarNav from './components/SidebarNav';
-import SidebarHeader from './components/SidebarHeader';
-import UserProfile from './components/UserProfile';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Icon } from "@iconify/react";
+import { useSidebarState } from "./hooks/useSidebarState";
+import { navLinks } from "../../constants/navLinks";
+import SidebarNav from "./components/SidebarNav";
+import SidebarHeader from "./components/SidebarHeader";
+import UserProfile from "./components/UserProfile";
 
-import './Sidebar.css';
+import "./Sidebar.css";
 
 /**
  * Sidebar component for the application
@@ -19,33 +19,35 @@ import './Sidebar.css';
 const Sidebar = ({ username = "User Name", isCollapsed, onToggle }) => {
   // Use internal state if props are not provided
   const sidebarState = useSidebarState();
-  const isSidebarCollapsed = isCollapsed !== undefined ? isCollapsed : sidebarState.isCollapsed;
+  const isSidebarCollapsed =
+    isCollapsed !== undefined ? isCollapsed : sidebarState.isCollapsed;
   const toggleSidebar = onToggle || sidebarState.toggleSidebar;
-  
+
   const navigate = useNavigate();
-  
+
   // Navigate to the landing page for logout
   const handleLogout = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/');
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   return (
-    <div className={`sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>
-      <SidebarHeader 
-        isCollapsed={isSidebarCollapsed} 
-        onToggle={toggleSidebar} 
+    <div className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}>
+      <SidebarHeader
+        isCollapsed={isSidebarCollapsed}
+        onToggle={toggleSidebar}
       />
-      
-      <SidebarNav 
-        links={navLinks} 
-        isCollapsed={isSidebarCollapsed} 
-      />
-      
+
+      <SidebarNav links={navLinks} isCollapsed={isSidebarCollapsed} />
+
       <div className="sidebar-footer">
         <div className="logout-container">
           {isSidebarCollapsed ? (
-            <button className="logout-icon-button" onClick={handleLogout} title="Logout">
+            <button
+              className="logout-icon-button"
+              onClick={handleLogout}
+              title="Logout"
+            >
               <Icon icon="mdi:logout" />
             </button>
           ) : (
