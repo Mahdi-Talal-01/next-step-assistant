@@ -27,7 +27,8 @@ const Sidebar = ({ username = "User Name", isCollapsed, onToggle }) => {
 
   // Navigate to the landing page for logout
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
     navigate("/");
   };
 
