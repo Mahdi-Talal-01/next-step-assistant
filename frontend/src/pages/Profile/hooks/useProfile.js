@@ -1,138 +1,107 @@
-import { useState, useEffect } from 'react';
-import { mockProfileData } from '../utils/mockData';
-import { ProfileService } from '../services/ProfileService';
+import { useState, useEffect, useCallback } from 'react';
+import profileService from '../services/profileService';
 
-const useProfile = () => {
+export const useProfile = () => {
   const [profile, setProfile] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setIsLoading(true);
-        // In a real application, this would be an API call
-        // const response = await ProfileService.getProfile();
-        // setProfile(response.data);
-        
-        // For demo purposes, we're using mock data with a timeout
-        setTimeout(() => {
-          setProfile(mockProfileData);
-          setIsLoading(false);
-        }, 1000);
-      } catch (err) {
-        setError(err.message || 'Failed to load profile');
-        setIsLoading(false);
+  const fetchProfile = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await profileService.getProfile();
+      console.log('Profile Response:', response); // Debug log
+      
+      if (response && response.data) {
+        setProfile(response.data);
+      } else {
+        throw new Error('Invalid profile data received');
       }
-    };
-
-    fetchProfile();
+    } catch (err) {
+      console.error('Profile Error:', err); // Debug log
+      setError(err.message || 'Failed to fetch profile');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Update profile information
-  const updateProfileInfo = async (updatedInfo) => {
+  const updateProfile = useCallback(async (profileData) => {
     try {
-      setIsLoading(true);
-      // In a real application, this would be an API call
-      // await ProfileService.updateProfile(updatedInfo);
-      
-      // For demo purposes, we're updating the state directly
-      setProfile(prevProfile => ({
-        ...prevProfile,
-        ...updatedInfo
-      }));
-      
-      setIsLoading(false);
-      return { success: true };
+      setLoading(true);
+      setError(null);
+      const response = await profileService.updateProfile(profileData);
+      if (response && response.data) {
+        setProfile(response.data);
+        return response;
+      } else {
+        throw new Error('Failed to update profile');
+      }
     } catch (err) {
       setError(err.message || 'Failed to update profile');
-      setIsLoading(false);
-      return { success: false, error: err.message };
+      throw err;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  // Update avatar
-  const updateAvatar = async (file) => {
+  const uploadCV = useCallback(async (file) => {
     try {
-      setIsLoading(true);
-      // In a real application, this would be an API call to upload the file
-      // const response = await ProfileService.uploadAvatar(file);
-      
-      // For demo purposes, create a temporary URL for the uploaded file
-      const imageUrl = URL.createObjectURL(file);
-      
-      setProfile(prevProfile => ({
-        ...prevProfile,
-        avatar: imageUrl
-      }));
-      
-      setIsLoading(false);
-      return { success: true, imageUrl };
+      setLoading(true);
+      setError(null);
+      const response = await profileService.uploadCV(file);
+      if (response && response.data) {
+        setProfile(prev => ({
+          ...prev,
+          resumeUrl: response.data.resumeUrl,
+          resumeName: response.data.resumeName
+        }));
+        return response;
+      } else {
+        throw new Error('Failed to upload CV');
+      }
     } catch (err) {
-      setError(err.message || 'Failed to update avatar');
-      setIsLoading(false);
-      return { success: false, error: err.message };
+      setError(err.message || 'Failed to upload CV');
+      throw err;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  // Update skills
-  const updateSkills = async (skills) => {
+  const deleteCV = useCallback(async () => {
     try {
-      setIsLoading(true);
-      // In a real application, this would be an API call
-      // await ProfileService.updateSkills(skills);
-      
-      setProfile(prevProfile => ({
-        ...prevProfile,
-        skills
-      }));
-      
-      setIsLoading(false);
-      return { success: true };
+      setLoading(true);
+      setError(null);
+      const response = await profileService.deleteCV();
+      if (response && response.data) {
+        setProfile(prev => ({
+          ...prev,
+          resumeUrl: null,
+          resumeName: null
+        }));
+      } else {
+        throw new Error('Failed to delete CV');
+      }
     } catch (err) {
-      setError(err.message || 'Failed to update skills');
-      setIsLoading(false);
-      return { success: false, error: err.message };
+      setError(err.message || 'Failed to delete CV');
+      throw err;
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  // Upload resume
-  const uploadResume = async (file) => {
-    try {
-      setIsLoading(true);
-      // In a real application, this would be an API call to upload the file
-      // const response = await ProfileService.uploadResume(file);
-      
-      // For demo purposes, create a temporary URL for the uploaded file
-      const resumeUrl = URL.createObjectURL(file);
-      const resumeName = file.name;
-      
-      setProfile(prevProfile => ({
-        ...prevProfile,
-        resume: {
-          url: resumeUrl,
-          name: resumeName,
-          updatedAt: new Date().toISOString()
-        }
-      }));
-      
-      setIsLoading(false);
-      return { success: true, resumeUrl };
-    } catch (err) {
-      setError(err.message || 'Failed to upload resume');
-      setIsLoading(false);
-      return { success: false, error: err.message };
-    }
-  };
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   return {
     profile,
-    isLoading,
+    loading,
     error,
-    updateProfileInfo,
-    updateAvatar,
-    updateSkills,
-    uploadResume
+    updateProfile,
+    uploadCV,
+    deleteCV,
+    refreshProfile: fetchProfile
   };
 };
 

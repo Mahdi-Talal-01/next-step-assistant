@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { Icon } from '@iconify/react';
 import styles from '../Auth.module.css';
 
-const AuthForm = ({ isLogin, onSubmit, loading, error }) => {
+const AuthForm = ({ onSubmit, onGoogleLogin, error, loading }) => {
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,78 +24,101 @@ const AuthForm = ({ isLogin, onSubmit, loading, error }) => {
   };
 
   return (
-    <form className={styles.authForm} onSubmit={handleSubmit}>
-      {!isLogin && (
+    <div className={styles.authForm}>
+      <h2>{isLogin ? 'Welcome Back!' : 'Create Account'}</h2>
+      <p className={styles.subtitle}>
+        {isLogin ? 'Sign in to continue your journey' : 'Start your journey with us'}
+      </p>
+
+      <form onSubmit={handleSubmit}>
+        {!isLogin && (
+          <div className={styles.formGroup}>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className={styles.input}
+              placeholder="Full Name"
+              required
+              disabled={loading}
+            />
+          </div>
+        )}
+
         <div className={styles.formGroup}>
           <input
-            type="text"
-            name="name"
-            value={formData.name}
+            type="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             className={styles.input}
-            placeholder="Full Name"
+            placeholder="Email Address"
             required
             disabled={loading}
           />
         </div>
-      )}
 
-      <div className={styles.formGroup}>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          className={styles.input}
-          placeholder="Email Address"
-          required
-          disabled={loading}
-        />
-      </div>
-
-      <div className={styles.formGroup}>
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          className={styles.input}
-          placeholder="Password"
-          required
-          disabled={loading}
-          minLength={6}
-        />
-      </div>
-
-      {error && (
-        <div className={styles.error}>
-          <svg
-            className={styles.errorIcon}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {error}
+        <div className={styles.formGroup}>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className={styles.input}
+            placeholder="Password"
+            required
+            disabled={loading}
+            minLength={6}
+          />
         </div>
-      )}
+
+        {error && (
+          <div className={styles.error}>
+            <Icon icon="mdi:alert-circle" className={styles.errorIcon} />
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          className={styles.submitButton}
+          disabled={loading}
+        >
+          {loading ? (
+            <div className={styles.loadingSpinner} />
+          ) : (
+            isLogin ? 'Sign In' : 'Create Account'
+          )}
+        </button>
+      </form>
+
+      <div className={styles.divider}>
+        <span>or</span>
+      </div>
 
       <button
-        type="submit"
-        className={styles.submitButton}
+        type="button"
+        className={styles.googleButton}
+        onClick={onGoogleLogin}
         disabled={loading}
       >
-        {loading ? (
-          <div className={styles.loadingSpinner} />
-        ) : (
-          isLogin ? 'Sign In' : 'Create Account'
-        )}
+        <Icon icon="mdi:google" className={styles.googleIcon} />
+        Continue with Google
       </button>
-    </form>
+
+      <p className={styles.toggleText}>
+        {isLogin ? "Don't have an account? " : 'Already have an account? '}
+        <button
+          type="button"
+          className={styles.toggleButton}
+          onClick={() => setIsLogin(!isLogin)}
+          disabled={loading}
+        >
+          {isLogin ? 'Sign Up' : 'Sign In'}
+        </button>
+      </p>
+    </div>
   );
 };
 

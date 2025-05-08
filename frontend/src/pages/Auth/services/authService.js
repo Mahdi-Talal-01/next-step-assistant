@@ -37,24 +37,39 @@ class AuthService {
   setAuthData(data) {
     if (!data) return;
     
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-    }
-    if (data.user) {
-      localStorage.setItem('user', JSON.stringify(data.user));
+    try {
+      if (data.token) {
+        localStorage.setItem('access_token', data.token);
+        console.log('Token saved in setAuthData:', data.token);
+      }
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('User data saved in setAuthData:', data.user);
+      }
+    } catch (error) {
+      console.error('Error saving auth data:', error);
+      this.clearAuthData();
+      throw error;
     }
   }
 
   clearAuthData() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    try {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      console.log('Auth data cleared');
+    } catch (error) {
+      console.error('Error clearing auth data:', error);
+    }
   }
 
   getAuthData() {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       const userStr = localStorage.getItem('user');
       const user = userStr ? JSON.parse(userStr) : null;
+      
+      console.log('Getting auth data:', { token: !!token, user: !!user });
       
       return {
         token,
@@ -62,6 +77,7 @@ class AuthService {
         isAuthenticated: !!token && !!user
       };
     } catch (error) {
+      console.error('Error getting auth data:', error);
       this.clearAuthData();
       return {
         token: null,
@@ -73,6 +89,7 @@ class AuthService {
 
   isAuthenticated() {
     const { isAuthenticated } = this.getAuthData();
+    console.log('Checking authentication:', isAuthenticated);
     return isAuthenticated;
   }
 }
