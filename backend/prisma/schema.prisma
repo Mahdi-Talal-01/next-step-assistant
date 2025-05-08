@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,10 +11,30 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  password      String?   // Optional for OAuth users
+  avatar        String?
+  provider      String    @default("local") // "local" or "google"
+  providerId    String?   // Google ID for OAuth users
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  profile       Profile?
+}
+
+model Profile {
+  id          String    @id @default(uuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  bio         String?
+  location    String?
+  phone       String?
+  linkedin    String?
+  github      String?
+  website     String?
+  resumeUrl   String?
+  resumeName  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 } 
