@@ -1,26 +1,36 @@
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const userRoutes = require('./routes/userRoutes');
+const profileRoutes = require('./routes/profileRoutes');
+const oauthRoutes = require('./routes/oauthRoutes');
 
 const app = express();
 
-// Verify environment variables are loaded
-console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Set' : 'Not Set');
-console.log('Environment Variables:', {
-  JWT_SECRET: process.env.JWT_SECRET,
-  NODE_ENV: process.env.NODE_ENV,
-  PORT: process.env.PORT
-});
-
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Mount OAuth routes at root level for the redirect
+app.use('/', oauthRoutes);
+
+// Mount OAuth routes under /api/auth for the API endpoints
+app.use('/api/auth', oauthRoutes);
+
+// Serve static files from storage directory
+app.use('/storage', express.static(path.join(__dirname, '../storage')));
+
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/profiles', profileRoutes);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-}); 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Something went wrong!'
+  });
+});
+
+module.exports = app; 
