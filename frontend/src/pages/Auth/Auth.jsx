@@ -41,6 +41,12 @@ const Auth = () => {
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h1>
         
+        <p className={styles.subtitle}>
+          {isLogin 
+            ? 'Sign in to continue your journey'
+            : 'Join us and start your journey today'}
+        </p>
+
         <AuthForm
           isLogin={isLogin}
           onSubmit={handleSubmit}
@@ -55,6 +61,7 @@ const Auth = () => {
               type="button"
               onClick={() => setIsLogin(!isLogin)}
               className={styles.switchButton}
+              disabled={loading}
             >
               {isLogin ? 'Register' : 'Login'}
             </button>
