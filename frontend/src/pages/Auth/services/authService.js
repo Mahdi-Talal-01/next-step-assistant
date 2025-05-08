@@ -5,12 +5,13 @@ class AuthService {
   async register(userData) {
     try {
       const response = await BaseApi.post('/users/register', userData);
-      if (response.success) {
-        this.setAuthToken(response.data.token);
+      if (response.success && response.data) {
+        this.setAuthData(response.data);
         return response.data;
       }
-      throw new Error(response.message);
+      throw new Error(response.message || 'Registration failed');
     } catch (error) {
+      this.clearAuthData();
       throw error;
     }
   }
@@ -18,30 +19,61 @@ class AuthService {
   async login(credentials) {
     try {
       const response = await BaseApi.post('/users/login', credentials);
-      if (response.success) {
-        this.setAuthToken(response.data.token);
+      if (response.success && response.data) {
+        this.setAuthData(response.data);
         return response.data;
       }
-      throw new Error(response.message);
+      throw new Error(response.message || 'Login failed');
     } catch (error) {
+      this.clearAuthData();
       throw error;
     }
   }
 
   logout() {
-    localStorage.removeItem('token');
+    this.clearAuthData();
   }
 
-  setAuthToken(token) {
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
+  setAuthData(data) {
+    if (!data) return;
+    
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+    }
+    if (data.user) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
+  }
+
+  clearAuthData() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  }
+
+  getAuthData() {
+    try {
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      const user = userStr ? JSON.parse(userStr) : null;
+      
+      return {
+        token,
+        user,
+        isAuthenticated: !!token && !!user
+      };
+    } catch (error) {
+      this.clearAuthData();
+      return {
+        token: null,
+        user: null,
+        isAuthenticated: false
+      };
     }
   }
 
   isAuthenticated() {
-    return !!localStorage.getItem('token');
+    const { isAuthenticated } = this.getAuthData();
+    return isAuthenticated;
   }
 }
 

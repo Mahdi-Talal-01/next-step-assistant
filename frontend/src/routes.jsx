@@ -1,10 +1,11 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import React from "react";
 import GmailTracker from "./pages/EmailTracker";
 import MainLayout from "./layouts/MainLayout.jsx";
 import Dashboard from "./pages/Dashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Landing from "./pages/Landing";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Lazy load other pages
 const Applications = React.lazy(() => import("./pages/Application"));
@@ -33,11 +34,19 @@ export const router = createBrowserRouter([
   },
   {
     path: "/app",
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorBoundary />,
     children: [
       {
         index: true,
+        element: <Navigate to="/app/dashboard" replace />,
+      },
+      {
+        path: "dashboard",
         element: <Dashboard />,
       },
       {

@@ -30,8 +30,12 @@ axiosInstance.interceptors.response.use(
   (error) => {
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/auth';
+      // Only redirect if we're not already on the auth page
+      if (!window.location.pathname.includes('/auth')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/auth';
+      }
     }
     return Promise.reject(error);
   }
@@ -56,8 +60,13 @@ const request = async ({ method = 'GET', url, data = null, params = null }) => {
 
     return response.data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message;
-    throw new Error(errorMessage);
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    if (error.message) {
+      throw new Error(error.message);
+    }
+    throw new Error('An unexpected error occurred');
   }
 };
 
