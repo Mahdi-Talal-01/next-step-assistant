@@ -47,6 +47,21 @@ class ProfileRepository {
       throw error;
     }
   }
+
+  async getCV(userId) {
+    try {
+      const profile = await prisma.profile.findUnique({
+        where: { userId },
+        select: {
+          resumeUrl: true,
+          resumeName: true
+        }
+      });
+      return profile;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new ProfileRepository(); 
