@@ -17,6 +17,9 @@ router.post('/cv',
   ProfileController.uploadCV
 );
 
+// Get CV
+router.get('/cv', auth, ProfileController.getCV);
+
 // Delete CV
 router.delete('/cv', auth, ProfileController.deleteCV);
 
