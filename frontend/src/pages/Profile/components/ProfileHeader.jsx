@@ -1,10 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import styles from './ProfileHeader.module.css';
 
 const ProfileHeader = ({ name, email, avatar, onAvatarUpdate }) => {
   const fileInputRef = useRef(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   const handleAvatarClick = () => {
     fileInputRef.current.click();
@@ -18,8 +19,15 @@ const ProfileHeader = ({ name, email, avatar, onAvatarUpdate }) => {
 
   return (
     <div className={styles.profileHeader}>
+      <div className={styles.headerBackground}></div>
+      
       <div className={styles.avatarContainer}>
-        <div className={styles.avatar} onClick={handleAvatarClick}>
+        <div 
+          className={styles.avatar} 
+          onClick={handleAvatarClick}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
           {avatar ? (
             <img 
               src={avatar} 
@@ -31,8 +39,9 @@ const ProfileHeader = ({ name, email, avatar, onAvatarUpdate }) => {
               {name ? name.charAt(0).toUpperCase() : 'U'}
             </div>
           )}
-          <div className={styles.editOverlay}>
+          <div className={`${styles.editOverlay} ${isHovering ? styles.showOverlay : ''}`}>
             <Icon icon="mdi:camera" className={styles.cameraIcon} />
+            <span className={styles.editText}>Change Photo</span>
           </div>
         </div>
         <input
@@ -46,7 +55,20 @@ const ProfileHeader = ({ name, email, avatar, onAvatarUpdate }) => {
       
       <div className={styles.profileInfo}>
         <h1 className={styles.name}>{name || 'User'}</h1>
-        <p className={styles.email}>{email || ''}</p>
+        <p className={styles.email}>
+          <Icon icon="mdi:email-outline" className={styles.emailIcon} />
+          {email || ''}
+        </p>
+        <div className={styles.profileBadges}>
+          <span className={styles.badge}>
+            <Icon icon="mdi:account" className={styles.badgeIcon} />
+            Member
+          </span>
+          <span className={styles.badgeDate}>
+            <Icon icon="mdi:calendar" className={styles.badgeIcon} />
+            Joined 2023
+          </span>
+        </div>
       </div>
     </div>
   );
