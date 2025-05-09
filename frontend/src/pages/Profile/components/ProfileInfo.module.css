@@ -13,7 +13,7 @@
 .sectionTitle {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-primary, #333);
+  color: #111827;
   margin: 0;
 }
 
@@ -22,10 +22,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: var(--background-secondary, #f5f7fa);
-  color: var(--text-secondary, #666);
+  background-color: rgba(243, 244, 246, 0.8);
+  color: #4b5563;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
@@ -33,8 +33,8 @@
 }
 
 .editButton:hover {
-  background-color: var(--hover-color, #e9ecef);
-  color: var(--text-primary, #333);
+  background-color: rgba(229, 231, 235, 0.9);
+  color: #111827;
 }
 
 .buttonIcon {
@@ -63,7 +63,7 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
-  color: var(--text-secondary, #666);
+  color: #4b5563;
   font-weight: 500;
 }
 
@@ -71,18 +71,18 @@
 .formGroup textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
-  background-color: var(--background-primary, #fff);
-  color: var(--text-primary, #333);
+  background-color: #fff;
+  color: #111827;
 }
 
 .formGroup input:focus,
 .formGroup textarea:focus {
-  border-color: var(--primary-color, #3699ff);
-  box-shadow: 0 0 0 3px rgba(54, 153, 255, 0.15);
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
   outline: none;
 }
 
@@ -91,18 +91,35 @@
   min-height: 100px;
 }
 
+.inputWithIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 0.75rem;
+  font-size: 1.25rem;
+  color: #9ca3af;
+}
+
+.inputWithIcon input {
+  padding-left: 2.75rem;
+}
+
 .sectionSubtitle {
   font-size: 1.1rem;
   font-weight: 500;
-  color: var(--text-primary, #333);
+  color: #111827;
   margin: 1.5rem 0 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-color, #eee);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .socialIcon {
   font-size: 1.25rem;
-  color: var(--text-secondary, #666);
+  color: #4b5563;
 }
 
 .formActions {
@@ -115,9 +132,9 @@
 .cancelButton {
   padding: 0.75rem 1.5rem;
   background: none;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 6px;
-  color: var(--text-secondary, #666);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #4b5563;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -125,15 +142,15 @@
 }
 
 .cancelButton:hover {
-  background-color: var(--hover-color, #e9ecef);
-  color: var(--text-primary, #333);
+  background-color: #f3f4f6;
+  color: #111827;
 }
 
 .saveButton {
   padding: 0.75rem 1.5rem;
-  background-color: var(--primary-color, #3699ff);
+  background-color: #4f46e5;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   color: white;
   font-size: 0.95rem;
   font-weight: 500;
@@ -142,8 +159,8 @@
 }
 
 .saveButton:hover {
-  background-color: var(--primary-dark, #1a86ff);
-  box-shadow: 0 4px 10px rgba(54, 153, 255, 0.3);
+  background-color: #4338ca;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
 }
 
 /* Info Display Styles */
@@ -155,46 +172,135 @@
   margin-bottom: 2rem;
 }
 
-.infoRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
 .infoItem {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
 }
 
 .infoLabel {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--text-secondary, #666);
+  font-size: 0.95rem;
+  color: #6b7280;
   font-weight: 500;
+  margin-bottom: 0.5rem;
 }
 
 .infoIcon {
   font-size: 1.25rem;
-  color: var(--primary-color, #3699ff);
+  color: #4f46e5;
 }
 
 .infoValue {
   font-size: 1.1rem;
-  color: var(--text-primary, #333);
+  color: #111827;
+  line-height: 1.5;
 }
 
-.aboutSection {
-  margin-top: 2rem;
+/* Social Links Styles */
+.socialLinksSection {
+  margin-top: 1rem;
 }
 
-.aboutText {
-  margin-top: 0.75rem;
-  line-height: 1.6;
-  color: var(--text-primary, #333);
+.socialCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.socialCard {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: #111827;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.socialCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: rgba(79, 70, 229, 0.3);
+}
+
+.socialCardIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.cardIcon {
+  font-size: 1.75rem;
+}
+
+.socialCardContent {
+  flex: 1;
+}
+
+.socialCardTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.socialCardValue {
+  font-size: 0.875rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.linkIcon {
+  color: #9ca3af;
+  font-size: 1.25rem;
+  position: absolute;
+  right: 1rem;
+  transition: color 0.2s ease;
+}
+
+.socialCard:hover .linkIcon {
+  color: #4f46e5;
+}
+
+.emptySocialState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 12px;
+  border: 1px dashed #e5e7eb;
+  grid-column: 1 / -1;
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.emptyText {
+  font-size: 1rem;
+  color: #6b7280;
 }
 
 @keyframes fadeIn {
@@ -209,8 +315,26 @@
     gap: 0;
   }
   
-  .infoRow {
+  .socialCards {
     grid-template-columns: 1fr;
-    gap: 1rem;
+  }
+  
+  .socialCardValue {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .socialCardValue {
+    max-width: 150px;
+  }
+  
+  .socialCardIcon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .cardIcon {
+    font-size: 1.5rem;
   }
 } 
