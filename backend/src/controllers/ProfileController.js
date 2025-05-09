@@ -32,14 +32,28 @@ class ProfileController {
 
   async uploadCV(req, res) {
     try {
+      console.log("req.file., req.filef;ile", req.file);
       if (!req.file) {
-        return ResponseTrait.error(res, 'No file uploaded');
+        return ResponseTrait.error(res, 'No file uploaded. Make sure the field name is "cv" in your form-data.');
       }
 
       const userId = req.user.id;
       const fileUrl = fileUploadService.getFileUrl(req.file.filename);
       const result = await ProfileService.updateResume(userId, fileUrl, req.file.originalname);
       return ResponseTrait.success(res, result.data, 'CV uploaded successfully');
+    } catch (error) {
+      if (error.name === 'MulterError') {
+        return ResponseTrait.error(res, `File upload error: ${error.message}. Make sure the field name is "cv" in your form-data.`);
+      }
+      return ResponseTrait.error(res, error.message);
+    }
+  }
+
+  async getCV(req, res) {
+    try {
+      const userId = req.user.id;
+      const result = await ProfileService.getCV(userId);
+      return ResponseTrait.success(res, result.data);
     } catch (error) {
       return ResponseTrait.error(res, error.message);
     }
