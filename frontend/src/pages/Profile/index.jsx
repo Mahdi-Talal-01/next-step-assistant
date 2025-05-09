@@ -9,15 +9,15 @@ import ResumeSection from './components/ResumeSection';
 import SkillsSection from './components/SkillsSection';
 
 const Profile = () => {
-  const {
-    profile,
+  const { 
+    profile, 
     loading,
     error,
     updateProfile,
     uploadCV,
     deleteCV
   } = useProfile();
-
+  
   const handleProfileUpdate = async (profileData) => {
     try {
       await updateProfile(profileData);
@@ -97,22 +97,22 @@ const Profile = () => {
         onAvatarUpdate={handleAvatarUpdate}
       />
 
-      <ProfileInfo
+          <ProfileInfo 
         profile={safeProfile}
         onUpdate={handleProfileUpdate}
-      />
+          />
 
       <ResumeSection
         resumeUrl={safeProfile.resumeUrl}
         resumeName={safeProfile.resumeName}
         onUpload={handleCVUpload}
         onDelete={handleCVDelete}
-      />
+          />
 
       <SkillsSection
         skills={safeProfile.skills}
         onUpdate={handleProfileUpdate}
-      />
+          />
     </div>
   );
 };

@@ -7,7 +7,7 @@ export const useProfile = () => {
   const [error, setError] = useState(null);
 
   const fetchProfile = useCallback(async () => {
-    try {
+      try {
       setLoading(true);
       setError(null);
       const response = await profileService.getProfile();
@@ -18,12 +18,12 @@ export const useProfile = () => {
       } else {
         throw new Error('Invalid profile data received');
       }
-    } catch (err) {
+      } catch (err) {
       console.error('Profile Error:', err); // Debug log
       setError(err.message || 'Failed to fetch profile');
     } finally {
       setLoading(false);
-    }
+      }
   }, []);
 
   const updateProfile = useCallback(async (profileData) => {
