@@ -6,65 +6,55 @@ import styles from './ProfileInfo.module.css';
 const ProfileInfo = ({ profile, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: profile.name || '',
-    email: profile.email || '',
-    phone: profile.phone || '',
+    bio: profile.bio || '',
     location: profile.location || '',
-    title: profile.title || '',
-    about: profile.about || '',
-    socialLinks: {
-      github: profile.socialLinks?.github || '',
-      linkedin: profile.socialLinks?.linkedin || '',
-      twitter: profile.socialLinks?.twitter || '',
-      portfolio: profile.socialLinks?.portfolio || ''
-    }
+    phone: profile.phone || '',
+    linkedin: profile.linkedin || '',
+    github: profile.github || '',
+    website: profile.website || ''
   });
   
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await onUpdate(formData);
-    if (result.success) {
+    try {
+      await onUpdate(formData);
       setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
     }
   };
   
   const handleCancel = () => {
     setFormData({
-      name: profile.name || '',
-      email: profile.email || '',
-      phone: profile.phone || '',
+      bio: profile.bio || '',
       location: profile.location || '',
-      title: profile.title || '',
-      about: profile.about || '',
-      socialLinks: {
-        github: profile.socialLinks?.github || '',
-        linkedin: profile.socialLinks?.linkedin || '',
-        twitter: profile.socialLinks?.twitter || '',
-        portfolio: profile.socialLinks?.portfolio || ''
-      }
+      phone: profile.phone || '',
+      linkedin: profile.linkedin || '',
+      github: profile.github || '',
+      website: profile.website || ''
     });
     setIsEditing(false);
   };
   
+  // Format domain name for display
+  const extractDomain = (url) => {
+    if (!url) return '';
+    try {
+      const domain = new URL(url).hostname.replace('www.', '');
+      return domain;
+    } catch (e) {
+      return url;
+    }
+  };
+
   return (
     <div className={styles.profileInfoContainer}>
       <div className={styles.sectionHeader}>
@@ -90,56 +80,16 @@ const ProfileInfo = ({ profile, onUpdate }) => {
       
       {isEditing ? (
         <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="name">Full Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            
-            <div className={styles.formGroup}>
-              <label htmlFor="title">Job Title</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="e.g. Software Engineer"
-              />
-            </div>
-          </div>
-          
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="email">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            
-            <div className={styles.formGroup}>
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="e.g. +1 (555) 123-4567"
-              />
-            </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="bio">Bio</label>
+            <textarea
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              rows="4"
+              placeholder="Tell us about yourself and your professional experience"
+            ></textarea>
           </div>
           
           <div className={styles.formGroup}>
@@ -155,15 +105,15 @@ const ProfileInfo = ({ profile, onUpdate }) => {
           </div>
           
           <div className={styles.formGroup}>
-            <label htmlFor="about">About</label>
-            <textarea
-              id="about"
-              name="about"
-              value={formData.about}
+            <label htmlFor="phone">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
               onChange={handleChange}
-              rows="4"
-              placeholder="Tell us about yourself and your professional experience"
-            ></textarea>
+              placeholder="e.g. +1 (555) 123-4567"
+            />
           </div>
           
           <div className={styles.sectionSubtitle}>Social Links</div>
@@ -173,14 +123,17 @@ const ProfileInfo = ({ profile, onUpdate }) => {
               <Icon icon="mdi:github" className={styles.socialIcon} />
               GitHub
             </label>
-            <input
-              type="url"
-              id="github"
-              name="socialLinks.github"
-              value={formData.socialLinks.github}
-              onChange={handleChange}
-              placeholder="https://github.com/username"
-            />
+            <div className={styles.inputWithIcon}>
+              <Icon icon="mdi:github" className={styles.inputIcon} />
+              <input
+                type="url"
+                id="github"
+                name="github"
+                value={formData.github}
+                onChange={handleChange}
+                placeholder="https://github.com/username"
+              />
+            </div>
           </div>
           
           <div className={styles.formGroup}>
@@ -188,44 +141,35 @@ const ProfileInfo = ({ profile, onUpdate }) => {
               <Icon icon="mdi:linkedin" className={styles.socialIcon} />
               LinkedIn
             </label>
-            <input
-              type="url"
-              id="linkedin"
-              name="socialLinks.linkedin"
-              value={formData.socialLinks.linkedin}
-              onChange={handleChange}
-              placeholder="https://linkedin.com/in/username"
-            />
+            <div className={styles.inputWithIcon}>
+              <Icon icon="mdi:linkedin" className={styles.inputIcon} />
+              <input
+                type="url"
+                id="linkedin"
+                name="linkedin"
+                value={formData.linkedin}
+                onChange={handleChange}
+                placeholder="https://linkedin.com/in/username"
+              />
+            </div>
           </div>
           
           <div className={styles.formGroup}>
-            <label htmlFor="twitter">
-              <Icon icon="mdi:twitter" className={styles.socialIcon} />
-              Twitter
-            </label>
-            <input
-              type="url"
-              id="twitter"
-              name="socialLinks.twitter"
-              value={formData.socialLinks.twitter}
-              onChange={handleChange}
-              placeholder="https://twitter.com/username"
-            />
-          </div>
-          
-          <div className={styles.formGroup}>
-            <label htmlFor="portfolio">
+            <label htmlFor="website">
               <Icon icon="mdi:web" className={styles.socialIcon} />
-              Portfolio
+              Website/Portfolio
             </label>
-            <input
-              type="url"
-              id="portfolio"
-              name="socialLinks.portfolio"
-              value={formData.socialLinks.portfolio}
-              onChange={handleChange}
-              placeholder="https://yourportfolio.com"
-            />
+            <div className={styles.inputWithIcon}>
+              <Icon icon="mdi:web" className={styles.inputIcon} />
+              <input
+                type="url"
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+                placeholder="https://yourportfolio.com"
+              />
+            </div>
           </div>
           
           <div className={styles.formActions}>
@@ -246,58 +190,71 @@ const ProfileInfo = ({ profile, onUpdate }) => {
         </form>
       ) : (
         <div className={styles.infoDisplay}>
-          <div className={styles.infoSection}>
-            <div className={styles.infoRow}>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>
-                  <Icon icon="mdi:email" className={styles.infoIcon} />
-                  Email
-                </span>
-                <span className={styles.infoValue}>{profile.email}</span>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>
-                  <Icon icon="mdi:phone" className={styles.infoIcon} />
-                  Phone
-                </span>
-                <span className={styles.infoValue}>
-                  {profile.phone || 'Not provided'}
-                </span>
-              </div>
-            </div>
-            
-            <div className={styles.infoRow}>
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>
-                  <Icon icon="mdi:map-marker" className={styles.infoIcon} />
-                  Location
-                </span>
-                <span className={styles.infoValue}>
-                  {profile.location || 'Not provided'}
-                </span>
-              </div>
-              
-              <div className={styles.infoItem}>
-                <span className={styles.infoLabel}>
-                  <Icon icon="mdi:briefcase" className={styles.infoIcon} />
-                  Title
-                </span>
-                <span className={styles.infoValue}>
-                  {profile.title || 'Not provided'}
-                </span>
-              </div>
-            </div>
+          <div className={styles.infoItem}>
+            <div className={styles.infoLabel}>Bio</div>
+            <div className={styles.infoValue}>{profile.bio || 'Not specified'}</div>
           </div>
           
-          <div className={styles.aboutSection}>
-            <span className={styles.infoLabel}>
-              <Icon icon="mdi:account" className={styles.infoIcon} />
-              About
-            </span>
-            <p className={styles.aboutText}>
-              {profile.about || 'No information provided.'}
-            </p>
+          <div className={styles.infoItem}>
+            <div className={styles.infoLabel}>Location</div>
+            <div className={styles.infoValue}>{profile.location || 'Not specified'}</div>
+          </div>
+          
+          <div className={styles.infoItem}>
+            <div className={styles.infoLabel}>Phone</div>
+            <div className={styles.infoValue}>{profile.phone || 'Not specified'}</div>
+          </div>
+          
+          <div className={styles.socialLinksSection}>
+            <div className={styles.infoLabel}>Social Links</div>
+            
+            <div className={styles.socialCards}>
+              {profile.github && (
+                <a href={profile.github} target="_blank" rel="noopener noreferrer" className={styles.socialCard}>
+                  <div className={styles.socialCardIcon} style={{ backgroundColor: 'rgba(36, 41, 47, 0.1)' }}>
+                    <Icon icon="mdi:github" className={styles.cardIcon} style={{ color: '#24292F' }} />
+                  </div>
+                  <div className={styles.socialCardContent}>
+                    <div className={styles.socialCardTitle}>GitHub</div>
+                    <div className={styles.socialCardValue}>{extractDomain(profile.github)}</div>
+                  </div>
+                  <Icon icon="mdi:open-in-new" className={styles.linkIcon} />
+                </a>
+              )}
+              
+              {profile.linkedin && (
+                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className={styles.socialCard}>
+                  <div className={styles.socialCardIcon} style={{ backgroundColor: 'rgba(0, 119, 181, 0.1)' }}>
+                    <Icon icon="mdi:linkedin" className={styles.cardIcon} style={{ color: '#0077B5' }} />
+                  </div>
+                  <div className={styles.socialCardContent}>
+                    <div className={styles.socialCardTitle}>LinkedIn</div>
+                    <div className={styles.socialCardValue}>{extractDomain(profile.linkedin)}</div>
+                  </div>
+                  <Icon icon="mdi:open-in-new" className={styles.linkIcon} />
+                </a>
+              )}
+              
+              {profile.website && (
+                <a href={profile.website} target="_blank" rel="noopener noreferrer" className={styles.socialCard}>
+                  <div className={styles.socialCardIcon} style={{ backgroundColor: 'rgba(79, 70, 229, 0.1)' }}>
+                    <Icon icon="mdi:web" className={styles.cardIcon} style={{ color: '#4F46E5' }} />
+                  </div>
+                  <div className={styles.socialCardContent}>
+                    <div className={styles.socialCardTitle}>Website</div>
+                    <div className={styles.socialCardValue}>{extractDomain(profile.website)}</div>
+                  </div>
+                  <Icon icon="mdi:open-in-new" className={styles.linkIcon} />
+                </a>
+              )}
+              
+              {!profile.github && !profile.linkedin && !profile.website && (
+                <div className={styles.emptySocialState}>
+                  <Icon icon="mdi:link-variant-off" className={styles.emptyIcon} />
+                  <div className={styles.emptyText}>No social links provided</div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -307,19 +264,17 @@ const ProfileInfo = ({ profile, onUpdate }) => {
 
 ProfileInfo.propTypes = {
   profile: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    email: PropTypes.string,
-    phone: PropTypes.string,
+    bio: PropTypes.string,
     location: PropTypes.string,
-    title: PropTypes.string,
-    about: PropTypes.string,
-    socialLinks: PropTypes.shape({
-      github: PropTypes.string,
-      linkedin: PropTypes.string,
-      twitter: PropTypes.string,
-      portfolio: PropTypes.string
+    phone: PropTypes.string,
+    linkedin: PropTypes.string,
+    github: PropTypes.string,
+    website: PropTypes.string,
+    user: PropTypes.shape({
+      name: PropTypes.string,
+      email: PropTypes.string
     })
-  }).isRequired,
+  }),
   onUpdate: PropTypes.func.isRequired
 };
 
