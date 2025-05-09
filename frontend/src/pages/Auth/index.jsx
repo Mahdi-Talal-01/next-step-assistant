@@ -1,133 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import AuthForm from './components/AuthForm';
-import styles from './Auth.module.css';
+import { AuthHeader } from './components/AuthHeader';
+import { LoginForm } from './components/LoginForm';
+import { RegisterForm } from './components/RegisterForm';
+import { GoogleLoginButton } from './components/GoogleLoginButton';
 import { useAuth } from './hooks/useAuth';
-import authService from './services/authService';
+import styles from './Auth.module.css';
 
 const Auth = () => {
+  const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  // Debug function to check token state
-  const debugToken = () => {
-    console.log('Debug Token State:', {
-      token: localStorage.getItem('access_token'),
-      url: window.location.href,
-      searchParams: Object.fromEntries(new URLSearchParams(window.location.search))
-    });
-  };
-
-  useEffect(() => {
-    debugToken();
-  }, []);
+  const { isAuthenticated } = useAuth();
 
   // Handle OAuth callback
   useEffect(() => {
-    const handleOAuthCallback = async () => {
-      const searchParams = new URLSearchParams(location.search);
-      const token = searchParams.get('token');
-      const userData = searchParams.get('user');
-      const error = searchParams.get('error');
-      
-      if (error) {
-        setError(error);
-        return;
-      }
-
-      if (token && userData) {
-        try {
-          setLoading(true);
-          console.log('Processing OAuth callback with token and user data');
-          
-          // Decode and parse user data
-          const decodedUserData = JSON.parse(decodeURIComponent(userData));
-          console.log('Decoded user data:', decodedUserData);
-          
-          // Save token and user data
-          localStorage.setItem('access_token', token);
-          await login(decodedUserData, token);
-          
-          // Clean URL and navigate
-          const cleanUrl = window.location.pathname;
-          window.history.replaceState({}, document.title, cleanUrl);
-          console.log('Navigating to dashboard');
-          navigate('/app/dashboard', { replace: true });
-        } catch (err) {
-          console.error('OAuth callback error:', err);
-          setError('Failed to complete authentication');
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    handleOAuthCallback();
-  }, [location.search, login, navigate]);
-
-  const handleSubmit = async (formData) => {
-    try {
-      setLoading(true);
-      setError('');
-      const response = await authService.login(formData);
-      if (response.token) {
-        localStorage.setItem('access_token', response.token);
-        await login(response.user);
-        navigate('/app/dashboard', { replace: true });
-      }
-    } catch (err) {
-      setError(err.message || 'Authentication failed');
-    } finally {
-      setLoading(false);
+    const params = new URLSearchParams(location.search);
+    const urlToken = params.get('token');
+    const urlUser = params.get('user');
+    if (urlToken && urlUser) {
+      localStorage.setItem('access_token', urlToken);
+      localStorage.setItem('user', decodeURIComponent(urlUser));
+      window.history.replaceState({}, document.title, '/');
+      navigate('/app/dashboard', { replace: true });
+      return;
     }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const response = await fetch('http://localhost:3000/api/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await response.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError('Failed to initiate Google login');
-      }
-    } catch (err) {
-      setError('Failed to connect to authentication server');
-    } finally {
-      setLoading(false);
+    // If already authenticated, redirect to dashboard
+    const { authenticated } = isAuthenticated();
+    if (authenticated) {
+      navigate('/app/dashboard', { replace: true });
     }
-  };
+  }, [location, navigate, isAuthenticated]);
 
   return (
-    <div className={styles.authContainer}>
+    <div className={styles.container}>
       <div className={styles.authBox}>
-        <h1 className={styles.title}>Welcome Back</h1>
-        <p className={styles.subtitle}>Sign in to continue to your account</p>
-        
-        {error && (
-          <div className={styles.error}>
-            <span className={styles.errorIcon}>⚠️</span>
-            {error}
-          </div>
-        )}
-        
-        <AuthForm 
-          onSubmit={handleSubmit}
-          onGoogleLogin={handleGoogleLogin}
-          error={error}
-          loading={loading}
-        />
+        <AuthHeader />
+        {isLogin ? <LoginForm /> : <RegisterForm />}
+        <div className={styles.divider}><span>or</span></div>
+        <GoogleLoginButton />
+        <div className={styles.toggleText} style={{ marginTop: 16 }}>
+          {isLogin ? (
+            <span>
+              Don't have an account?{' '}
+              <button className={styles.toggleButton} onClick={() => setIsLogin(false)}>
+                Create one
+              </button>
+            </span>
+          ) : (
+            <span>
+              Already have an account?{' '}
+              <button className={styles.toggleButton} onClick={() => setIsLogin(true)}>
+                Sign in
+              </button>
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
