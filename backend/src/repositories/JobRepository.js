@@ -124,5 +124,26 @@ class JobRepository {
       throw error;
     }
   }
+  /**
+   * Delete a job
+   * @param {string} jobId - The job ID
+   * @param {string} userId - The user ID (for security)
+   * @returns {Promise<boolean>} - True if deleted, false if not found
+   */
+  async deleteJob(jobId, userId) {
+    try {
+      const result = await prisma.job.deleteMany({
+        where: {
+          id: jobId,
+          userId
+        }
+      });
+
+      return result.count > 0;
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      throw error;
+    }
+  }
 }
 module.exports = new JobRepository();
