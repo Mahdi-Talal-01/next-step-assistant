@@ -14,7 +14,7 @@ router.post('/', RoadmapRequest.validateCreate, roadmapController.createRoadmap)
 router.get('/', roadmapController.getRoadmaps);
 
 // Get a specific roadmap
-router.get('/:id', roadmapController.getRoadmapById);
+router.get('/:id', RoadmapRequest.validateGetById, roadmapController.getRoadmapById);
 
 // Update a roadmap
 router.put('/:id', RoadmapRequest.validateUpdate, roadmapController.updateRoadmap);
