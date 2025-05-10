@@ -81,5 +81,10 @@ class RoadmapRepository {
             }
         });
     }
+    async delete(id) {
+        return await prisma.roadmap.delete({
+            where: { id }
+        });
+    }
 }
 module.exports = new RoadmapRepository(); 
