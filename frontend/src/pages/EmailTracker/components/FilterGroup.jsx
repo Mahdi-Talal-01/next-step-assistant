@@ -10,10 +10,11 @@ const FilterGroup = ({ filters, onFilterChange }) => {
         onChange={(e) => onFilterChange("category", e.target.value)}
       >
         <option value="all">All Categories</option>
-        <option value="interview">Interviews</option>
-        <option value="application">Applications</option>
-        <option value="assessment">Assessments</option>
-        <option value="job-alert">Job Alerts</option>
+        <option value="primary">Primary</option>
+        <option value="social">Social</option>
+        <option value="promotions">Promotions</option>
+        <option value="updates">Updates</option>
+        <option value="forums">Forums</option>
       </select>
 
       <select
@@ -23,7 +24,7 @@ const FilterGroup = ({ filters, onFilterChange }) => {
       >
         <option value="all">All Priorities</option>
         <option value="high">High</option>
-        <option value="medium">Medium</option>
+        <option value="normal">Normal</option>
         <option value="low">Low</option>
       </select>
 
@@ -38,7 +39,7 @@ const FilterGroup = ({ filters, onFilterChange }) => {
       </select>
 
       <button
-        className={`btn btn-outline ${filters.starred ? "active" : ""}`}
+        className={`filter-btn ${filters.starred ? "active" : ""}`}
         onClick={() => onFilterChange("starred", !filters.starred)}
       >
         Starred Only
