@@ -23,6 +23,7 @@ model User {
   profile       Profile?
   token         Token?    // One-to-one relation with Token
   jobs          Job[]     // One-to-many relation with Job
+  roadmaps      Roadmap[] // One-to-many relation with Roadmap
 }
 
 model Profile {
@@ -72,4 +73,21 @@ model Job {
   stages        String?   @db.Text // Stored as JSON string
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-} 
+}
+
+model Roadmap {
+  id            String    @id @default(uuid())
+  userId        String    // Foreign key to User
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  icon          String
+  color         String
+  progress      Int       @default(0)
+  estimatedTime String
+  difficulty    String
+  isTemplate    Boolean   @default(false) // Whether this is a template or user-created
+  topics        Topic[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
