@@ -113,5 +113,61 @@ class GmailService {
     const { tokens } = await oauth2Client.getToken(code);
     return tokens;
   }
+   /**
+   * List emails from user's Gmail inbox
+   * @param {string} userId - The user ID
+   * @param {object} options - Query options (maxResults, labelIds, q)
+   * @returns {array} - List of emails
+   */
+   async listEmails(userId, options = {}) {
+    try {
+      const auth = await this.getOAuth2Client(userId);
+      const gmail = google.gmail({ version: "v1", auth });
+
+      // Default query parameters for listing messages
+      const params = {
+        userId: "me",
+        maxResults: options.maxResults || 20,
+        labelIds: options.labelIds || ["INBOX"],
+        q: options.q || "",
+        format: "full",
+      };
+      const parsed = this.parseMessage(params);
+      console.log("Parsed message:", parsed);
+
+      console.log("Fetching emails with params:", params);
+
+      // Get message list
+      const response = await gmail.users.messages.list(params);
+      const messageIds = response.data.messages || [];
+
+      if (messageIds.length === 0) {
+        console.log("No messages found matching criteria");
+        return [];
+      }
+
+      console.log(`Found ${messageIds.length} messages, fetching details...`);
+
+      // Get message details for each message using only metadata format
+      const emails = await Promise.all(
+        messageIds.map(async (message) => {
+          const msg = await gmail.users.messages.get({
+            userId: "me",
+            id: message.id,
+            format: "full",
+          });
+          console.log("Message data:", msg.data);
+
+          return this.parseMessage(msg.data);
+        })
+      );
+
+      console.log(`Successfully processed ${emails.length} emails`);
+      return emails;
+    } catch (error) {
+      console.error("List emails error:", error);
+      throw error;
+    }
+  }
 }
 module.exports = new GmailService();
