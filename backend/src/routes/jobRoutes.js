@@ -18,5 +18,9 @@ router.get('/stats', JobController.getJobStats);
 // Create a new job
 router.post('/', JobController.createJob);
 
+// Update a job
+router.put('/:jobId', JobController.updateJob);
+
+
 
 module.exports = router;
