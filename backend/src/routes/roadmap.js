@@ -20,7 +20,7 @@ router.get('/:id', roadmapController.getRoadmapById);
 router.put('/:id', RoadmapRequest.validateUpdate, roadmapController.updateRoadmap);
 
 // Delete a roadmap
-router.delete('/:id', roadmapController.deleteRoadmap);
+router.delete('/:id', RoadmapRequest.validateDelete, roadmapController.deleteRoadmap);
 
 // Update topic status
 router.patch('/:roadmapId/topics/:topicId/status', roadmapController.updateTopicStatus);
