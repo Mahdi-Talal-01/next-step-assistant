@@ -84,5 +84,21 @@ class RoadmapRequest {
 
         next();
     }
+    static validateTopicStatus(req, res, next) {
+        const { status } = req.body;
+        const errors = {};
+
+        if (!status) {
+            errors.status = "Status is required";
+        } else if (!["pending", "in-progress", "completed"].includes(status)) {
+            errors.status = "Invalid status. Must be one of: pending, in-progress, completed";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            return ResponseTrait.validationError(res, errors);
+        }
+
+        next();
+    }
 }
 module.exports = RoadmapRequest; 
