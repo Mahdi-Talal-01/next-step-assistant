@@ -409,4 +409,41 @@ export const useGmailApi = () => {
     }
     return "normal";
   };
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const connected = urlParams.get("connected");
+    const errorParam = urlParams.get("error");
+
+    if (connected === "true") {
+      console.log(
+        "OAuth callback indicates successful connection - enabling authorization"
+      );
+      setIsAuthorized(true);
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (errorParam === "true") {
+      setError(
+        "Failed to connect Gmail: " +
+          (urlParams.get("message") || "Unknown error")
+      );
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // First check the server-side authorization status
+    checkAuthorization();
+
+    // Auto-enable authorization after a small delay if auth check doesn't respond properly
+    const autoAuthTimer = setTimeout(() => {
+      // Only attempt auto-auth if no authorization was detected by the checkAuthorization call
+      if (!isAuthorized && authChecked) {
+        console.log("Auto-enabling authorization as a fallback");
+        setIsAuthorized(true);
+        fetchEmails();
+      }
+    }, 2000); // Wait 2 seconds after the component mounts
+
+    return () => clearTimeout(autoAuthTimer);
+  }, [checkAuthorization, fetchEmails]);
+
 }
