@@ -34,5 +34,42 @@ class GmailController {
       return ResponseTrait.error(res, 'Failed to generate authorization URL');
     }
   }
+  async handleCallback(req, res) {
+    try {
+      const { code, state } = req.query;
+      
+      if (!code) {
+        return ResponseTrait.validationError(res, ['Authorization code is required']);
+      }
+
+      let userId;
+      
+      // Extract the user ID from the state parameter
+      try {
+        const decoded = jwt.verify(state, process.env.JWT_SECRET);
+        userId = decoded.userId;
+      } catch (err) {
+        throw new Error('Invalid state parameter');
+      }
+
+      // Get tokens from Gmail OAuth
+      const tokens = await GmailService.getTokens(code);
+      
+      // Save tokens to the database
+      await TokenRepository.saveTokens(userId, {
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiryDate: tokens.expiry_date,
+        scope: tokens.scope
+      });
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      res.redirect(`${frontendUrl}/app/gmail-tracker?connected=true`);
+    } catch (error) {
+      console.error('Gmail callback error:', error);
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      res.redirect(`${frontendUrl}/app/gmail-tracker?error=true&message=${encodeURIComponent('Failed to connect Gmail')}`);
+    }
+  }
 }
 module.exports = new GmailController();
