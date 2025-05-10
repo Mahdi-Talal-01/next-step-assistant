@@ -35,5 +35,14 @@ class RoadmapController {
             res.status(400).json({ error: error.message });
         }
     }
+    async deleteRoadmap(req, res) {
+        try {
+            const userId = req.user.id;
+            await roadmapService.deleteRoadmap(req.params.id, userId);
+            res.status(204).send();
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 module.exports = new RoadmapController();
