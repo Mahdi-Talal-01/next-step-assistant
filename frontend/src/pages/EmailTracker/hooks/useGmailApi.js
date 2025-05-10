@@ -398,4 +398,15 @@ export const useGmailApi = () => {
     if (labels.includes("CATEGORY_FORUMS")) return "forums";
     return "primary";
   };
+   // Helper function to determine email priority
+   const getPriorityFromHeaders = (email) => {
+    if (!email || !email.subject) return "normal";
+
+    // This is a simplified approach; in a real app, you'd use more sophisticated logic
+    const subject = email.subject?.toLowerCase() || "";
+    if (subject.includes("urgent") || subject.includes("important")) {
+      return "high";
+    }
+    return "normal";
+  };
 }
