@@ -66,16 +66,7 @@ class RoadmapController {
       const userId = req.user.id;
       const { roadmapId, topicId } = req.params;
       const { status } = req.body;
-
-      if (
-        !status ||
-        !["pending", "in-progress", "completed"].includes(status)
-      ) {
-        return ResponseTrait.validationError(res, {
-          status: "Invalid status. Must be one of: pending, in-progress, completed"
-        });
-      }
-
+      
       const topic = await roadmapService.updateTopicStatus(
         roadmapId,
         topicId,
