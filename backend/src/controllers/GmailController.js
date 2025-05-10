@@ -108,6 +108,11 @@ class GmailController {
       return ResponseTrait.error(res, 'Failed to disconnect Gmail');
     }
   }
+   /**
+   * Get user's emails from Gmail
+   * @param {object} req - Express request
+   * @param {object} res - Express response
+   */
   
    async getEmails(req, res) {
     try {
