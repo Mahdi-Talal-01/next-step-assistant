@@ -76,5 +76,6 @@ export const useEmailFiltering = (initialEmails) => {
     toggleReadStatus,
     toggleStarred,
     handleFilterChange,
+    setEmails
   };
 };
