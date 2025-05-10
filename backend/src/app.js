@@ -6,6 +6,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const oauthRoutes = require('./routes/oauthRoutes');
 const gmailRoutes = require('./routes/gmailRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const roadmapRoutes = require('./routes/roadmap');
 // Import the environment setup script
 const { checkAndSetGoogleEnv } = require('../setup-env');
 
@@ -34,6 +35,7 @@ app.use('/api/auth', oauthRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/roadmaps', roadmapRoutes);
 
 // Special case for OAuth routes that need to be at root level
 app.use('/', oauthRoutes);
