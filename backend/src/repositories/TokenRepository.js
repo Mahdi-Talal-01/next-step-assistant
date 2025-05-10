@@ -43,6 +43,25 @@ class TokenRepository {
       throw error;
     }
   }
+  /**
+   * Update tokens for a user
+   * @param {string} userId - The user ID
+   * @param {object} tokenData - Token data (accessToken, refreshToken, expiryDate)
+   * @returns {object} - The updated token record
+   */
+  async updateTokens(userId, tokenData) {
+    try {
+      return await prisma.token.update({
+        where: { userId },
+        data: {
+          ...tokenData,
+          updatedAt: new Date()
+        }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = { TokenRepository: new TokenRepository() }; 
