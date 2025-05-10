@@ -15,5 +15,8 @@ router.get('/:jobId', JobController.getJob);
 // Get job statistics
 router.get('/stats', JobController.getJobStats);
 
+// Create a new job
+router.post('/', JobController.createJob);
+
 
 module.exports = router;
