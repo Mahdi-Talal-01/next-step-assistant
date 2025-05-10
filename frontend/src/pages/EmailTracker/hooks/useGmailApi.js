@@ -134,4 +134,24 @@ export const useGmailApi = () => {
       setIsLoading(false);
     }
   }, []);
+   // Handle authorization
+   const authorizeGmail = useCallback(async () => {
+    try {
+      setError(null);
+      setIsLoading(true);
+      const authUrl = await getAuthUrl();
+      if (authUrl) {
+        window.location.href = authUrl;
+      } else {
+        throw new Error("Could not get authorization URL");
+      }
+    } catch (err) {
+      console.error("Authorization error:", err);
+      setError(
+        "Failed to authorize Gmail: " + (err.message || "Unknown error")
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [getAuthUrl]);
 }
