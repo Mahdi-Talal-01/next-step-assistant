@@ -77,6 +77,12 @@ class GmailController {
       res.redirect(`${frontendUrl}/app/gmail-tracker?error=true&message=${encodeURIComponent('Failed to connect Gmail')}`);
     }
   }
+  /**
+   * Check if the user has authorized Gmail access
+   * @param {object} req - Express request
+   * @param {object} res - Express response
+   */
+  
   async checkAuthorization(req, res) {
     try {
       const tokens = await TokenRepository.getTokensByUserId(req.user.id);
