@@ -4,29 +4,46 @@ const path = require('path');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const oauthRoutes = require('./routes/oauthRoutes');
+const gmailRoutes = require('./routes/gmailRoutes');
+const jobRoutes = require('./routes/jobRoutes');
+// Import the environment setup script
+const { checkAndSetGoogleEnv } = require('../setup-env');
 
 const app = express();
+
+// Check Google environment variables
+const envVarsSet = checkAndSetGoogleEnv();
+console.log('Environment variables configured:', envVarsSet ? 'Yes' : 'No');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Mount OAuth routes at root level for the redirect
-app.use('/', oauthRoutes);
+// Test route to verify Gmail callback URL
+app.get('/test-gmail-callback', (req, res) => {
+  res.send(`
+    <h1>Gmail Callback Test</h1>
+    <p>Redirect URL is set to: ${process.env.GOOGLE_REDIRECT_URL}</p>
+    <p>This endpoint helps verify the callback is accessible.</p>
+  `);
+});
 
-// Mount OAuth routes under /api/auth for the API endpoints
+// Mount all routes
+app.use('/api/gmail', gmailRoutes);
 app.use('/api/auth', oauthRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/profiles', profileRoutes);
+app.use('/api/jobs', jobRoutes);
+
+// Special case for OAuth routes that need to be at root level
+app.use('/', oauthRoutes);
 
 // Serve static files from storage directory
 app.use('/storage', express.static(path.join(__dirname, '../storage')));
 
-// Routes
-app.use('/api/users', userRoutes);
-app.use('/api/profiles', profileRoutes);
-
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Application error:', err.stack);
   res.status(500).json({
     success: false,
     message: 'Something went wrong!'
