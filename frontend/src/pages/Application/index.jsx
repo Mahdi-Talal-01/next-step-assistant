@@ -8,9 +8,9 @@ import ApplicationsContainer from './components/ApplicationsContainer';
 import ApplicationModal from './components/ApplicationModal';
 import ApplicationCard from './components/ApplicationCard';
 
-// Import hooks and data
+// Import hooks and utilities
 import { useApplications } from './hooks/useApplications';
-import { mockApplications } from './data/mockData';
+import { exportToCSV } from './utils/exportUtils';
 
 const Applications = () => {
   const {
@@ -24,13 +24,15 @@ const Applications = () => {
     sortOrder,
     setSortOrder,
     loading,
+    error,
     viewMode,
     addApplication,
     deleteApplication,
     updateApplicationStatus,
     updateApplication,
     toggleViewMode,
-  } = useApplications(mockApplications);
+    refreshApplications
+  } = useApplications();
 
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -47,8 +49,7 @@ const Applications = () => {
   };
 
   const handleExportCSV = () => {
-    // Implementation for CSV export
-    console.log('Exporting to CSV...');
+    exportToCSV(applications);
   };
 
   const handleViewApplication = (application) => {
@@ -86,20 +87,42 @@ const Applications = () => {
     setSelectedCardId(cardId);
   };
 
-  const handleUpdateApplication = (updatedApplication) => {
+  const handleUpdateApplication = async (updatedApplication) => {
+    let success;
     if (isNew) {
-      addApplication(updatedApplication);
+      success = await addApplication(updatedApplication);
     } else {
-      updateApplication(updatedApplication.id, updatedApplication);
+      success = await updateApplication(updatedApplication.id, updatedApplication);
     }
-    handleCloseModal();
+    
+    if (success) {
+      handleCloseModal();
+      refreshApplications(); // Refresh to get the latest data
+    }
   };
 
-  const handleStatusUpdate = (id, newStatus) => {
-    updateApplicationStatus(id, newStatus);
+  const handleStatusUpdate = async (id, newStatus) => {
+    console.log(`Application component: Status update requested for job ID ${id} to status '${newStatus}'`);
+    try {
+      const result = await updateApplicationStatus(id, newStatus);
+      if (result) {
+        console.log(`Status update successful for job ID ${id}`);
+      } else {
+        console.error(`Status update failed for job ID ${id}`);
+      }
+    } catch (error) {
+      console.error(`Error updating status for job ID ${id}:`, error);
+    }
   };
 
-  if (loading) {
+  const handleDeleteApplication = async (id) => {
+    const success = await deleteApplication(id);
+    if (success && showModal) {
+      handleCloseModal();
+    }
+  };
+
+  if (loading && applications.length === 0) {
     return (
       <div className="loading-container">
         <div className="loading-spinner" />
@@ -110,6 +133,15 @@ const Applications = () => {
 
   return (
     <div className="page-container">
+      {error && (
+        <div className="error-message">
+          {error}
+          <button onClick={refreshApplications} className="retry-button">
+            Retry
+          </button>
+        </div>
+      )}
+
       <ApplicationHeader
         viewMode={viewMode}
         onToggleView={toggleViewMode}
@@ -127,17 +159,23 @@ const Applications = () => {
         onSortChange={handleSortChange}
       />
 
+      {loading && applications.length > 0 && (
+        <div className="loading-overlay">
+          <div className="loading-spinner" />
+        </div>
+      )}
+
       <ApplicationsContainer
         applications={applications}
         viewMode={viewMode}
-        onDelete={deleteApplication}
+        onDelete={handleDeleteApplication}
         onView={handleViewApplication}
       >
         {applications.map(application => (
           <ApplicationCard
             key={application.id}
             application={application}
-            onDelete={deleteApplication}
+            onDelete={handleDeleteApplication}
             onView={handleViewApplication}
             isSelected={selectedCardId === application.id}
             onSelect={handleCardSelect}
@@ -145,13 +183,23 @@ const Applications = () => {
         ))}
       </ApplicationsContainer>
 
+      {applications.length === 0 && !loading && !error && (
+        <div className="no-applications">
+          <h3>No applications found</h3>
+          <p>Start tracking your job applications by clicking the "Add Application" button.</p>
+          <button onClick={handleAddApplication} className="add-application-btn">
+            Add Application
+          </button>
+        </div>
+      )}
+
       {showModal && selectedApplication && (
         <ApplicationModal
           application={selectedApplication}
           isNew={isNew}
           onClose={handleCloseModal}
           onUpdate={handleUpdateApplication}
-          onDelete={deleteApplication}
+          onDelete={handleDeleteApplication}
         />
       )}
     </div>
