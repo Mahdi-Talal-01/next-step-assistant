@@ -19,6 +19,18 @@ class RoadmapService {
         }
         return roadmap;
     }
+    async updateRoadmap(id, userId, roadmapData) {
+        const roadmap = await roadmapRepository.findById(id);
+        if (!roadmap) {
+            throw new Error('Roadmap not found');
+        }
+        if (roadmap.userId !== userId) {
+            throw new Error('Unauthorized to update this roadmap');
+        }
+
+        const updatedRoadmap = await roadmapRepository.update(id, roadmapData);
+        return updatedRoadmap;
+    }
     
 }
 module.exports = new RoadmapService(); 
