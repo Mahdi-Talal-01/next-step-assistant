@@ -18,5 +18,13 @@ class RoadmapController {
             res.status(400).json({ error: error.message });
         }
     }
+    async getRoadmapById(req, res) {
+        try {
+            const roadmap = await roadmapService.getRoadmapById(req.params.id);
+            res.json(roadmap);
+        } catch (error) {
+            res.status(404).json({ error: error.message });
+        }
+    }
 }
 module.exports = new RoadmapController();
