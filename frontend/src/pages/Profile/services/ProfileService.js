@@ -11,10 +11,33 @@ class ProfileService {
    */
   async getProfile() {
     try {
-      const response = await BaseApi.get('/profile');
-      // The response is already in the correct format from the backend
+      console.log('Sending profile request to backend...');
+      const response = await BaseApi.get('/profiles');
+      console.log('Raw profile response from backend:', response);
+      
+      // Log detailed structure to help debug
+      if (response) {
+        console.log('Profile response exists. Type:', typeof response);
+        console.log('Response keys:', Object.keys(response));
+        
+        if (response.data !== undefined) {
+          console.log('Response has data property. Type:', typeof response.data);
+        } else {
+          console.log('Response does NOT have data property');
+          // Check if the response itself is the data we need
+          console.log('Response may be directly usable as data');
+        }
+        
+        if (response.success !== undefined) {
+          console.log('Response has success property:', response.success);
+        }
+      } else {
+        console.log('Response is null or undefined');
+      }
+      
       return response;
     } catch (error) {
+      console.error('Profile fetch error details:', error);
       throw error;
     }
   }
@@ -26,7 +49,7 @@ class ProfileService {
    */
   async updateProfile(profileData) {
     try {
-      const response = await BaseApi.put('/profile', profileData);
+      const response = await BaseApi.put('/profiles', profileData);
       return response;
     } catch (error) {
       throw error;
@@ -86,25 +109,49 @@ class ProfileService {
     });
   }
 
+  /**
+   * Upload a CV file
+   * @param {File} file - CV file to upload
+   * @returns {Promise} Response with uploaded file info
+   */
   async uploadCV(file) {
     try {
       const formData = new FormData();
       formData.append('cv', file);
       
-      const response = await BaseApi.post('/profile/cv', formData, {
+      // Don't set Content-Type here - axios will set it with the correct boundary
+      const response = await BaseApi.post('/profiles/cv', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-        },
+        }
       });
+      return response;
+    } catch (error) {
+      console.error('CV upload error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete the CV
+   * @returns {Promise} Response with success status
+   */
+  async deleteCV() {
+    try {
+      const response = await BaseApi.delete('/profiles/cv');
       return response;
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteCV() {
+  /**
+   * Get the CV URL for viewing/downloading
+   * @returns {Promise} Response with CV URL and name
+   */
+  async getCV() {
     try {
-      const response = await BaseApi.delete('/profile/cv');
+      const response = await BaseApi.get('/profiles/cv');
       return response;
     } catch (error) {
       throw error;

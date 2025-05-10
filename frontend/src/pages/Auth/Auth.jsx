@@ -40,7 +40,7 @@ const Auth = () => {
         <h1 className={styles.title}>
           {isLogin ? 'Welcome Back' : 'Create Account'}
         </h1>
-        
+          
         <p className={styles.subtitle}>
           {isLogin 
             ? 'Sign in to continue your journey'
@@ -57,7 +57,7 @@ const Auth = () => {
         <div className={styles.switchMode}>
           <p>
             {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button
+            <button 
               type="button"
               onClick={() => setIsLogin(!isLogin)}
               className={styles.switchButton}
@@ -66,8 +66,8 @@ const Auth = () => {
               {isLogin ? 'Register' : 'Login'}
             </button>
           </p>
-        </div>
-      </div>
+              </div>
+            </div>
     </div>
   );
 };

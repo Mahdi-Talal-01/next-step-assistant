@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const instance = axios.create({
   baseURL: 'http://localhost:3000/api',
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -47,8 +47,37 @@ const request = async (method, url, data = null, config = {}) => {
       data,
       ...config,
     });
-    return response.data;
+    
+    // Extract the data from the response to handle our API format
+    if (response && response.data) {
+      // Handle our backend ResponseTrait format
+      if (response.data.success !== undefined) {
+        // For profile API where data is in message field
+        if (response.data.message && typeof response.data.message === 'object' && response.data.data === null) {
+          return {
+            success: response.data.success,
+            message: response.data.message,
+            data: response.data.message  // Use message as data when data is null
+          };
+        }
+        // Standard format: { success: boolean, message: string, data: any }
+        else if (response.data.data !== undefined) {
+          return {
+            success: response.data.success,
+            message: response.data.message,
+            data: response.data.data
+          };
+        }
+      }
+      
+      // For regular axios responses, keep data property
+      return response.data;
+    }
+    
+    // Fallback for unexpected response format
+    return response;
   } catch (error) {
+    console.error('Request error:', error);
     throw error.response?.data || error;
   }
 };

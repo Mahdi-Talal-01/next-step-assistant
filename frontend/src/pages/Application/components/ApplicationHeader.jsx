@@ -9,23 +9,25 @@ const ApplicationHeader = ({
   onExportCSV,
 }) => {
   return (
-    <div className="applications-header">
-      <h1>Job Applications</h1>
+    <div className="application-header">
+      <h1 className="header-title">Job Applications</h1>
       <div className="header-actions">
-        <button className="btn btn-primary" onClick={onOpenAddModal}>
-          <Icon icon="mdi:plus" className="me-2" />
+        <button className="header-button primary-button" onClick={onOpenAddModal}>
+          <Icon icon="mdi:plus" />
           Add Application
         </button>
-        <button className="btn btn-outline" onClick={onExportCSV}>
-          <Icon icon="mdi:download" className="me-2" />
+        <button className="header-button secondary-button" onClick={onExportCSV}>
+          <Icon icon="mdi:download" />
           Export CSV
         </button>
-        <button className="btn btn-outline" onClick={onToggleView}>
+        <button 
+          className="icon-button" 
+          onClick={onToggleView}
+          title={viewMode === 'grid' ? 'Switch to List View' : 'Switch to Grid View'}
+        >
           <Icon
             icon={viewMode === 'grid' ? 'mdi:view-list' : 'mdi:view-grid'}
-            className="me-2"
           />
-          {viewMode === 'grid' ? 'List View' : 'Grid View'}
         </button>
       </div>
     </div>

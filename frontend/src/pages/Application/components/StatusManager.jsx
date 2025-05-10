@@ -12,6 +12,11 @@ const STATUS_OPTIONS = [
 ];
 
 const StatusManager = ({ currentStatus, onStatusChange }) => {
+  const handleStatusChange = (newStatus) => {
+    console.log(`Status change requested from '${currentStatus}' to '${newStatus}'`);
+    onStatusChange(newStatus);
+  };
+
   return (
     <div className="status-manager">
       <div className="status-options">
@@ -19,7 +24,7 @@ const StatusManager = ({ currentStatus, onStatusChange }) => {
           <button
             key={status.value}
             className={`status-option ${currentStatus === status.value ? 'active' : ''}`}
-            onClick={() => onStatusChange(status.value)}
+            onClick={() => handleStatusChange(status.value)}
             title={status.label}
           >
             <Icon icon={status.icon} />

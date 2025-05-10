@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { defaultStages } from '../data/mockData';
 import { sortApplications } from '../utils/formatUtils';
+import jobService from '../services/jobService';
 
-export const useApplications = (initialApplications) => {
-  const [applications, setApplications] = useState(initialApplications);
+export const useApplications = () => {
+  const [applications, setApplications] = useState([]);
   const [filters, setFilters] = useState({
     status: 'all',
     jobType: 'all',
@@ -12,17 +13,37 @@ export const useApplications = (initialApplications) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('lastUpdated');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
 
-  // Simulate loading
+  // Fetch applications from API
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
+    fetchApplications();
   }, []);
+
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await jobService.getJobs();
+      
+      if (Array.isArray(response)) {
+        setApplications(response);
+      } else if (response && Array.isArray(response.data)) {
+        setApplications(response.data);
+      } else {
+        console.error('Unexpected API response format:', response);
+        setApplications([]);
+      }
+    } catch (err) {
+      console.error('Error fetching applications:', err);
+      setError('Failed to load applications. Please try again later.');
+      setApplications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredApplications = applications.filter((application) => {
     // Apply status filter
@@ -59,10 +80,11 @@ export const useApplications = (initialApplications) => {
       return (
         application.company.toLowerCase().includes(searchLower) ||
         application.position.toLowerCase().includes(searchLower) ||
-        application.location.toLowerCase().includes(searchLower) ||
-        application.skills.some((skill) =>
-          skill.toLowerCase().includes(searchLower)
-        )
+        (application.location && application.location.toLowerCase().includes(searchLower)) ||
+        (Array.isArray(application.skills) && 
+          application.skills.some((skill) =>
+            skill.toLowerCase().includes(searchLower)
+          ))
       );
     }
 
@@ -71,41 +93,112 @@ export const useApplications = (initialApplications) => {
 
   const sortedApplications = sortApplications(filteredApplications, sortBy, sortOrder);
 
-  const addApplication = (newApplication) => {
-    setApplications([
-      ...applications,
-      {
-        ...newApplication,
-        id: applications.length + 1,
-        stages: [...defaultStages],
-      },
-    ]);
+  const addApplication = async (newApplication) => {
+    try {
+      setLoading(true);
+      // Ensure stages property exists and is in the expected format
+      if (!newApplication.stages) {
+        newApplication.stages = [...defaultStages];
+      }
+      
+      const created = await jobService.createJob(newApplication);
+      if (created && created.data) {
+        // If the API returns the created job, use it
+        setApplications(prev => [...prev, created.data]);
+      } else {
+        // Otherwise, refresh the list to get updated data
+        await fetchApplications();
+      }
+      return true;
+    } catch (err) {
+      console.error('Error adding application:', err);
+      setError('Failed to add application');
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateApplication = (id, updatedData) => {
-    setApplications(
-      applications.map((app) =>
-        app.id === id ? { ...app, ...updatedData } : app
-      )
-    );
+  const updateApplication = async (id, updatedData) => {
+    try {
+      setLoading(true);
+      await jobService.updateJob(id, updatedData);
+      
+      // Update local state
+      setApplications(
+        applications.map((app) =>
+          app.id === id ? { ...app, ...updatedData } : app
+        )
+      );
+      return true;
+    } catch (err) {
+      console.error('Error updating application:', err);
+      setError('Failed to update application');
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteApplication = (id) => {
-    setApplications(applications.filter((app) => app.id !== id));
+  const deleteApplication = async (id) => {
+    try {
+      setLoading(true);
+      await jobService.deleteJob(id);
+      
+      // Update local state
+      setApplications(applications.filter((app) => app.id !== id));
+      return true;
+    } catch (err) {
+      console.error('Error deleting application:', err);
+      setError('Failed to delete application');
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateApplicationStatus = (id, newStatus) => {
-    setApplications(
-      applications.map((app) =>
-        app.id === id
-          ? {
-              ...app,
-              status: newStatus,
-              lastUpdated: new Date().toISOString().split('T')[0],
-            }
-          : app
-      )
-    );
+  const updateApplicationStatus = async (id, newStatus) => {
+    try {
+      const app = applications.find((a) => a.id === id);
+      if (!app) return false;
+      
+      console.log(`Updating application ${id} status to ${newStatus}`);
+      
+      // Use the dedicated status update method instead of the general update method
+      const response = await jobService.updateJobStatus(id, newStatus, app.notes);
+      console.log('Status update response:', response);
+      
+      if (response) {
+        // If we got a response with updated job data, use it to update our local state
+        if (response.data && typeof response.data === 'object') {
+          setApplications(
+            applications.map((app) =>
+              app.id === id ? response.data : app
+            )
+          );
+        } else {
+          // Otherwise just update the status locally
+          setApplications(
+            applications.map((app) =>
+              app.id === id
+                ? { 
+                    ...app, 
+                    status: newStatus,
+                    lastUpdated: new Date().toISOString().split('T')[0]
+                  }
+                : app
+            )
+          );
+        }
+        return true;
+      }
+      
+      return false;
+    } catch (err) {
+      console.error('Error updating application status:', err);
+      setError('Failed to update application status');
+      return false;
+    }
   };
 
   const toggleViewMode = () => {
@@ -123,11 +216,13 @@ export const useApplications = (initialApplications) => {
     sortOrder,
     setSortOrder,
     loading,
+    error,
     viewMode,
     addApplication,
     updateApplication,
     deleteApplication,
     updateApplicationStatus,
     toggleViewMode,
+    refreshApplications: fetchApplications
   };
 }; 

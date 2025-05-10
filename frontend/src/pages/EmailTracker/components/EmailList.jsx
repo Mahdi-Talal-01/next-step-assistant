@@ -2,7 +2,7 @@ import React from "react";
 import EmailItem from "./EmailItem";
 import "../EmailTracker.css";
 
-const EmailList = ({ emails, onToggleRead, onToggleStarred }) => {
+const EmailList = ({ emails, onToggleRead, onToggleStarred, onViewEmail }) => {
   if (emails.length === 0) {
     return (
       <div className="no-emails">
@@ -19,6 +19,7 @@ const EmailList = ({ emails, onToggleRead, onToggleStarred }) => {
           email={email}
           onToggleRead={onToggleRead}
           onToggleStarred={onToggleStarred}
+          onViewEmail={onViewEmail}
         />
       ))}
     </div>

@@ -7,13 +7,22 @@ import {
 } from "../utils/formatUtils";
 import "../EmailTracker.css";
 
-const EmailItem = ({ email, onToggleRead, onToggleStarred }) => {
+const EmailItem = ({ email, onToggleRead, onToggleStarred, onViewEmail }) => {
+  // Prevent event bubbling for action buttons
+  const handleActionClick = (e, action) => {
+    e.stopPropagation();
+    action();
+  };
+
   return (
-    <div className={`email-item ${email.isRead ? "read" : ""}`}>
+    <div 
+      className={`email-item ${email.isRead ? "read" : ""}`}
+      onClick={() => onViewEmail(email)}
+    >
       <div className="email-actions">
         <button
           className="action-btn"
-          onClick={() => onToggleStarred(email.id)}
+          onClick={(e) => handleActionClick(e, () => onToggleStarred(email.id))}
           title={email.isStarred ? "Unstar" : "Star"}
         >
           <Icon
@@ -23,7 +32,7 @@ const EmailItem = ({ email, onToggleRead, onToggleStarred }) => {
         </button>
         <button
           className="action-btn"
-          onClick={() => onToggleRead(email.id)}
+          onClick={(e) => handleActionClick(e, () => onToggleRead(email.id))}
           title={email.isRead ? "Mark as unread" : "Mark as read"}
         >
           <Icon

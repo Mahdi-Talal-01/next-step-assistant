@@ -3,18 +3,8 @@ import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import styles from './ResumeSection.module.css';
 
-const ResumeSection = ({ resume, onUpload }) => {
+const ResumeSection = ({ resumeUrl, resumeName, onUpload, onDelete }) => {
   const fileInputRef = useRef(null);
-  
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
   
   const handleFileClick = () => {
     fileInputRef.current.click();
@@ -24,9 +14,10 @@ const ResumeSection = ({ resume, onUpload }) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Check if file is a PDF
-      if (file.type !== 'application/pdf') {
-        alert('Please upload a PDF file');
+      // Check if file is a PDF or Word doc
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Please upload a PDF or Word document');
         return;
       }
       
@@ -36,18 +27,32 @@ const ResumeSection = ({ resume, onUpload }) => {
         return;
       }
       
-      await onUpload(file);
+      try {
+        await onUpload(file);
+      } catch (error) {
+        console.error('Failed to upload CV:', error);
+        alert('Failed to upload CV. Please try again.');
+      }
     }
   };
+  
+  // Get the full URL for the CV
+  const getFullCVUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `http://localhost:3000${url}`;
+  };
+  
+  const cvUrl = getFullCVUrl(resumeUrl);
   
   return (
     <div className={styles.resumeSection}>
       <div className={styles.sectionHeader}>
-        <h3 className={styles.sectionTitle}>Resume</h3>
+        <h3 className={styles.sectionTitle}>Resume / CV</h3>
       </div>
       
       <div className={styles.resumeContent}>
-        {resume ? (
+        {resumeUrl ? (
           <div className={styles.resumeFile}>
             <div className={styles.fileInfo}>
               <div className={styles.fileIcon}>
@@ -55,16 +60,13 @@ const ResumeSection = ({ resume, onUpload }) => {
               </div>
               
               <div className={styles.fileDetails}>
-                <h4 className={styles.fileName}>{resume.name}</h4>
-                <p className={styles.fileDate}>
-                  Uploaded on {formatDate(resume.updatedAt)}
-                </p>
+                <h4 className={styles.fileName}>{resumeName || 'Resume'}</h4>
               </div>
             </div>
             
             <div className={styles.fileActions}>
               <a 
-                href={resume.url}
+                href={cvUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.viewButton}
@@ -82,13 +84,21 @@ const ResumeSection = ({ resume, onUpload }) => {
               </button>
               
               <a 
-                href={resume.url}
-                download={resume.name}
+                href={cvUrl}
+                download={resumeName}
                 className={styles.downloadButton}
               >
                 <Icon icon="mdi:download" className={styles.actionIcon} />
                 Download
               </a>
+              
+              <button 
+                className={styles.deleteButton}
+                onClick={onDelete}
+              >
+                <Icon icon="mdi:delete" className={styles.actionIcon} />
+                Delete
+              </button>
             </div>
           </div>
         ) : (
@@ -99,10 +109,10 @@ const ResumeSection = ({ resume, onUpload }) => {
               </div>
               <h4 className={styles.uploadTitle}>Upload your resume</h4>
               <p className={styles.uploadText}>
-                Drag and drop a PDF file here, or click to browse
+                Click to browse and select a file
               </p>
               <p className={styles.uploadHelp}>
-                Max file size: 5MB | Supported format: PDF
+                Max file size: 5MB | Supported formats: PDF, DOC, DOCX
               </p>
             </div>
           </div>
@@ -112,7 +122,7 @@ const ResumeSection = ({ resume, onUpload }) => {
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept="application/pdf"
+          accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           style={{ display: 'none' }}
         />
       </div>
@@ -121,12 +131,10 @@ const ResumeSection = ({ resume, onUpload }) => {
 };
 
 ResumeSection.propTypes = {
-  resume: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    updatedAt: PropTypes.string
-  }),
-  onUpload: PropTypes.func.isRequired
+  resumeUrl: PropTypes.string,
+  resumeName: PropTypes.string,
+  onUpload: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired
 };
 
 export default ResumeSection; 

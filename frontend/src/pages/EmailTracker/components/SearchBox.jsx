@@ -2,9 +2,16 @@ import React from "react";
 import { Icon } from "@iconify/react";
 import "../EmailTracker.css";
 
-const SearchBox = ({ searchTerm, onSearchChange, onClearSearch }) => {
+const SearchBox = ({ searchTerm, onSearchChange, onClearSearch, onSearch }) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (onSearch) {
+      onSearch(searchTerm);
+    }
+  };
+
   return (
-    <div className="search-box">
+    <form className="search-box" onSubmit={handleSubmit}>
       <Icon icon="mdi:magnify" className="search-icon" />
       <input
         type="text"
@@ -14,11 +21,14 @@ const SearchBox = ({ searchTerm, onSearchChange, onClearSearch }) => {
         className="search-input"
       />
       {searchTerm && (
-        <button className="clear-search" onClick={onClearSearch}>
+        <button type="button" className="clear-search" onClick={onClearSearch}>
           <Icon icon="mdi:close" />
         </button>
       )}
-    </div>
+      <button type="submit" className="search-submit" style={{ display: 'none' }}>
+        Search
+      </button>
+    </form>
   );
 };
 

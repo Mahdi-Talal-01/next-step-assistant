@@ -27,6 +27,17 @@ class ProfileService {
       throw error;
     }
   }
+  async getCV(userId) {
+    try {
+      const profile = await ProfileRepository.getCV(userId);
+      return {
+        success: true,
+        data: profile
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async updateResume(userId, resumeUrl, resumeName) {
     try {
@@ -40,5 +51,6 @@ class ProfileService {
     }
   }
 }
+
 
 module.exports = new ProfileService(); 
