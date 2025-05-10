@@ -80,5 +80,49 @@ class JobRepository {
       throw error;
     }
   }
+   /**
+   * Update a job
+   * @param {string} jobId - The job ID
+   * @param {string} userId - The user ID (for security)
+   * @param {Object} jobData - The job data to update
+   * @returns {Promise<Object|null>} - The updated job or null if not found
+   */
+   async updateJob(jobId, userId, jobData) {
+    try {
+      // Parse skills and stages if they are provided
+      const parsedData = { ...jobData };
+      
+      if (jobData.skills) {
+        parsedData.skills = Array.isArray(jobData.skills) 
+          ? JSON.stringify(jobData.skills) 
+          : jobData.skills;
+      }
+      
+      if (jobData.stages) {
+        parsedData.stages = Array.isArray(jobData.stages) 
+          ? JSON.stringify(jobData.stages) 
+          : jobData.stages;
+      }
+
+      if (jobData.appliedDate) {
+        parsedData.appliedDate = new Date(jobData.appliedDate);
+      }
+
+      const job = await prisma.job.updateMany({
+        where: {
+          id: jobId,
+          userId
+        },
+        data: parsedData
+      });
+
+      if (job.count === 0) return null;
+
+      return this.getJobById(jobId, userId);
+    } catch (error) {
+      console.error('Error updating job:', error);
+      throw error;
+    }
+  }
 }
 module.exports = new JobRepository();
