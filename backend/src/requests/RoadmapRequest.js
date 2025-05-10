@@ -1,4 +1,5 @@
 const ResponseTrait = require("../traits/ResponseTrait");
+
 class RoadmapRequest {
     static validateCreate(req, res, next) {
         const { title, description, icon, color, estimatedTime, difficulty, topics } = req.body;
@@ -42,6 +43,7 @@ class RoadmapRequest {
 
         next();
     }
+
     static validateUpdate(req, res, next) {
         const { title, description, icon, color, estimatedTime, difficulty, topics } = req.body;
 
@@ -84,6 +86,7 @@ class RoadmapRequest {
 
         next();
     }
+
     static validateTopicStatus(req, res, next) {
         const { status } = req.body;
         const errors = {};
@@ -100,6 +103,7 @@ class RoadmapRequest {
 
         next();
     }
+
     static validateGetAll(req, res, next) {
         const { page, limit, search, sort, filter } = req.query;
         const errors = {};
@@ -144,6 +148,7 @@ class RoadmapRequest {
 
         next();
     }
+
     static validateGetById(req, res, next) {
         const { id } = req.params;
         const errors = {};
@@ -160,5 +165,23 @@ class RoadmapRequest {
 
         next();
     }
+
+    static validateDelete(req, res, next) {
+        const { id } = req.params;
+        const errors = {};
+
+        if (!id) {
+            errors.id = "Roadmap ID is required";
+        } else if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id)) {
+            errors.id = "Invalid roadmap ID format";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            return ResponseTrait.validationError(res, errors);
+        }
+
+        next();
+    }
 }
+
 module.exports = RoadmapRequest; 
