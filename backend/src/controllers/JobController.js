@@ -87,5 +87,27 @@ class JobController {
       return ResponseTrait.error(res, 'Failed to update job');
     }
   }
+  /**
+   * Delete a job
+   * @param {Object} req - Express request
+   * @param {Object} res - Express response
+   */
+  async deleteJob(req, res) {
+    try {
+      const { jobId } = req.params;
+      const userId = req.user.id;
+      
+      const deleted = await JobRepository.deleteJob(jobId, userId);
+      
+      if (!deleted) {
+        return ResponseTrait.notFound(res, 'Job not found');
+      }
+      
+      return ResponseTrait.success(res, 'Job deleted successfully');
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      return ResponseTrait.error(res, 'Failed to delete job');
+    }
+  }
 }
 module.exports = new JobController();
