@@ -23,5 +23,22 @@ class RoadmapRepository {
             }
         });
     }
+    async findAll(userId) {
+        return await prisma.roadmap.findMany({
+            where: {
+                OR: [
+                    { userId },
+                    { isTemplate: true }
+                ]
+            },
+            include: {
+                topics: {
+                    include: {
+                        resources: true
+                    }
+                }
+            }
+        });
+    }
 }
 module.exports = new RoadmapRepository(); 
