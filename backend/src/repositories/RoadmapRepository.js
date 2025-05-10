@@ -52,5 +52,34 @@ class RoadmapRepository {
             }
         });
     }
+    async update(id, data) {
+        // First delete existing topics and resources
+        await prisma.topic.deleteMany({
+            where: { roadmapId: id }
+        });
+
+        // Then update the roadmap with new data
+        return await prisma.roadmap.update({
+            where: { id },
+            data: {
+                ...data,
+                topics: {
+                    create: data.topics.map(topic => ({
+                        ...topic,
+                        resources: {
+                            create: topic.resources || []
+                        }
+                    }))
+                }
+            },
+            include: {
+                topics: {
+                    include: {
+                        resources: true
+                    }
+                }
+            }
+        });
+    }
 }
 module.exports = new RoadmapRepository(); 
