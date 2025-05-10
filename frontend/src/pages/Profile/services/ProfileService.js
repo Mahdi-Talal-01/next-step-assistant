@@ -11,9 +11,33 @@ class ProfileService {
    */
   async getProfile() {
     try {
+      console.log('Sending profile request to backend...');
       const response = await BaseApi.get('/profiles');
+      console.log('Raw profile response from backend:', response);
+      
+      // Log detailed structure to help debug
+      if (response) {
+        console.log('Profile response exists. Type:', typeof response);
+        console.log('Response keys:', Object.keys(response));
+        
+        if (response.data !== undefined) {
+          console.log('Response has data property. Type:', typeof response.data);
+        } else {
+          console.log('Response does NOT have data property');
+          // Check if the response itself is the data we need
+          console.log('Response may be directly usable as data');
+        }
+        
+        if (response.success !== undefined) {
+          console.log('Response has success property:', response.success);
+        }
+      } else {
+        console.log('Response is null or undefined');
+      }
+      
       return response;
     } catch (error) {
+      console.error('Profile fetch error details:', error);
       throw error;
     }
   }
