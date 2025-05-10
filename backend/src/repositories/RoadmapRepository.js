@@ -86,5 +86,26 @@ class RoadmapRepository {
             where: { id }
         });
     }
+    async updateTopicStatus(roadmapId, topicId, status) {
+        // First check if the topic exists
+        const topic = await prisma.topic.findFirst({
+            where: {
+                id: topicId,
+                roadmapId: roadmapId
+            }
+        });
+
+        if (!topic) {
+            throw new Error(`Topic not found with ID: ${topicId} in roadmap: ${roadmapId}`);
+        }
+
+        return await prisma.topic.update({
+            where: {
+                id: topicId,
+                roadmapId: roadmapId
+            },
+            data: { status }
+        });
+    }
 }
 module.exports = new RoadmapRepository(); 
