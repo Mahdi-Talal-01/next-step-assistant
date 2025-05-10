@@ -94,7 +94,11 @@ class GmailController {
       return ResponseTrait.error(res, 'Failed to check Gmail authorization');
     }
   }
-  
+   /**
+   * Disconnect Gmail from the user account
+   * @param {object} req - Express request
+   * @param {object} res - Express response
+   */
    async disconnect(req, res) {
     try {
       await TokenRepository.deleteTokens(req.user.id);
