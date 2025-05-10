@@ -41,5 +41,28 @@ class JobController {
       return ResponseTrait.error(res, 'Failed to fetch job');
     }
   }
+   /**
+   * Create a new job
+   * @param {Object} req - Express request
+   * @param {Object} res - Express response
+   */
+   async createJob(req, res) {
+    try {
+      const userId = req.user.id;
+      const jobData = req.body;
+      
+      // Validate required fields
+      if (!jobData.company || !jobData.position || !jobData.status) {
+        return ResponseTrait.badRequest(res, 'Company, position, and status are required');
+      }
+      
+      const job = await JobRepository.createJob(userId, jobData);
+      
+      return ResponseTrait.success(res, 'Job created successfully', job, 201);
+    } catch (error) {
+      console.error('Error creating job:', error);
+      return ResponseTrait.error(res, 'Failed to create job');
+    }
+  }
 }
 module.exports = new JobController();
