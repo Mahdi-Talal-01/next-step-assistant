@@ -200,5 +200,19 @@ class JobService {
       throw error;
     }
   }
+   /**
+   * Delete a job application
+   * @param {string} jobId - The ID of the job to delete
+   * @returns {Promise<boolean>} Success status
+   */
+   async deleteJob(jobId) {
+    try {
+      await BaseApi.delete(`/jobs/${jobId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error deleting job ${jobId}:`, error);
+      throw error;
+    }
+  }
 }
 export default new JobService();
