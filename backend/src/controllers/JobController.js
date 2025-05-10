@@ -64,5 +64,28 @@ class JobController {
       return ResponseTrait.error(res, 'Failed to create job');
     }
   }
+  /**
+   * Update an existing job
+   * @param {Object} req - Express request
+   * @param {Object} res - Express response
+   */
+  async updateJob(req, res) {
+    try {
+      const { jobId } = req.params;
+      const userId = req.user.id;
+      const jobData = req.body;
+      
+      const job = await JobRepository.updateJob(jobId, userId, jobData);
+      
+      if (!job) {
+        return ResponseTrait.notFound(res, 'Job not found');
+      }
+      
+      return ResponseTrait.success(res, 'Job updated successfully', job);
+    } catch (error) {
+      console.error('Error updating job:', error);
+      return ResponseTrait.error(res, 'Failed to update job');
+    }
+  }
 }
 module.exports = new JobController();
