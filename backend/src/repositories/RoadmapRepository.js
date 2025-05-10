@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+
 class RoadmapRepository {
     async create(data) {
         return await prisma.roadmap.create({
@@ -23,6 +24,7 @@ class RoadmapRepository {
             }
         });
     }
+
     async findAll(userId) {
         return await prisma.roadmap.findMany({
             where: {
@@ -40,6 +42,7 @@ class RoadmapRepository {
             }
         });
     }
+
     async findById(id) {
         return await prisma.roadmap.findUnique({
             where: { id },
@@ -52,6 +55,7 @@ class RoadmapRepository {
             }
         });
     }
+
     async update(id, data) {
         // First delete existing topics and resources
         await prisma.topic.deleteMany({
@@ -81,11 +85,13 @@ class RoadmapRepository {
             }
         });
     }
+
     async delete(id) {
         return await prisma.roadmap.delete({
             where: { id }
         });
     }
+
     async updateTopicStatus(roadmapId, topicId, status) {
         // First check if the topic exists
         const topic = await prisma.topic.findFirst({
@@ -107,5 +113,17 @@ class RoadmapRepository {
             data: { status }
         });
     }
+
+    async calculateProgress(roadmapId) {
+        const topics = await prisma.topic.findMany({
+            where: { roadmapId }
+        });
+
+        if (topics.length === 0) return 0;
+
+        const completedTopics = topics.filter(topic => topic.status === 'completed').length;
+        return Math.round((completedTopics / topics.length) * 100);
+    }
 }
+
 module.exports = new RoadmapRepository(); 
