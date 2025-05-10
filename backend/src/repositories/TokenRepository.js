@@ -62,6 +62,20 @@ class TokenRepository {
       throw error;
     }
   }
+   /**
+   * Get tokens by user ID
+   * @param {string} userId - The user ID
+   * @returns {object|null} - The token record or null
+   */
+   async getTokensByUserId(userId) {
+    try {
+      return await prisma.token.findUnique({
+        where: { userId }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = { TokenRepository: new TokenRepository() }; 
