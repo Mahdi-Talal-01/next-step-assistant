@@ -94,5 +94,15 @@ class GmailController {
       return ResponseTrait.error(res, 'Failed to check Gmail authorization');
     }
   }
+  
+   async disconnect(req, res) {
+    try {
+      await TokenRepository.deleteTokens(req.user.id);
+      return ResponseTrait.success(res, null, 'Gmail disconnected successfully');
+    } catch (error) {
+      console.error('Gmail disconnect error:', error);
+      return ResponseTrait.error(res, 'Failed to disconnect Gmail');
+    }
+  }
 }
 module.exports = new GmailController();
