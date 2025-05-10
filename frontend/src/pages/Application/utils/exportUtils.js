@@ -54,3 +54,38 @@ export const convertToCSV = (applications) => {
   // Combine header and data rows
   return [headerRow, ...rows].join("\n");
 };
+/**
+ * Export applications to CSV file
+ * @param {Array} applications - The job applications to export
+ * @returns {void}
+ */
+export const exportToCSV = (applications) => {
+  // Convert to CSV
+  const csv = convertToCSV(applications);
+
+  // Create a Blob with the CSV data
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+  // Create a download link
+  const link = document.createElement("a");
+
+  // Create a URL for the Blob
+  const url = URL.createObjectURL(blob);
+
+  // Set link properties
+  link.setAttribute("href", url);
+  link.setAttribute(
+    "download",
+    `job_applications_${new Date().toISOString().split("T")[0]}.csv`
+  );
+  link.style.visibility = "hidden";
+
+  // Add link to document
+  document.body.appendChild(link);
+
+  // Click the link to trigger download
+  link.click();
+
+  // Clean up
+  document.body.removeChild(link);
+};
