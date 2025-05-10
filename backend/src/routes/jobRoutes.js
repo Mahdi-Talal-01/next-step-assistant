@@ -7,20 +7,21 @@ const auth = require("../middleware/auth");
 router.use(auth);
 
 // Get all jobs for the authenticated user
-router.get('/', JobController.getJobs);
+router.get("/", JobController.getJobs);
 
 // Get a specific job
-router.get('/:jobId', JobController.getJob);
+router.get("/:jobId", JobController.getJob);
 
 // Get job statistics
-router.get('/stats', JobController.getJobStats);
+router.get("/stats", JobController.getJobStats);
 
 // Create a new job
-router.post('/', JobController.createJob);
+router.post("/", JobController.createJob);
 
 // Update a job
-router.put('/:jobId', JobController.updateJob);
+router.put("/:jobId", JobController.updateJob);
 
-
+// Delete a job
+router.delete("/:jobId", JobController.deleteJob);
 
 module.exports = router;
