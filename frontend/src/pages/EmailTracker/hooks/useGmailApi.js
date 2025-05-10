@@ -388,4 +388,14 @@ export const useGmailApi = () => {
       },
       [isAuthorized]
     );
+     // Helper function to determine email category from labels
+  const getCategoryFromLabels = (labels = []) => {
+    if (!Array.isArray(labels)) return "primary";
+
+    if (labels.includes("CATEGORY_SOCIAL")) return "social";
+    if (labels.includes("CATEGORY_PROMOTIONS")) return "promotions";
+    if (labels.includes("CATEGORY_UPDATES")) return "updates";
+    if (labels.includes("CATEGORY_FORUMS")) return "forums";
+    return "primary";
+  };
 }
