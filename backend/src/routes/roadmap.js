@@ -17,7 +17,7 @@ router.get('/', roadmapController.getRoadmaps);
 router.get('/:id', roadmapController.getRoadmapById);
 
 // Update a roadmap
-router.put('/:id', roadmapController.updateRoadmap);
+router.put('/:id', RoadmapRequest.validateUpdate, roadmapController.updateRoadmap);
 
 // Delete a roadmap
 router.delete('/:id', roadmapController.deleteRoadmap);
