@@ -10,6 +10,7 @@ class GmailService {
       "https://www.googleapis.com/auth/userinfo.email",
     ];
   }
+
   /**
    * Create OAuth2 client with user tokens
    * @param {string} userId - The user ID
@@ -58,6 +59,7 @@ class GmailService {
       throw error;
     }
   }
+
   /**
    * Generate URL for Gmail authorization
    * @param {string} state - State parameter for OAuth
@@ -94,6 +96,7 @@ class GmailService {
       redirect_uri: redirectUrl, // Explicitly include the redirect_uri
     });
   }
+
   /**
    * Exchange authorization code for tokens
    * @param {string} code - Authorization code
@@ -113,6 +116,7 @@ class GmailService {
     const { tokens } = await oauth2Client.getToken(code);
     return tokens;
   }
+
   /**
    * List emails from user's Gmail inbox
    * @param {string} userId - The user ID
@@ -169,6 +173,7 @@ class GmailService {
       throw error;
     }
   }
+
   /**
    * Parse Gmail message to a more readable format
    * @param {object} message - Gmail message
@@ -240,4 +245,5 @@ class GmailService {
     }
   }
 }
+
 module.exports = new GmailService();
