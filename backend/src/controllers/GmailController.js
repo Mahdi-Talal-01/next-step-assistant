@@ -4,6 +4,12 @@ const ResponseTrait = require('../traits/ResponseTrait');
 const jwt = require('jsonwebtoken');
 
 class GmailController {
+  /**
+   * Get Gmail authorization URL
+   * @param {object} req - Express request
+   * @param {object} res - Express response
+   */
+  
   async getAuthUrl(req, res) {
     try {
       // Include the user ID in the state parameter
