@@ -154,4 +154,19 @@ export const useGmailApi = () => {
       setIsLoading(false);
     }
   }, [getAuthUrl]);
+   // Disconnect Gmail
+   const disconnectGmail = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      await BaseApi.delete("/gmail/disconnect");
+      setIsAuthorized(false);
+      setEmails([]);
+    } catch (err) {
+      console.error("Disconnect error:", err);
+      setError("Failed to disconnect Gmail");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 }
