@@ -19,5 +19,27 @@ class JobController {
       return ResponseTrait.error(res, "Failed to fetch jobs");
     }
   }
+  /**
+   * Get a specific job by ID
+   * @param {Object} req - Express request
+   * @param {Object} res - Express response
+   */
+  async getJob(req, res) {
+    try {
+      const { jobId } = req.params;
+      const userId = req.user.id;
+      
+      const job = await JobRepository.getJobById(jobId, userId);
+      
+      if (!job) {
+        return ResponseTrait.notFound(res, 'Job not found');
+      }
+      
+      return ResponseTrait.success(res, 'Job fetched successfully', job);
+    } catch (error) {
+      console.error('Error fetching job:', error);
+      return ResponseTrait.error(res, 'Failed to fetch job');
+    }
+  }
 }
 module.exports = new JobController();
