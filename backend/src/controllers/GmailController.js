@@ -77,5 +77,16 @@ class GmailController {
       res.redirect(`${frontendUrl}/app/gmail-tracker?error=true&message=${encodeURIComponent('Failed to connect Gmail')}`);
     }
   }
+  async checkAuthorization(req, res) {
+    try {
+      const tokens = await TokenRepository.getTokensByUserId(req.user.id);
+      return ResponseTrait.success(res, {
+        isAuthorized: !!tokens
+      });
+    } catch (error) {
+      console.error('Check Gmail auth error:', error);
+      return ResponseTrait.error(res, 'Failed to check Gmail authorization');
+    }
+  }
 }
 module.exports = new GmailController();
