@@ -108,5 +108,28 @@ class GmailController {
       return ResponseTrait.error(res, 'Failed to disconnect Gmail');
     }
   }
+  
+   async getEmails(req, res) {
+    try {
+      const { maxResults, labelIds, q } = req.query;
+      
+      const options = {
+        maxResults: maxResults ? parseInt(maxResults, 10) : 20,
+        labelIds: labelIds ? labelIds.split(',') : ['INBOX'],
+        q: q || ''
+      };
+
+      const emails = await GmailService.listEmails(req.user.id, options);
+      return ResponseTrait.success(res, emails);
+    } catch (error) {
+      console.error('Get Gmail emails error:', error);
+      
+      if (error.message === 'User has not authorized Gmail access') {
+        return ResponseTrait.error(res, error.message, 401);
+      }
+      
+      return ResponseTrait.error(res, 'Failed to fetch emails');
+    }
+  }
 }
 module.exports = new GmailController();
