@@ -9,6 +9,9 @@ class RoadmapService {
         };
         return await roadmapRepository.create(roadmap);
     }
+    async getRoadmaps(userId) {
+        return await roadmapRepository.findAll(userId);
+    }
    
     
 }
