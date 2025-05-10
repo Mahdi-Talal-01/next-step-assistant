@@ -40,5 +40,17 @@ class RoadmapRepository {
             }
         });
     }
+    async findById(id) {
+        return await prisma.roadmap.findUnique({
+            where: { id },
+            include: {
+                topics: {
+                    include: {
+                        resources: true
+                    }
+                }
+            }
+        });
+    }
 }
 module.exports = new RoadmapRepository(); 
