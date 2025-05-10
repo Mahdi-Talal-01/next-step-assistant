@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import BaseApi from "../../../commons/request";
 
 export const useGmailApi = () => {
+  const [emails, setEmails] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+
   // Check if user has authorized Gmail access
   const checkAuthorization = useCallback(async () => {
     try {
@@ -76,4 +82,56 @@ export const useGmailApi = () => {
       setIsLoading(false);
     }
   }, []);
-};
+  // Get authorization URL
+  const getAuthUrl = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await BaseApi.get("/gmail/auth");
+      console.log("Auth URL response:", response);
+
+      // Check different possibilities for how the URL might be nested
+      if (response && response.authUrl) {
+        return response.authUrl;
+      } else if (response && response.data && response.data.authUrl) {
+        return response.data.authUrl;
+      } else if (typeof response === "string" && response.includes("http")) {
+        return response;
+      } else if (response && typeof response === "object") {
+        // Log the full response to help debug
+        console.log("Auth URL response structure:", JSON.stringify(response));
+        // Try to find anything that looks like a URL
+        for (const key in response) {
+          if (
+            typeof response[key] === "string" &&
+            response[key].includes("accounts.google.com")
+          ) {
+            return response[key];
+          }
+          if (response[key] && typeof response[key] === "object") {
+            for (const innerKey in response[key]) {
+              if (
+                typeof response[key][innerKey] === "string" &&
+                response[key][innerKey].includes("accounts.google.com")
+              ) {
+                return response[key][innerKey];
+              }
+            }
+          }
+        }
+      }
+
+      // If we couldn't find a URL, log an error
+      console.error(
+        "Could not extract authorization URL from response:",
+        response
+      );
+      return null;
+    } catch (err) {
+      console.error("Auth URL error:", err);
+      setError("Failed to get authorization URL");
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+}
