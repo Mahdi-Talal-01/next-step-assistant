@@ -94,5 +94,24 @@ class GmailService {
       redirect_uri: redirectUrl, // Explicitly include the redirect_uri
     });
   }
+  /**
+   * Exchange authorization code for tokens
+   * @param {string} code - Authorization code
+   * @returns {object} - Tokens
+   */
+  async getTokens(code) {
+    const redirectUrl =
+      process.env.GOOGLE_REDIRECT_URL ||
+      "http://localhost:3000/api/gmail/callback";
+
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      redirectUrl
+    );
+
+    const { tokens } = await oauth2Client.getToken(code);
+    return tokens;
+  }
 }
 module.exports = new GmailService();
