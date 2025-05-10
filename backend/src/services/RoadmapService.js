@@ -12,7 +12,13 @@ class RoadmapService {
     async getRoadmaps(userId) {
         return await roadmapRepository.findAll(userId);
     }
-   
+    async getRoadmapById(id) {
+        const roadmap = await roadmapRepository.findById(id);
+        if (!roadmap) {
+            throw new Error('Roadmap not found');
+        }
+        return roadmap;
+    }
     
 }
 module.exports = new RoadmapService(); 
