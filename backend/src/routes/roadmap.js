@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 const roadmapController = require('../controllers/RoadmapController');
 const authMiddleware = require('../middleware/auth');
+const RoadmapRequest = require('../requests/RoadmapRequest');
 
 // Apply auth middleware to all routes
 router.use(authMiddleware);
 
 // Create a new roadmap
-router.post('/', roadmapController.createRoadmap);
+router.post('/', RoadmapRequest.validateCreate, roadmapController.createRoadmap);
 
 // Get all roadmaps (including templates)
 router.get('/', roadmapController.getRoadmaps);
