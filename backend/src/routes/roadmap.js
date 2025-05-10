@@ -8,3 +8,6 @@ router.use(authMiddleware);
 
 // Create a new roadmap
 router.post('/', roadmapController.createRoadmap);
+
+// Get all roadmaps (including templates)
+router.get('/', roadmapController.getRoadmaps);
