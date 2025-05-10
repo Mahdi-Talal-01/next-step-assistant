@@ -1,5 +1,48 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-class TokenRepository {}
+class TokenRepository {
+   /**
+   * Save tokens from OAuth for a user
+   * @param {string} userId - The user ID
+   * @param {object} tokenData - Token data (accessToken, refreshToken, expiryDate)
+   * @returns {object} - The saved token record
+   */
+   async saveTokens(userId, tokenData) {
+    try {
+      // Check if token exists for this user
+      const existingToken = await prisma.token.findUnique({
+        where: { userId }
+      });
+
+      if (existingToken) {
+        // Update existing token
+        return await prisma.token.update({
+          where: { userId },
+          data: {
+            accessToken: tokenData.accessToken,
+            refreshToken: tokenData.refreshToken || existingToken.refreshToken,
+            expiryDate: tokenData.expiryDate,
+            provider: 'google',
+            scope: tokenData.scope || existingToken.scope
+          }
+        });
+      } else {
+        // Create new token
+        return await prisma.token.create({
+          data: {
+            userId,
+            accessToken: tokenData.accessToken,
+            refreshToken: tokenData.refreshToken,
+            expiryDate: tokenData.expiryDate,
+            provider: 'google',
+            scope: tokenData.scope || ''
+          }
+        });
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+}
 
 module.exports = { TokenRepository: new TokenRepository() }; 
