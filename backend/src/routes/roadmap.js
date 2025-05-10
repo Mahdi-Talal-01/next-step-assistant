@@ -11,3 +11,6 @@ router.post('/', roadmapController.createRoadmap);
 
 // Get all roadmaps (including templates)
 router.get('/', roadmapController.getRoadmaps);
+
+// Get a specific roadmap
+router.get('/:id', roadmapController.getRoadmapById);
