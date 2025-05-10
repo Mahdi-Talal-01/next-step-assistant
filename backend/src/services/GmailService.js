@@ -113,13 +113,13 @@ class GmailService {
     const { tokens } = await oauth2Client.getToken(code);
     return tokens;
   }
-   /**
+  /**
    * List emails from user's Gmail inbox
    * @param {string} userId - The user ID
    * @param {object} options - Query options (maxResults, labelIds, q)
    * @returns {array} - List of emails
    */
-   async listEmails(userId, options = {}) {
+  async listEmails(userId, options = {}) {
     try {
       const auth = await this.getOAuth2Client(userId);
       const gmail = google.gmail({ version: "v1", auth });
@@ -167,6 +167,76 @@ class GmailService {
     } catch (error) {
       console.error("List emails error:", error);
       throw error;
+    }
+  }
+  /**
+   * Parse Gmail message to a more readable format
+   * @param {object} message - Gmail message
+   * @returns {object} - Parsed email
+   */
+  parseMessage(message) {
+    try {
+      // Handle case where payload might be null or undefined
+      if (!message || !message.payload) {
+        console.log("Unable to parse message, invalid format:", message?.id);
+        return {
+          id: message?.id || "unknown",
+          threadId: message?.threadId || "unknown",
+          subject: "Unable to retrieve subject",
+          from: "Unable to retrieve sender",
+          to: "Unable to retrieve recipient",
+          date: new Date().toISOString(),
+          body: "",
+          snippet: message?.snippet || "",
+          labels: message?.labelIds || [],
+          isUnread: false,
+        };
+      }
+
+      const headers = message.payload.headers || [];
+
+      // Extract headers
+      const subject =
+        headers.find((h) => h.name.toLowerCase() === "subject")?.value || "";
+      const from =
+        headers.find((h) => h.name.toLowerCase() === "from")?.value || "";
+      const to =
+        headers.find((h) => h.name.toLowerCase() === "to")?.value || "";
+      const date =
+        headers.find((h) => h.name.toLowerCase() === "date")?.value || "";
+
+      // For metadata format, we won't have the body
+      let body = "";
+
+      // Extract labels
+      const labels = message.labelIds || [];
+
+      return {
+        id: message.id,
+        threadId: message.threadId,
+        subject,
+        from,
+        to,
+        date,
+        body,
+        snippet: message.snippet || "",
+        labels,
+        isUnread: labels.includes("UNREAD"),
+      };
+    } catch (error) {
+      console.error("Error parsing message:", error);
+      return {
+        id: message?.id || "unknown",
+        threadId: message?.threadId || "unknown",
+        subject: "Error parsing email",
+        from: "Error",
+        to: "Error",
+        date: new Date().toISOString(),
+        body: "",
+        snippet: "Error parsing email contents",
+        labels: [],
+        isUnread: false,
+      };
     }
   }
 }
