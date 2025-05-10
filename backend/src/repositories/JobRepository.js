@@ -52,5 +52,33 @@ class JobRepository {
       throw error;
     }
   }
+   /**
+   * Get a job by ID
+   * @param {string} jobId - The job ID
+   * @param {string} userId - The user ID (for security)
+   * @returns {Promise<Object|null>} - The job or null if not found
+   */
+   async getJobById(jobId, userId) {
+    try {
+      const job = await prisma.job.findFirst({
+        where: {
+          id: jobId,
+          userId
+        }
+      });
+
+      if (!job) return null;
+
+      // Parse JSON strings back to objects
+      return {
+        ...job,
+        skills: job.skills ? JSON.parse(job.skills) : [],
+        stages: job.stages ? JSON.parse(job.stages) : []
+      };
+    } catch (error) {
+      console.error('Error fetching job:', error);
+      throw error;
+    }
+  }
 }
 module.exports = new JobRepository();
