@@ -26,5 +26,14 @@ class RoadmapController {
             res.status(404).json({ error: error.message });
         }
     }
+    async updateRoadmap(req, res) {
+        try {
+            const userId = req.user.id;
+            const roadmap = await roadmapService.updateRoadmap(req.params.id, userId, req.body);
+            res.json(roadmap);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    }
 }
 module.exports = new RoadmapController();
