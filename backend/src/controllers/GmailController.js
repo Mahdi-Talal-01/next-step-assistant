@@ -34,6 +34,12 @@ class GmailController {
       return ResponseTrait.error(res, 'Failed to generate authorization URL');
     }
   }
+  /**
+   * Handle Gmail callback after authorization
+   * @param {object} req - Express request
+   * @param {object} res - Express response
+   */
+  
   async handleCallback(req, res) {
     try {
       const { code, state } = req.query;
