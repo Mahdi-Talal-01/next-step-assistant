@@ -11,7 +11,7 @@ router.use(authMiddleware);
 router.post('/', RoadmapRequest.validateCreate, roadmapController.createRoadmap);
 
 // Get all roadmaps (including templates)
-router.get('/', roadmapController.getRoadmaps);
+router.get('/', RoadmapRequest.validateGetAll, roadmapController.getRoadmaps);
 
 // Get a specific roadmap
 router.get('/:id', RoadmapRequest.validateGetById, roadmapController.getRoadmapById);
@@ -23,4 +23,6 @@ router.put('/:id', RoadmapRequest.validateUpdate, roadmapController.updateRoadma
 router.delete('/:id', RoadmapRequest.validateDelete, roadmapController.deleteRoadmap);
 
 // Update topic status
-router.patch('/:roadmapId/topics/:topicId/status', roadmapController.updateTopicStatus);
+router.patch('/:roadmapId/topics/:topicId/status', RoadmapRequest.validateTopicStatus, roadmapController.updateTopicStatus);
+
+module.exports = router;
