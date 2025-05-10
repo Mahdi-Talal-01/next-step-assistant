@@ -20,3 +20,6 @@ router.put('/:id', roadmapController.updateRoadmap);
 
 // Delete a roadmap
 router.delete('/:id', roadmapController.deleteRoadmap);
+
+// Update topic status
+router.patch('/:roadmapId/topics/:topicId/status', roadmapController.updateTopicStatus);
