@@ -22,6 +22,9 @@ class RoadmapService {
     async updateRoadmap(id, roadmapData) {
         return request.put(`/roadmaps/${id}`, roadmapData);
     }
+    async deleteRoadmap(id) {
+        return request.delete(`/roadmaps/${id}`);
+    }
  
 }
 
