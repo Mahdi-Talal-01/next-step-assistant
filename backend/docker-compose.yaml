@@ -1,14 +1,45 @@
+# services:
+#   backend:
+#     image: mahditalaldev/nextstep-backend:latest
+#     ports:
+#       - "3000:3000"
+#     environment:
+#       - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/nextstep
+#       - NODE_ENV=production
+#       - JWT_SECRET=${JWT_SECRET}
+#       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+#       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+#     depends_on:
+#       - db
+#     restart: always
+
+#   db:
+#     image: mysql:8.0
+#     ports:
+#       - "3306:3306"
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#       - MYSQL_DATABASE=nextstep
+      
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+#     restart: always
+#     command: --default-authentication-plugin=mysql_native_password
+
+# volumes:
+#   mysql_data: 
+
 services:
   backend:
     image: mahditalaldev/nextstep-backend:latest
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/nextstep
+      - DATABASE_URL=mysql://root:root@db:3306/nextstep
       - NODE_ENV=production
-      - JWT_SECRET=${JWT_SECRET}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - JWT_SECRET=asdfghjkl
+      - GOOGLE_CLIENT_ID=asdfghjkl
+      - GOOGLE_CLIENT_SECRET=asdfghjkl
     depends_on:
       - db
     restart: always
@@ -18,7 +49,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=nextstep
       
     volumes:
