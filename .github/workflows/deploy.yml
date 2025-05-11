@@ -59,7 +59,7 @@ jobs:
             
             # Copy docker-compose.yaml from repository
             echo "Copying docker-compose.yaml..."
-            cp /home/${{ secrets.EC2_USER }}/backend/docker-compose.yaml .
+            cp /home/${{ secrets.EC2_USER }}/app/docker-compose.yaml .
             
             # Create .env file with secrets
             echo "Creating .env file..."
