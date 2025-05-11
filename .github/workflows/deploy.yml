@@ -1,0 +1,6 @@
+name: Push and Run Backend
+
+on:
+  push:
+    branches:
+      - staging
