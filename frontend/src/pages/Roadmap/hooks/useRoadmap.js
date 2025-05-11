@@ -38,9 +38,9 @@ const useRoadmap = () => {
     };
   };
 
-  const fetchRoadmaps = async () => {
-    setIsLoading(true);
-    try {
+    const fetchRoadmaps = async () => {
+      setIsLoading(true);
+      try {
       const params = {
         search: searchTerm,
         sort: `${sortBy}:${sortOrder}`,
@@ -52,12 +52,12 @@ const useRoadmap = () => {
         const transformedRoadmaps = response.data.map(transformRoadmapData);
         setRoadmaps(transformedRoadmaps);
       }
-    } catch (error) {
-      console.error('Error fetching roadmaps:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      } catch (error) {
+        console.error('Error fetching roadmaps:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
   const calculateProgress = (topics) => {
     if (!topics || topics.length === 0) return 0;
@@ -72,29 +72,29 @@ const useRoadmap = () => {
       const response = await roadmapService.updateTopicStatus(roadmapId, topicId, newStatus);
       if (response.success) {
         // Update local state
-        setRoadmaps(prevRoadmaps => {
+    setRoadmaps(prevRoadmaps => {
           return prevRoadmaps.map(roadmap => {
             if (roadmap.id === roadmapId) {
-              const updatedTopics = roadmap.topics.map(topic =>
-                topic.id === topicId ? { ...topic, status: newStatus } : topic
-              );
+          const updatedTopics = roadmap.topics.map(topic =>
+            topic.id === topicId ? { ...topic, status: newStatus } : topic
+          );
               return {
-                ...roadmap,
-                topics: updatedTopics,
-                progress: calculateProgress(updatedTopics)
-              };
-            }
-            return roadmap;
+            ...roadmap,
+            topics: updatedTopics,
+            progress: calculateProgress(updatedTopics)
+          };
+        }
+        return roadmap;
           });
-        });
+      });
 
-        // Update selected roadmap if it exists
+      // Update selected roadmap if it exists
         if (selectedRoadmap && selectedRoadmap.id === roadmapId) {
           const updatedRoadmap = await roadmapService.getRoadmapById(roadmapId);
           if (updatedRoadmap.success) {
             setSelectedRoadmap(transformRoadmapData(updatedRoadmap.data));
-          }
         }
+      }
       }
     } catch (error) {
       console.error('Error updating topic status:', error);
@@ -107,7 +107,7 @@ const useRoadmap = () => {
       if (response.success) {
         const transformedRoadmap = transformRoadmapData(response.data);
         setRoadmaps(prev => [...prev, transformedRoadmap]);
-        setShowCreateModal(false);
+    setShowCreateModal(false);
       }
     } catch (error) {
       console.error('Error creating roadmap:', error);
@@ -120,8 +120,8 @@ const useRoadmap = () => {
       if (response.success) {
         const transformedRoadmap = transformRoadmapData(response.data);
         setRoadmaps(prev => prev.map(r => r.id === updatedRoadmap.id ? transformedRoadmap : r));
-        setShowEditModal(false);
-        setRoadmapToEdit(null);
+    setShowEditModal(false);
+    setRoadmapToEdit(null);
       }
     } catch (error) {
       console.error('Error updating roadmap:', error);
@@ -153,7 +153,7 @@ const useRoadmap = () => {
       const response = await roadmapService.getRoadmapById(roadmap.id);
       if (response.success) {
         setSelectedRoadmap(transformRoadmapData(response.data));
-      }
+    }
     } catch (error) {
       console.error('Error fetching roadmap details:', error);
     }
