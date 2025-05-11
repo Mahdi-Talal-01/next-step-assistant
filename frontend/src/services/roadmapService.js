@@ -13,6 +13,9 @@ class RoadmapService {
 
         return request.get(`/roadmaps?${queryParams.toString()}`);
     }
+    async getRoadmapById(id) {
+        return request.get(`/roadmaps/${id}`);
+    }
  
 }
 
