@@ -4,13 +4,13 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install || (echo "npm install failed" && exit 1)
 
 COPY . .
 
-RUN npx prisma generate
+RUN npx prisma generate || (echo "prisma generate failed" && exit 1)
 
 EXPOSE 3000
 
-# Use start for production, dev for development
+# Use start for production
 CMD ["npm", "start"]
