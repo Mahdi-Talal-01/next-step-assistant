@@ -63,17 +63,37 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            # Add user to docker group if not already added
+            sudo usermod -aG docker $USER
+            
+            # Start Docker service if not running
+            sudo systemctl start docker || true
+            
+            # Ensure docker-compose is installed
+            if ! command -v docker-compose &> /dev/null; then
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+            
+            # Create app directory if it doesn't exist
+            mkdir -p ~/app
+            cd ~/app
+            
+            # Copy docker-compose and .env to app directory
+            cp ~/docker-compose.yaml .
+            cp ~/.env .
+            
             # Pull latest image
-            docker pull ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
             
             # Stop and remove existing containers
-            docker-compose down
+            sudo docker-compose down || true
             
             # Remove old images
-            docker image prune -f
+            sudo docker image prune -f
             
             # Start new containers
-            docker-compose up -d
+            sudo docker-compose up -d
             
             # Verify deployment
-            docker-compose ps
+            sudo docker-compose ps
