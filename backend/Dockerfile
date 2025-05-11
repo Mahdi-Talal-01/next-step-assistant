@@ -2,15 +2,18 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Install required dependencies for Prisma
+RUN apk add --no-cache openssl
 
-RUN npm install
+COPY package.json ./
+
+RUN npm install || (echo "npm install failed" && exit 1)
 
 COPY . .
 
-RUN npx prisma generate
+RUN npx prisma generate || (echo "prisma generate failed" && exit 1)
 
 EXPOSE 3000
 
-# Use start for production, dev for development
+# Use start for production
 CMD ["npm", "start"]
