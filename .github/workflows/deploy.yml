@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKER_KEY }}
 
       - name: Build Docker image
-        run: docker build -f ./backend/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest .
+        run: docker build -f ./backend/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest ./backend
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
@@ -39,7 +39,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "docker-compose.yaml"
+          source: "backend/docker-compose.yaml"
           target: "/home/${{ secrets.EC2_USER }}/"
 
       - name: Create .env file on EC2
@@ -49,11 +49,12 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            echo "POSTGRES_USER=postgres" > .env
-            echo "POSTGRES_PASSWORD=postgres" >> .env
+            echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" > .env
+            echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            echo "GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}" >> .env
-            echo "GMAIL_USER=${{ secrets.GMAIL_USER }}" >> .env
+            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v0.1.10
