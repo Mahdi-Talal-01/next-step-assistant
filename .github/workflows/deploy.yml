@@ -6,10 +6,8 @@ on:
       - staging
 
 jobs:
-
-    Build-Node-And-Push-Dockerhub:
+  Build-Node-And-Push-Dockerhub:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
