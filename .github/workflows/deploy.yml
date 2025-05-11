@@ -35,92 +35,93 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Create app directory and copy files
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
-            # Create app directory
+            # Debug: Print current user and groups
+            echo "Current user: $USER"
+            echo "Current groups:"
+            groups
+            
+            # Debug: Print Docker and Docker Compose versions
+            echo "Docker version:"
+            docker --version
+            echo "Docker Compose version:"
+            docker-compose --version
+            
+            # Create and setup app directory
+            echo "Setting up app directory..."
+            rm -rf ~/app
             mkdir -p ~/app
             cd ~/app
-            # Remove any existing docker-compose.yaml directory if it exists
-            rm -rf docker-compose.yaml
-
-      - name: Copy docker-compose to EC2
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "backend/docker-compose.yaml"
-          target: "/home/${{ secrets.EC2_USER }}/app/docker-compose.yaml"
-          strip_components: 0
-
-      - name: Create .env file on EC2
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            cd ~/app
-            echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" > .env
-            echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
-            echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-            echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
-            echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
-
-      - name: Verify files and deploy
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
-            # Add user to docker group if not already added
-            sudo usermod -aG docker $USER
             
-            # Start Docker service if not running
-            sudo systemctl start docker || true
+            # Create docker-compose.yaml
+            echo "Creating docker-compose.yaml..."
+            cat > docker-compose.yaml << 'EOL'
+            version: '3.8'
+            services:
+              backend:
+                image: ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
+                ports:
+                  - "3000:3000"
+                environment:
+                  - NODE_ENV=production
+                depends_on:
+                  - db
+                restart: always
+              db:
+                image: mysql:8.0
+                environment:
+                  - MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+                  - MYSQL_DATABASE=nextstep
+                  - MYSQL_USER=${{ secrets.MYSQL_USER }}
+                  - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+                volumes:
+                  - mysql_data:/var/lib/mysql
+                ports:
+                  - "3306:3306"
+                restart: always
+            volumes:
+              mysql_data:
+            EOL
             
-            # Ensure docker-compose is installed
-            if ! command -v docker-compose &> /dev/null; then
-              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              sudo chmod +x /usr/local/bin/docker-compose
-            fi
+            # Create .env file
+            echo "Creating .env file..."
+            cat > .env << EOL
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            EOL
             
-            # Go to app directory
-            cd ~/app
-            
-            # Verify files exist
-            echo "Checking files in ~/app:"
+            # Debug: List files and show contents
+            echo "Listing files in ~/app:"
             ls -la
-            
-            # Verify docker-compose.yaml exists and has content
-            if [ ! -f docker-compose.yaml ]; then
-              echo "Error: docker-compose.yaml not found!"
-              echo "Current directory contents:"
-              ls -la
-              exit 1
-            fi
-            
-            echo "docker-compose.yaml contents:"
+            echo "Contents of docker-compose.yaml:"
             cat docker-compose.yaml
             
             # Pull latest image
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
+            echo "Pulling latest image..."
+            docker pull ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
             
-            # Stop and remove existing containers
-            sudo docker-compose down || true
+            # Stop existing containers
+            echo "Stopping existing containers..."
+            docker-compose down || true
             
             # Remove old images
-            sudo docker image prune -f
+            echo "Cleaning up old images..."
+            docker image prune -f
             
             # Start new containers
-            sudo docker-compose up -d
+            echo "Starting new containers..."
+            docker-compose up -d
             
             # Verify deployment
-            sudo docker-compose ps
+            echo "Verifying deployment..."
+            docker-compose ps
