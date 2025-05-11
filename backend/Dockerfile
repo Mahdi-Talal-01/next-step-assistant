@@ -2,6 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Install required dependencies for Prisma
+RUN apk add --no-cache openssl1.1-compat
+
 COPY package.json ./
 
 RUN npm install || (echo "npm install failed" && exit 1)
