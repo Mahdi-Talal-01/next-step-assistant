@@ -19,6 +19,9 @@ class RoadmapService {
     async createRoadmap(roadmapData) {
         return request.post('/roadmaps', roadmapData);
     }
+    async updateRoadmap(id, roadmapData) {
+        return request.put(`/roadmaps/${id}`, roadmapData);
+    }
  
 }
 
