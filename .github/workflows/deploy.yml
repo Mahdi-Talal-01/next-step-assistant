@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  Build-Backend-And-Push-Dockerhub:
+    Build-Node-And-Push-Dockerhub:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,15 +21,13 @@ jobs:
           password: ${{ secrets.DOCKER_KEY }}
 
       - name: Build Docker image
-        working-directory: ./backend
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest .
+        run: docker build -f ./backend/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest ./backend
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
 
   Deploy-to-EC2:
-    needs: Build-Backend-And-Push-Dockerhub
+    needs: Build-Node-And-Push-Dockerhub
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
