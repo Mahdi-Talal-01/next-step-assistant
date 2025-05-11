@@ -2,7 +2,7 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY ./backend/package*.json /app/
+COPY ./backend/package.json /app/
 
 RUN npm install || (echo "npm install failed" && exit 1)
 
