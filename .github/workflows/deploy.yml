@@ -57,42 +57,19 @@ jobs:
             mkdir -p ~/app
             cd ~/app
             
-            # Create docker-compose.yaml
-            echo "Creating docker-compose.yaml..."
-            cat > docker-compose.yaml << 'EOL'
-            version: '3.8'
-            services:
-              backend:
-                image: ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
-                ports:
-                  - "3000:3000"
-                environment:
-                  - NODE_ENV=production
-                  - MYSQL_HOST=db
-                  - MYSQL_DATABASE=nextstep
-                  - MYSQL_USER=${{ secrets.MYSQL_USER }}
-                  - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-                  - JWT_SECRET=${{ secrets.JWT_SECRET }}
-                  - GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-                  - GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-                depends_on:
-                  - db
-                restart: always
-              db:
-                image: mysql:8.0
-                environment:
-                  - MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-                  - MYSQL_DATABASE=nextstep
-                  - MYSQL_USER=${{ secrets.MYSQL_USER }}
-                  - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-                  - MYSQL_ALLOW_EMPTY_PASSWORD=no
-                volumes:
-                  - mysql_data:/var/lib/mysql
-                ports:
-                  - "3306:3306"
-                restart: always
-            volumes:
-              mysql_data:
+            # Copy docker-compose.yaml from repository
+            echo "Copying docker-compose.yaml..."
+            cp /home/${{ secrets.EC2_USER }}/backend/docker-compose.yaml .
+            
+            # Create .env file with secrets
+            echo "Creating .env file..."
+            cat > .env << 'EOL'
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
             EOL
             
             # Debug: List files and show contents
