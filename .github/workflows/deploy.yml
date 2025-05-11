@@ -21,7 +21,9 @@ jobs:
           password: ${{ secrets.DOCKER_KEY }}
 
       - name: Build Docker image
-        run: docker build -f ./backend/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest ./backend
+        working-directory: ./backend
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest .
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
@@ -51,7 +53,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           source: "backend/docker-compose.yaml"
-          target: "/home/${{ secrets.EC2_USER }}/app/"
+          target: "/home/${{ secrets.EC2_USER }}/app/docker-compose.yaml"
 
       - name: Create .env file on EC2
         uses: appleboy/ssh-action@v0.1.10
@@ -68,7 +70,7 @@ jobs:
             echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
             echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
 
-      - name: Deploy on EC2
+      - name: Verify files and deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -91,7 +93,17 @@ jobs:
             cd ~/app
             
             # Verify files exist
+            echo "Checking files in ~/app:"
             ls -la
+            
+            # Verify docker-compose.yaml exists and has content
+            if [ ! -f docker-compose.yaml ]; then
+              echo "Error: docker-compose.yaml not found!"
+              exit 1
+            fi
+            
+            echo "docker-compose.yaml contents:"
+            cat docker-compose.yaml
             
             # Pull latest image
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
