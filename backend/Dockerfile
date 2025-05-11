@@ -2,11 +2,11 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY ./backend/package.json /app/
+COPY package.json ./
 
 RUN npm install || (echo "npm install failed" && exit 1)
 
-COPY ./backend /app/
+COPY . .
 
 RUN npx prisma generate || (echo "prisma generate failed" && exit 1)
 
