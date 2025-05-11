@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKER_KEY }}
 
       - name: Build Docker image
-        run: docker build -f ./Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest .
+        run: docker build -f ./backend/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest .
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
