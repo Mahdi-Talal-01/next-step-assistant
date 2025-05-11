@@ -68,18 +68,15 @@ jobs:
                 image: ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
                 ports:
                   - "3000:3000"
+                volumes:
+                  - ./backend:/app
                 environment:
                   - NODE_ENV=production
-                  - JWT_SECRET=${{ secrets.JWT_SECRET }}
-                  - GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-                  - GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-                  - MYSQL_USER=${{ secrets.MYSQL_USER }}
-                  - MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-                  - MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
                   - MYSQL_HOST=db
                   - MYSQL_DATABASE=nextstep
                 depends_on:
                   - db
+                restart: always
               db:
                 image: mysql:8.0
                 environment:
@@ -96,9 +93,10 @@ jobs:
               mysql_data:
             EOL
             
-            # Create .env file
-            echo "Creating .env file..."
-            cat > .env << EOL
+            # Create backend directory and .env file
+            echo "Creating backend directory and .env file..."
+            mkdir -p ~/app/backend
+            cat > ~/app/backend/.env << EOL
             MYSQL_USER=${{ secrets.MYSQL_USER }}
             MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
             MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
@@ -110,6 +108,8 @@ jobs:
             # Debug: List files and show contents
             echo "Listing files in ~/app:"
             ls -la
+            echo "Listing files in ~/app/backend:"
+            ls -la ~/app/backend
             echo "Contents of docker-compose.yaml:"
             cat docker-compose.yaml
             
