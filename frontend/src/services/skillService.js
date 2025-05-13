@@ -49,6 +49,17 @@ export  const  skillService = {
     const response = await request.get('/skills/analytics/average-salary');
     return response.data;
   },
+  // Get job demand per skill
+  getJobDemandPerSkill: async () => {
+    const response = await request.get('/skills/analytics/job-demand');
+    return response.data;
+  },
+
+  // Get skill growth rate
+  getSkillGrowthRate: async (skillId) => {
+    const response = await request.get(`/skills/analytics/growth-rate/${skillId}`);
+    return response.data;
+  },
 }
 
 
