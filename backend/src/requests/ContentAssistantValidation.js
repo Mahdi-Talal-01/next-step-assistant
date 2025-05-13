@@ -37,5 +37,17 @@ class ContentAssistantValidation {
       responsibilities: Joi.string().allow(''),
       isRemote: Joi.boolean().default(false)
     });
+    /**
+   * Schema for email reply form data
+   */
+  static emailReplySchema = Joi.object({
+    originalEmail: Joi.string().required().messages({
+      'any.required': 'Original email is required',
+      'string.empty': 'Original email cannot be empty'
+    }),
+    tone: Joi.string().valid('professional', 'casual', 'enthusiastic', 'informative', 'persuasive').default('professional'),
+    additionalContext: Joi.string().allow(''),
+    skills: Joi.array().items(Joi.string()).default([])
+  });
 }
 module.exports = ContentAssistantValidation;
