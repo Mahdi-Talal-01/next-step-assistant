@@ -45,5 +45,11 @@ export const useContentGenerator = (contentType, formData) => {
       default:
         return baseState;
     }
+    const [formState, setFormState] = useState(getInitialState());
+    const [generatedContent, setGeneratedContent] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false);
+    const [streamProgress, setStreamProgress] = useState(0);
+    
   };
 }
