@@ -35,6 +35,9 @@ class SkillService {
     }
     return skill;
   }
+  async getAllSkills() {
+    return skillRepository.getAllSkills();
+  }
 }
 
 module.exports = new SkillService(); 
