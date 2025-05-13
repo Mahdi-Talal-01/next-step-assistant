@@ -52,4 +52,8 @@ export const useContentGenerator = (contentType, formData) => {
     const [streamProgress, setStreamProgress] = useState(0);
     
   };
+   // Keep track of the streaming connection
+   const streamCleanupRef = useRef(null);
+   const skillInputRef = useRef(null);
+ 
 }
