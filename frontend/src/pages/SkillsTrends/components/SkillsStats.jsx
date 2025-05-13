@@ -2,74 +2,55 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 
 const SkillsStats = ({ stats }) => {
-  const { overallGrowth, averageSalary, jobDemand, learningResources } = stats;
-
-  const getGrowthColor = (growth) => {
-    const value = parseInt(growth);
-    if (value >= 20) return 'bg-success';
-    if (value >= 10) return 'bg-warning';
-    return 'bg-danger';
-  };
-
-  const getDemandColor = (demand) => {
-    const value = parseInt(demand);
-    if (value >= 80) return 'bg-success';
-    if (value >= 60) return 'bg-warning';
-    return 'bg-danger';
-  };
-
-  const getSalaryColor = (salary) => {
-    const value = parseInt(salary.replace(/[^0-9]/g, ''));
-    if (value >= 120000) return 'bg-success';
-    if (value >= 90000) return 'bg-warning';
-    return 'bg-danger';
-  };
-
-  const getResourcesColor = (resources) => {
-    const value = parseInt(resources);
-    if (value >= 200) return 'bg-success';
-    if (value >= 100) return 'bg-warning';
-    return 'bg-danger';
-  };
+  const statsConfig = [
+    {
+      label: 'Overall Growth',
+      value: stats.overallGrowth,
+      icon: 'mdi:trending-up',
+      color: '#4caf50',
+      description: 'Average growth rate across all skills'
+    },
+    {
+      label: 'Average Salary',
+      value: stats.averageSalary,
+      icon: 'mdi:currency-usd',
+      color: '#2196f3',
+      description: 'Average annual salary for these skills'
+    },
+    {
+      label: 'Job Demand',
+      value: stats.jobDemand,
+      icon: 'mdi:briefcase',
+      color: '#ff9800',
+      description: 'Total job postings requiring these skills'
+    },
+    {
+      label: 'Learning Resources',
+      value: stats.learningResources,
+      icon: 'mdi:book-open-page-variant',
+      color: '#9c27b0',
+      description: 'Estimated learning resources available'
+    }
+  ];
 
   return (
-    <div className="skills-stats">
-      <div className="stat-card">
-        <div className={`stat-icon ${getGrowthColor(overallGrowth)}`}>
-          <Icon icon="mdi:trending-up" />
+    <div className="stats-grid">
+      {statsConfig.map((stat, index) => (
+        <div className="stat-card" key={index}>
+          <div className="stat-value" style={{ color: stat.color }}>
+            {stat.value}
+          </div>
+          <div className="stat-label">
+            <Icon icon={stat.icon} className="stat-icon" style={{ color: stat.color }} />
+            <div>
+              <div>{stat.label}</div>
+              <div style={{ fontSize: '0.75rem', color: '#718096', marginTop: '4px' }}>
+                {stat.description}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="stat-info">
-          <h3>{overallGrowth}</h3>
-          <p>Overall Skills Growth</p>
-        </div>
-      </div>
-      <div className="stat-card">
-        <div className={`stat-icon ${getSalaryColor(averageSalary)}`}>
-          <Icon icon="mdi:currency-usd" />
-        </div>
-        <div className="stat-info">
-          <h3>{averageSalary}</h3>
-          <p>Average Salary</p>
-        </div>
-      </div>
-      <div className="stat-card">
-        <div className={`stat-icon ${getDemandColor(jobDemand)}`}>
-          <Icon icon="mdi:briefcase" />
-        </div>
-        <div className="stat-info">
-          <h3>{jobDemand}</h3>
-          <p>Job Demand</p>
-        </div>
-      </div>
-      <div className="stat-card">
-        <div className={`stat-icon ${getResourcesColor(learningResources)}`}>
-          <Icon icon="mdi:school" />
-        </div>
-        <div className="stat-info">
-          <h3>{learningResources}</h3>
-          <p>Learning Resources</p>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
