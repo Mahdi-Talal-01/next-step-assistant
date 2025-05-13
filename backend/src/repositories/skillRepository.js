@@ -78,5 +78,13 @@ class SkillRepository {
       }
     });
   }
+  async getUserSkills(userId) {
+    return prisma.userSkill.findMany({
+      where: { userId },
+      include: {
+        skill: true
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
