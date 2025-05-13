@@ -384,5 +384,25 @@ class SkillRepository {
       growthRate: previousCount === 0 ? 100 : ((currentCount - previousCount) / previousCount) * 100
     };
   }
+  async getSkillDemandTrends(skillId, months = 12) {
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+
+    return prisma.jobSkill.groupBy({
+      by: ['createdAt'],
+      where: {
+        skillId,
+        createdAt: {
+          gte: startDate
+        }
+      },
+      _count: {
+        jobId: true
+      },
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
