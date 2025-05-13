@@ -282,5 +282,48 @@ class SkillRepository {
       }
     });
   }
+  async getAverageSalaryPerSkill() {
+    const results = await prisma.jobSkill.findMany({
+      select: {
+        skillId: true,
+        job: {
+          select: {
+            salary: true
+          }
+        }
+      }
+    });
+
+    // Group and calculate average salary per skill
+    const salaryBySkill = results.reduce((acc, curr) => {
+      if (!acc[curr.skillId]) {
+        acc[curr.skillId] = {
+          total: 0,
+          count: 0
+        };
+      }
+      if (curr.job?.salary) {
+        acc[curr.skillId].total += curr.job.salary;
+        acc[curr.skillId].count += 1;
+      }
+      return acc;
+    }, {});
+
+    // Get the skills data
+    const skills = await prisma.skill.findMany({
+      where: {
+        id: {
+          in: Object.keys(salaryBySkill)
+        }
+      }
+    });
+
+    // Format the results
+    return Object.entries(salaryBySkill).map(([skillId, data]) => ({
+      skillId,
+      averageSalary: data.count > 0 ? data.total / data.count : 0,
+      skill: skills.find(s => s.id === skillId)
+    }));
+  }
 }
 module.exports = new SkillRepository();
