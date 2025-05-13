@@ -32,5 +32,10 @@ class SkillRepository {
       throw new Error(error.message || 'Failed to create skill');
     }
   }
+  async getSkillById(id) {
+    return prisma.skill.findUnique({
+      where: { id }
+    });
+  }
 }
 module.exports = new SkillRepository();
