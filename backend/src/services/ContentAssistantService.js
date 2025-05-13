@@ -261,5 +261,38 @@ Balance informative content with an engaging style appropriate for the target au
     
     return prompt;
   }
+   /**
+   * Create LinkedIn post prompt from form data
+   * 
+   * @param {Object} formData - LinkedIn post form data
+   * @returns {string} LinkedIn post prompt
+   */
+   createLinkedInPostPrompt(formData) {
+    const { topic, goal, tone, includeHashtags, skills } = formData;
+    
+    let prompt = `Create a LinkedIn post about ${topic}.\n\n`;
+    
+    // Main goal
+    if (goal) {
+      prompt += `The main point I want to convey is: ${goal}\n\n`;
+    }
+    
+    // Tone
+    if (tone) {
+      prompt += `Use a ${tone} tone in the post.\n\n`;
+    }
+    
+    // Hashtags
+    if (includeHashtags) {
+      prompt += `Include relevant hashtags at the end of the post.\n\n`;
+    }
+    
+    // Skills to highlight
+    if (skills && skills.length > 0) {
+      prompt += `Highlight these keywords/skills if relevant: ${skills.join(', ')}.\n\n`;
+    }
+    
+    return prompt;
+  }
 }
 module.exports = new ContentAssistantService();
