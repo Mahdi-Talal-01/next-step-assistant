@@ -227,6 +227,16 @@ async getSkillsWithJobCount(req, res) {
     return ResponseTrait.error(res, error.message);
   }
 }
+// Skill matching and recommendations
+async getSkillGaps(req, res) {
+  try {
+    const { userId, jobId } = req.params;
+    const gaps = await skillService.getSkillGaps(userId, jobId);
+    return ResponseTrait.success(res, 'Skill gaps retrieved successfully', gaps);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 
 }
