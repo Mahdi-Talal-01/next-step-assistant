@@ -1,5 +1,5 @@
 import request from '../commons/request';
-export default skillService{
+export  const  skillService = {
   // Get all skills trends data in one call
   getSkillsTrendsData: async () => {
     try {
