@@ -261,5 +261,26 @@ class SkillRepository {
       }
     });
   }
+   // Skill Analytics methods
+   async getSkillGrowthTrends(skillId, months = 12) {
+    const startDate = new Date();
+    startDate.setMonth(startDate.getMonth() - months);
+
+    return prisma.userSkill.groupBy({
+      by: ['createdAt'],
+      where: {
+        skillId,
+        createdAt: {
+          gte: startDate
+        }
+      },
+      _count: {
+        userId: true
+      },
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
