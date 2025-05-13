@@ -40,6 +40,16 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  // User Skill operations
+  async addUserSkill(req, res) {
+    try {
+      const { userId, skillId, level } = req.body;
+      const userSkill = await skillService.addUserSkill(userId, skillId, parseInt(level));
+      return ResponseTrait.success(res, 'User skill added successfully', userSkill, 201);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
