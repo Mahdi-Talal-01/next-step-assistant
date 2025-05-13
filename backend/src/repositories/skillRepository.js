@@ -174,5 +174,15 @@ class SkillRepository {
       data: { level }
     });
   }
+  async removeRoadmapSkill(roadmapId, skillId) {
+    return prisma.roadmapSkill.delete({
+      where: {
+        roadmapId_skillId: {
+          roadmapId,
+          skillId
+        }
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
