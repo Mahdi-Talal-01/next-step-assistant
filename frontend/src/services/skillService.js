@@ -16,6 +16,29 @@ export default skillService{
     const response = await request.get('/skills/analytics/all');
     return response.data;
   },
+  // Get top growing skills
+  getTopGrowingSkills: async (limit = 10) => {
+    const response = await request.get('/skills/analytics/top/growing');
+    return response.data;
+  },
+
+  // Get top paying skills
+  getTopPayingSkills: async (limit = 10) => {
+    const response = await request.get('/skills/analytics/top/paying');
+    return response.data;
+  },
+
+  // Get most demanded skills
+  getMostDemandedSkills: async (limit = 10) => {
+    const response = await request.get('/skills/analytics/top/demanded');
+    return response.data;
+  },
+
+  // Get skills by category
+  getSkillsByCategory: async (category) => {
+    const response = await request.get(`/skills/category/${category}`);
+    return response.data;
+  },
 }
 
 
