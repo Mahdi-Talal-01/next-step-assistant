@@ -107,5 +107,15 @@ class SkillRepository {
       }
     });
   }
+  // Job Skill operations
+  async addJobSkill(jobId, skillId, required) {
+    return prisma.jobSkill.create({
+      data: {
+        jobId,
+        skillId,
+        required
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
