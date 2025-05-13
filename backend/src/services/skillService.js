@@ -234,6 +234,19 @@ class SkillService {
       }))
       .sort((a, b) => b.jobCount - a.jobCount);
   }
+    // Skill Analytics methods
+    async getSkillGrowthTrends(skillId, months) {
+      const skill = await this.getSkillById(skillId);
+      return skillRepository.getSkillGrowthTrends(skillId, months);
+    }
+  
+    async getAverageSalaryPerSkill() {
+      return skillRepository.getAverageSalaryPerSkill();
+    }
+  
+    async getJobDemandPerSkill() {
+      return skillRepository.getJobDemandPerSkill();
+    }
 }
 
 module.exports = new SkillService(); 
