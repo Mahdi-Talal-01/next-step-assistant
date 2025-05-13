@@ -32,6 +32,14 @@ class SkillController {
       return ResponseTrait.error(res, error.message);
     }
   }
+  async deleteSkill(req, res) {
+    try {
+      await skillService.deleteSkill(req.params.id);
+      return ResponseTrait.success(res, 'Skill deleted successfully', {});
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
