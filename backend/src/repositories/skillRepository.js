@@ -86,5 +86,16 @@ class SkillRepository {
       }
     });
   }
+  async updateUserSkillLevel(userId, skillId, level) {
+    return prisma.userSkill.update({
+      where: {
+        userId_skillId: {
+          userId,
+          skillId
+        }
+      },
+      data: { level }
+    });
+  }
 }
 module.exports = new SkillRepository();
