@@ -251,6 +251,10 @@ class SkillService {
       const skill = await this.getSkillById(skillId);
       return skillRepository.getSkillGrowthRate(skillId);
     }
+    async getSkillDemandTrends(skillId, months) {
+      const skill = await this.getSkillById(skillId);
+      return skillRepository.getSkillDemandTrends(skillId, months);
+    }
 }
 
 module.exports = new SkillService(); 
