@@ -193,6 +193,15 @@ async updateTopicSkillLevel(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async removeTopicSkill(req, res) {
+  try {
+    const { topicId, skillId } = req.params;
+    await skillService.removeTopicSkill(topicId, skillId);
+    return ResponseTrait.success(res, 'Topic skill removed successfully', {});
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 
 }
