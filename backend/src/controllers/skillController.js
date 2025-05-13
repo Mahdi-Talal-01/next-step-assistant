@@ -153,6 +153,15 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async removeRoadmapSkill(req, res) {
+    try {
+      const { roadmapId, skillId } = req.params;
+      await skillService.removeRoadmapSkill(roadmapId, skillId);
+      return ResponseTrait.success(res, 'Roadmap skill removed successfully', {});
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
