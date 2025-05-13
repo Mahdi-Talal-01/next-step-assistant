@@ -58,5 +58,16 @@ class SkillRepository {
       where: { id }
     });
   }
+   // User Skill operations
+   async getUserSkill(userId, skillId) {
+    return prisma.userSkill.findUnique({
+      where: {
+        userId_skillId: {
+          userId,
+          skillId
+        }
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
