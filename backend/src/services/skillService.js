@@ -112,6 +112,14 @@ class SkillService {
     }
     return skillRepository.updateJobSkillRequirement(jobId, skillId, required);
   }
+  async removeJobSkill(jobId, skillId) {
+    const jobSkills = await skillRepository.getJobSkills(jobId);
+    const skillExists = jobSkills.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('Job does not have this skill');
+    }
+    return skillRepository.removeJobSkill(jobId, skillId);
+  }
 }
 
 module.exports = new SkillService(); 
