@@ -172,6 +172,14 @@ class SkillController {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async getTopicSkills(req, res) {
+  try {
+    const skills = await skillService.getTopicSkills(req.params.topicId);
+    return ResponseTrait.success(res, 'Topic skills retrieved successfully', skills);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 
 }
