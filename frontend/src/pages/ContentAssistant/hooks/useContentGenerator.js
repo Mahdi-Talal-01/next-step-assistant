@@ -84,5 +84,47 @@ export const useContentGenerator = (contentType, formData) => {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
+  // Dedicated handlers for skills management
+  const handleSkillChange = {
+    // Update skill input field value
+    updateInput: (e) => {
+      setFormState(prev => ({ ...prev, skillInput: e.target.value }));
+    },
+    
+    // Add a new skill
+    addSkill: () => {
+      if (formState.skillInput.trim() && !formState.skills.includes(formState.skillInput.trim())) {
+        setFormState(prev => ({
+          ...prev,
+          skills: [...prev.skills, prev.skillInput.trim()],
+          skillInput: ''
+        }));
+        
+        // Focus the input again for quick entry of multiple skills
+        if (skillInputRef.current) {
+          skillInputRef.current.focus();
+        }
+      }
+    },
+    
+    // Handle Enter key press
+    handleKeyPress: (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleSkillChange.addSkill();
+      }
+    },
+    
+    // Remove a skill from the list
+    removeSkill: (skillToRemove) => {
+      setFormState(prev => ({
+        ...prev,
+        skills: prev.skills.filter(skill => skill !== skillToRemove)
+      }));
+    },
+    
+    // Provide reference to the input field
+    inputRef: skillInputRef
+  };
 
 }
