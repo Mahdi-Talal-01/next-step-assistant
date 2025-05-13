@@ -180,6 +180,19 @@ async getTopicSkills(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async updateTopicSkillLevel(req, res) {
+  try {
+    const { topicId, skillId } = req.params;
+    const { level } = req.body;
+    const topicSkill = await skillService.updateTopicSkillLevel(topicId, skillId, level);
+    if (!topicSkill) {
+      return ResponseTrait.notFound(res, 'Topic skill not found');
+    }
+    return ResponseTrait.success(res, 'Topic skill level updated successfully', topicSkill);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 
 }
