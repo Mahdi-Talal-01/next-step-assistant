@@ -131,3 +131,35 @@ export const getContentTypes = async () => {
     throw error;
   }
 };
+const createJobDescription = (data) => {
+  const { jobTitle, industry, experience, skills, responsibilities, isRemote } = data;
+  
+  const experienceText = experienceTexts[experience] || 'professionals';
+  const locationText = isRemote ? 'Remote' : 'On-site';
+  const skillsList = skills.map(skill => `• ${skill}`).join('\n');
+  
+  // Default responsibilities text if none provided
+  const defaultResponsibilities = 'The successful candidate will be responsible for implementing best practices, collaborating with team members, and driving results in a fast-paced environment.';
+  
+  return `# ${jobTitle}
+
+## About the Role
+We are seeking a talented ${jobTitle} to join our team in the ${industry} industry. This is a ${locationText} position designed for ${experienceText}.
+
+## Required Skills and Qualifications
+${skillsList}
+
+## Responsibilities
+${responsibilities || defaultResponsibilities}
+
+## What We Offer
+• Competitive salary and benefits package
+• Professional development opportunities
+• Collaborative and innovative work environment
+• Work-life balance
+${isRemote ? '• Flexible remote work arrangement' : ''}
+
+## How to Apply
+Please submit your resume and a cover letter explaining why you're the perfect fit for this role. We look forward to hearing from you!
+`;
+};
