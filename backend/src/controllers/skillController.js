@@ -301,6 +301,14 @@ async getSkillAnalytics(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async getAllSkillsAnalytics(req, res) {
+  try {
+    const analytics = await skillService.getAllSkillsAnalytics();
+    return ResponseTrait.success(res, 'All skills analytics retrieved successfully', analytics);
+  } catch (error) {
+    return ResponseTrait.error(res, error.message);
+  }
+}
 
 }
 
