@@ -195,5 +195,43 @@ Balance informative content with an engaging style appropriate for the target au
         return JSON.stringify(formData);
     }
   }
+   /**
+   * Create job description prompt from form data
+   * 
+   * @param {Object} formData - Job description form data
+   * @returns {string} Job description prompt
+   */
+   createJobDescriptionPrompt(formData) {
+    const { jobTitle, industry, experience, skills, responsibilities, isRemote } = formData;
+    
+    let prompt = `Create a job description for a ${jobTitle} position in the ${industry} industry.\n\n`;
+    
+    // Experience level
+    if (experience) {
+      const experienceText = {
+        'entry': 'entry-level (0-2 years of experience)',
+        'mid': 'mid-level (3-5 years of experience)',
+        'senior': 'senior-level (6+ years of experience)',
+        'executive': 'executive-level'
+      }[experience] || experience;
+      
+      prompt += `This is a ${experienceText} position.\n\n`;
+    }
+    
+    // Remote status
+    prompt += `This is a ${isRemote ? 'remote' : 'on-site'} role.\n\n`;
+    
+    // Skills
+    if (skills && skills.length > 0) {
+      prompt += `Required skills include: ${skills.join(', ')}.\n\n`;
+    }
+    
+    // Responsibilities
+    if (responsibilities) {
+      prompt += `Main responsibilities include: ${responsibilities}\n\n`;
+    }
+    
+    return prompt;
+  }
 }
 module.exports = new ContentAssistantService();
