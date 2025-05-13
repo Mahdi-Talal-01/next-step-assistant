@@ -1,0 +1,124 @@
+.status-manager {
+  margin-bottom: 24px;
+  padding: 16px 0;
+}
+
+.status-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.status-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  position: relative;
+  flex: 1;
+  max-width: 100px;
+}
+
+.status-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f2f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 8px;
+  transition: all 0.3s;
+}
+
+.status-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #666;
+  transition: color 0.3s;
+}
+
+.status-connector {
+  height: 2px;
+  background-color: #ddd;
+  flex-grow: 1;
+  transition: background-color 0.3s;
+}
+
+/* Status variations */
+.status-step.active .status-icon {
+  background-color: #4a6cf7;
+  color: white;
+  box-shadow: 0 4px 10px rgba(74, 108, 247, 0.3);
+}
+
+.status-step.active .status-label {
+  color: #4a6cf7;
+}
+
+.status-step.completed .status-icon {
+  background-color: #48bb78;
+  color: white;
+}
+
+.status-step.completed .status-label {
+  color: #48bb78;
+}
+
+.status-connector.completed {
+  background-color: #48bb78;
+}
+
+.status-step.pending:hover .status-icon {
+  background-color: #e2e8f0;
+}
+
+.status-step.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Specific status colors */
+.status-step[aria-label="Set status to Applied"].active .status-icon {
+  background-color: #1976d2;
+}
+
+.status-step[aria-label="Set status to Interview"].active .status-icon {
+  background-color: #2e7d32;
+}
+
+.status-step[aria-label="Set status to Assessment"].active .status-icon {
+  background-color: #ff8f00;
+}
+
+.status-step[aria-label="Set status to Offer"].active .status-icon {
+  background-color: #3f51b5;
+}
+
+.status-step[aria-label="Set status to Rejected"].active .status-icon {
+  background-color: #c62828;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .status-steps {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 16px;
+  }
+  
+  .status-connector {
+    display: none;
+  }
+  
+  .status-step {
+    max-width: none;
+    flex: 0 0 auto;
+  }
+} 

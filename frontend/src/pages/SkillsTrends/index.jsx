@@ -46,7 +46,35 @@ const SkillsTrends = () => {
     monthlyTrends,
     salaryComparison,
     skillCategories,
+    skillsData,
+    loading,
+    error
   } = useSkillsTrends();
+
+  if (loading) {
+    return (
+      <div className="page-container">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading skills data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container">
+        <div className="error-container">
+          <h2>Error Loading Data</h2>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Get unique categories from skills data
+  const categories = skillsData?.categories || [];
 
   return (
     <div className="page-container">
@@ -55,6 +83,7 @@ const SkillsTrends = () => {
         selectedCategory={selectedCategory}
         onTimeRangeChange={setTimeRange}
         onCategoryChange={setSelectedCategory}
+        categories={categories}
       />
 
       <SkillsStats stats={stats} />

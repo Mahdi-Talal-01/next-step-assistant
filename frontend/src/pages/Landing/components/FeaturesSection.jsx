@@ -1,102 +1,165 @@
 import React from 'react';
-import { Icon } from '@iconify/react';
 import { motion } from 'framer-motion';
+import { Icon } from '@iconify/react';
 import styles from '../Landing.module.css';
 
-const FeatureCard = ({ icon, title, description, index }) => (
-  <motion.div 
-    className={styles.featureCard}
-    initial={{ opacity: 0, y: 30 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay: index * 0.1 }}
-    viewport={{ once: true, margin: "-50px" }}
-    whileHover={{ y: -8, transition: { duration: 0.3 } }}
-  >
-    <motion.div 
-      className={styles.featureIcon}
-      initial={{ scale: 0.8 }}
-      whileInView={{ scale: 1 }}
-      transition={{ duration: 0.5, delay: index * 0.1 + 0.2, type: "spring" }}
-      viewport={{ once: true }}
-    >
-      <div className={styles.iconBackground}>
-        <Icon icon={icon} width="32" height="32" />
-      </div>
-    </motion.div>
-    <motion.h3
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: index * 0.1 + 0.1 }}
-      viewport={{ once: true }}
-    >
-      {title}
-    </motion.h3>
-    <motion.p
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
-      viewport={{ once: true }}
-    >
-      {description}
-    </motion.p>
-  </motion.div>
-);
+const features = [
+  {
+    icon: 'tabler:brain',
+    title: 'AI-Powered Insights',
+    description: 'Get personalized career recommendations and insights powered by advanced AI algorithms.',
+    color: '#2563eb'
+  },
+  {
+    icon: 'tabler:chart-bar',
+    title: 'Smart Analytics',
+    description: 'Track your progress with detailed analytics and visualizations of your career journey.',
+    color: '#7c3aed'
+  },
+  {
+    icon: 'tabler:target',
+    title: 'Goal Tracking',
+    description: 'Set and track your career goals with our intuitive goal management system.',
+    color: '#059669'
+  },
+  {
+    icon: 'tabler:rocket',
+    title: 'Career Roadmap',
+    description: 'Generate personalized career roadmaps based on your skills and aspirations.',
+    color: '#dc2626'
+  },
+  {
+    icon: 'tabler:users',
+    title: 'Community Support',
+    description: 'Connect with like-minded professionals and get support from our growing community.',
+    color: '#ea580c'
+  },
+  {
+    icon: 'tabler:certificate',
+    title: 'Skill Validation',
+    description: 'Validate and showcase your skills with our comprehensive certification system.',
+    color: '#0891b2'
+  }
+];
 
 const FeaturesSection = () => {
-  const features = [
-    {
-      icon: 'tabler:brain',
-      title: 'Smart Roadmap Generator',
-      description: 'Search any tech or skill, and get a visual learning roadmap instantly.'
-    },
-    {
-      icon: 'tabler:mail-automation',
-      title: 'Email Automation Tracker',
-      description: 'Connect your Gmail and let us track job replies and updates for you.'
-    },
-    {
-      icon: 'tabler:search',
-      title: 'Real-Time Job Scraper',
-      description: 'View open jobs from top platforms in one place.'
-    },
-    {
-      icon: 'tabler:chart-bar',
-      title: 'Skill Demand Analyzer',
-      description: 'Discover what skills are trending in your field using market data.'
-    },
-    {
-      icon: 'tabler:robot',
-      title: 'Personalized AI Assistant',
-      description: 'Ask career questions, get CV feedback, and plan your growth path.'
-    },
-    {
-      icon: 'tabler:users',
-      title: 'Recruiter Mode',
-      description: 'Create job descriptions and browse matched talent profiles.'
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
     }
-  ];
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.6, -0.05, 0.01, 0.99]
+      }
+    }
+  };
 
   return (
-    <section className={styles.featuresSection} id="features">
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        viewport={{ once: true, margin: "-50px" }}
+    <section className={styles.featuresSection}>
+      <motion.div 
+        className={styles.featuresContent}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={containerVariants}
       >
-        Powerful Features to Boost Your Career
-      </motion.h2>
-      <div className={styles.featuresGrid}>
-        {features.map((feature, index) => (
-          <FeatureCard 
-            key={index}
-            index={index}
-            icon={feature.icon} 
-            title={feature.title} 
-            description={feature.description} 
-          />
-        ))}
-      </div>
+        <motion.div variants={itemVariants} className={styles.sectionHeader}>
+          <motion.span 
+            className={styles.sectionBadge}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            Features
+          </motion.span>
+          <motion.h2 
+            className={styles.sectionTitle}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            Everything You Need to <span className={styles.gradientText}>Succeed</span>
+          </motion.h2>
+          <motion.p 
+            className={styles.sectionDescription}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
+            Discover powerful tools and features designed to accelerate your career growth
+          </motion.p>
+        </motion.div>
+
+        <motion.div 
+          className={styles.featuresGrid}
+          variants={containerVariants}
+        >
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              className={styles.featureCard}
+              variants={itemVariants}
+              whileHover={{ 
+                y: -10,
+                transition: { duration: 0.2 }
+              }}
+            >
+              <motion.div 
+                className={styles.featureIcon}
+                style={{ color: feature.color }}
+                whileHover={{ 
+                  scale: 1.1,
+                  rotate: 5
+                }}
+              >
+                <Icon icon={feature.icon} />
+              </motion.div>
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+              <motion.div 
+                className={styles.featureHoverEffect}
+                initial={{ opacity: 0 }}
+                whileHover={{ opacity: 1 }}
+                style={{ background: `linear-gradient(135deg, ${feature.color}20, ${feature.color}10)` }}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div 
+          className={styles.featuresCTA}
+          variants={itemVariants}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.6 }}
+        >
+          <motion.button 
+            className={styles.ctaButton}
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: "0 8px 20px rgba(37, 99, 235, 0.2)"
+            }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Explore All Features <Icon icon="tabler:arrow-right" className={styles.buttonIcon} />
+          </motion.button>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

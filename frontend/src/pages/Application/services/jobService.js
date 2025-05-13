@@ -54,41 +54,142 @@ class JobService {
    */
   async createJob(jobData) {
     try {
-      // Make a copy of the data to avoid modifying the original
-      const formattedData = { ...jobData };
+      // Check for empty skills array before doing anything else
+      if (!jobData.skills || !Array.isArray(jobData.skills) || jobData.skills.length === 0) {
+        console.error('ERROR: Cannot create job with empty skills array');
+        console.log('Original job data:', JSON.stringify(jobData));
+        throw new Error('Skills are required');
+      }
+      
+      // Make a deep copy of the data to avoid modifying the original
+      // Using JSON.parse/stringify to ensure deep copying of nested objects
+      const formattedData = JSON.parse(JSON.stringify(jobData));
+      
+      console.log('DEBUG Raw jobData:', JSON.stringify(jobData));
 
-      // Ensure skills is properly formatted
-      if (formattedData.skills && Array.isArray(formattedData.skills)) {
-        // Already an array, no need to change
-      } else if (
-        formattedData.skills &&
-        typeof formattedData.skills === "string"
-      ) {
-        // If it's a string (comma-separated), convert to array
-        formattedData.skills = formattedData.skills
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s);
-      } else if (!formattedData.skills) {
-        // Ensure skills is at least an empty array
-        formattedData.skills = [];
+      // Format skills data
+      if (formattedData.skills) {
+        console.log('DEBUG Original skills:', JSON.stringify(formattedData.skills));
+        
+        // Check for valid skills
+        const validSkills = formattedData.skills.filter(skill => 
+          typeof skill === 'object' && skill !== null && (skill.name || skill.skillId)
+        );
+        
+        if (validSkills.length === 0) {
+          console.error('ERROR: No valid skills found in:', JSON.stringify(formattedData.skills));
+          throw new Error('No valid skills provided');
+        }
+        
+        if (Array.isArray(formattedData.skills)) {
+          // If skills array is empty, initialize with at least one placeholder skill
+          if (formattedData.skills.length === 0) {
+            console.log('Skills array is empty, adding default required skills');
+            // We'll add a blank skill with just required property to trigger proper validation
+            formattedData.skills = [{ name: 'General', required: true }];
+          } else {
+            // Preserve existing skills that already have name and required properties
+            const hasValidSkills = formattedData.skills.some(skill => 
+              typeof skill === 'object' && skill !== null && skill.name && 'required' in skill
+            );
+            
+            if (hasValidSkills) {
+              console.log('Skills are already properly formatted');
+              // Make sure we keep the existing format but create a new array
+              formattedData.skills = formattedData.skills.map(skill => ({
+                name: skill.name,
+                required: skill.required ?? true
+              }));
+            } else {
+              // Filter out skills without a name and format remaining skills properly
+              const filteredSkills = formattedData.skills
+                .filter(skill => {
+                  // Keep skills that have a name or skillId or id
+                  const isValid = skill.name || skill.skillId || skill.id || (typeof skill === 'string' && skill.trim());
+                  if (!isValid) {
+                    console.log('Removing invalid skill:', JSON.stringify(skill));
+                  }
+                  return isValid;
+                })
+                .map(skill => {
+                  // Handle string input
+                  if (typeof skill === 'string') {
+                    return {
+                      name: skill.trim(),
+                      required: true
+                    };
+                  }
+                  
+                  // If it already has a name property, use it
+                  if (skill.name) {
+                    return {
+                      name: skill.name,
+                      required: skill.required ?? true
+                    };
+                  }
+                  
+                  // Use skillId or id as name if no name property exists
+                  return {
+                    name: skill.skillId || skill.id,
+                    required: skill.required ?? true
+                  };
+                });
+                
+              if (filteredSkills.length === 0) {
+                console.error('ERROR: All skills were filtered out');
+                throw new Error('No valid skills provided');
+              }
+              
+              formattedData.skills = filteredSkills;
+            }
+          }
+        } else if (typeof formattedData.skills === 'string') {
+          // If it's a string (comma-separated), convert to array of skill objects
+          formattedData.skills = formattedData.skills
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s)
+            .map(skillName => ({
+              name: skillName,
+              required: true
+            }));
+            
+          if (formattedData.skills.length === 0) {
+            console.error('ERROR: No skills parsed from string');
+            throw new Error('No valid skills provided');
+          }
+        }
+      } else {
+        console.error('ERROR: Skills property is missing or invalid');
+        throw new Error('Skills are required');
+      }
+      
+      console.log('DEBUG Final skills:', JSON.stringify(formattedData.skills));
+
+      // Final check before submitting
+      if (!formattedData.skills || formattedData.skills.length === 0) {
+        console.error('ERROR: Skills array is empty after processing');
+        throw new Error('Skills are required');
       }
 
       // Ensure dates are in correct format
       if (formattedData.appliedDate) {
-        // If it's a Date object, convert to ISO string
-        if (formattedData.appliedDate instanceof Date) {
-          formattedData.appliedDate = formattedData.appliedDate
-            .toISOString()
-            .split("T")[0];
-        }
+        formattedData.appliedDate = new Date(formattedData.appliedDate).toISOString();
       } else {
-        // Set default applied date to today
-        formattedData.appliedDate = new Date().toISOString().split("T")[0];
+        formattedData.appliedDate = new Date().toISOString();
       }
 
-      const response = await BaseApi.post("/jobs", formattedData);
-      return response.data || null;
+      // Log the exact data being sent to the API
+      console.log('Submitting job data to API:', JSON.stringify(formattedData));
+      
+      try {
+        const response = await BaseApi.post("/jobs", formattedData);
+        console.log('API response:', response);
+        return response.data || null;
+      } catch (apiError) {
+        console.error("API Error:", apiError);
+        throw apiError;
+      }
     } catch (error) {
       console.error("Error creating job:", error);
       throw error;
@@ -103,103 +204,131 @@ class JobService {
    */
   async updateJob(jobId, jobData) {
     try {
-      // Make a copy of the data to avoid modifying the original
-      const formattedData = { ...jobData };
+      // Check for empty skills array before doing anything else
+      if (!jobData.skills || !Array.isArray(jobData.skills) || jobData.skills.length === 0) {
+        console.error('ERROR: Cannot update job with empty skills array');
+        console.log('Original update job data:', JSON.stringify(jobData));
+        throw new Error('Skills are required');
+      }
+      
+      // Make a deep copy of the data to avoid modifying the original
+      // Using JSON.parse/stringify to ensure deep copying of nested objects
+      const formattedData = JSON.parse(JSON.stringify(jobData));
+      
+      console.log('DEBUG Raw updateJob data:', JSON.stringify(jobData));
 
-      // Ensure skills is properly formatted
-      if (formattedData.skills && Array.isArray(formattedData.skills)) {
-        // Already an array, no need to change
-      } else if (
-        formattedData.skills &&
-        typeof formattedData.skills === "string"
-      ) {
-        // If it's a string (comma-separated), convert to array
-        formattedData.skills = formattedData.skills
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s);
+      // Format skills data
+      if (formattedData.skills) {
+        console.log('DEBUG Original update skills:', JSON.stringify(formattedData.skills));
+        
+        // Check for valid skills
+        const validSkills = formattedData.skills.filter(skill => 
+          typeof skill === 'object' && skill !== null && (skill.name || skill.skillId)
+        );
+        
+        if (validSkills.length === 0) {
+          console.error('ERROR: No valid skills found in update:', JSON.stringify(formattedData.skills));
+          throw new Error('No valid skills provided');
+        }
+        
+        if (Array.isArray(formattedData.skills)) {
+          // If skills array is empty, initialize with at least one placeholder skill
+          if (formattedData.skills.length === 0) {
+            console.log('Skills array is empty, adding default required skills');
+            // We'll add a blank skill with just required property to trigger proper validation
+            formattedData.skills = [{ name: 'General', required: true }];
+          } else {
+            // Preserve existing skills that already have name and required properties
+            const hasValidSkills = formattedData.skills.some(skill => 
+              typeof skill === 'object' && skill !== null && skill.name && 'required' in skill
+            );
+            
+            if (hasValidSkills) {
+              console.log('Skills are already properly formatted');
+              // Make sure we keep the existing format but create a new array
+              formattedData.skills = formattedData.skills.map(skill => ({
+                name: skill.name,
+                required: skill.required ?? true
+              }));
+            } else {
+              // Filter out skills without a name and format remaining skills properly
+              const filteredSkills = formattedData.skills
+                .filter(skill => {
+                  // Keep skills that have a name or skillId or id
+                  const isValid = skill.name || skill.skillId || skill.id || (typeof skill === 'string' && skill.trim());
+                  if (!isValid) {
+                    console.log('Removing invalid skill in update:', JSON.stringify(skill));
+                  }
+                  return isValid;
+                })
+                .map(skill => {
+                  // Handle string input
+                  if (typeof skill === 'string') {
+                    return {
+                      name: skill.trim(),
+                      required: true
+                    };
+                  }
+                  
+                  // If it already has a name property, use it
+                  if (skill.name) {
+                    return {
+                      name: skill.name,
+                      required: skill.required ?? true
+                    };
+                  }
+                  
+                  // Use skillId or id as name if no name property exists
+                  return {
+                    name: skill.skillId || skill.id,
+                    required: skill.required ?? true
+                  };
+                });
+                
+              if (filteredSkills.length === 0) {
+                console.error('ERROR: All skills were filtered out in update');
+                throw new Error('No valid skills provided');
+              }
+              
+              formattedData.skills = filteredSkills;
+            }
+          }
+        } else if (typeof formattedData.skills === 'string') {
+          // If it's a string (comma-separated), convert to array of skill objects
+          formattedData.skills = formattedData.skills
+            .split(',')
+            .map(s => s.trim())
+            .filter(s => s)
+            .map(skillName => ({
+              name: skillName,
+              required: true
+            }));
+            
+          if (formattedData.skills.length === 0) {
+            console.error('ERROR: No skills parsed from string in update');
+            throw new Error('No valid skills provided');
+          }
+        }
+      } else {
+        console.error('ERROR: Skills property is missing or invalid in update');
+        throw new Error('Skills are required');
+      }
+      
+      console.log('DEBUG Final update skills:', JSON.stringify(formattedData.skills));
+      
+      // Final check before submitting
+      if (!formattedData.skills || formattedData.skills.length === 0) {
+        console.error('ERROR: Skills array is empty after processing in update');
+        throw new Error('Skills are required');
       }
 
       // Ensure dates are in correct format
       if (formattedData.appliedDate) {
-        // If it's a Date object, convert to ISO string
-        if (formattedData.appliedDate instanceof Date) {
-          formattedData.appliedDate = formattedData.appliedDate.toISOString();
-        } else {
-          // If it's a date string without time, add time component
-          if (!formattedData.appliedDate.includes("T")) {
-            formattedData.appliedDate = new Date(
-              formattedData.appliedDate
-            ).toISOString();
-          }
-        }
+        formattedData.appliedDate = new Date(formattedData.appliedDate).toISOString();
       }
 
-      // If there's a lastUpdated field, make sure it's formatted correctly with time component
-      if (formattedData.lastUpdated) {
-        if (formattedData.lastUpdated instanceof Date) {
-          formattedData.lastUpdated = formattedData.lastUpdated.toISOString();
-        } else if (!formattedData.lastUpdated.includes("T")) {
-          // If it's a date string without time, convert to full ISO string
-          formattedData.lastUpdated = new Date().toISOString();
-        }
-      } else {
-        // Add lastUpdated if not present
-        formattedData.lastUpdated = new Date().toISOString();
-      }
-
-      // Handle stages for status updates
-      if (formattedData.status) {
-        // Ensure stages is properly formatted
-        if (!formattedData.stages || !Array.isArray(formattedData.stages)) {
-          // If no stages, create default ones based on status
-          const today = new Date().toISOString().split("T")[0];
-          formattedData.stages = [
-            { name: "Applied", date: today, completed: true },
-            { name: "Screening", date: null, completed: false },
-            { name: "Technical Interview", date: null, completed: false },
-            { name: "Onsite", date: null, completed: false },
-            { name: "Offer", date: null, completed: false },
-          ];
-
-          // Update stages based on status
-          if (formattedData.status === "interview") {
-            formattedData.stages[1].date = today;
-            formattedData.stages[1].completed = true;
-          } else if (formattedData.status === "assessment") {
-            formattedData.stages[1].date = today;
-            formattedData.stages[1].completed = true;
-            formattedData.stages[2].date = today;
-            formattedData.stages[2].completed = true;
-          } else if (formattedData.status === "offer") {
-            formattedData.stages.forEach((stage) => {
-              stage.date = stage.date || today;
-              stage.completed = true;
-            });
-          }
-        }
-
-        // Ensure notes is initialized
-        if (formattedData.notes === undefined) {
-          formattedData.notes = "";
-        }
-      }
-
-      // Clean up the data before sending to the API
-      // Convert any non-string values to JSON strings that backend expects
-      for (const key in formattedData) {
-        // Skip id, userId, etc.
-        if (["id", "userId", "createdAt", "updatedAt"].includes(key)) continue;
-
-        // For stages and similar nested arrays/objects, ensure they're using consistent date formats
-        if (key === "stages" && Array.isArray(formattedData[key])) {
-          formattedData[key] = formattedData[key].map((stage) => ({
-            ...stage,
-            // Ensure date is a simple string, not a date object
-            date: stage.date || null,
-          }));
-        }
-      }
+      // Add lastUpdated if not present
+      formattedData.lastUpdated = new Date().toISOString();
 
       // Remove fields that should not be updated directly
       delete formattedData.id;
@@ -207,16 +336,14 @@ class JobService {
       delete formattedData.createdAt;
       delete formattedData.updatedAt;
 
-      console.log("Sending formatted job data to API:", formattedData);
-
-      // Make the actual API call
+      console.log('Submitting updated job data:', JSON.stringify(formattedData));
       try {
         const response = await BaseApi.put(`/jobs/${jobId}`, formattedData);
-        console.log("Received response from job update API:", response);
+        console.log('API update response:', response);
         return response.data || null;
-      } catch (error) {
-        console.error("API Error updating job:", error.response || error);
-        throw error;
+      } catch (apiError) {
+        console.error("API Update Error:", apiError);
+        throw apiError;
       }
     } catch (error) {
       console.error(`Error updating job ${jobId}:`, error);
@@ -231,10 +358,28 @@ class JobService {
    */
   async deleteJob(jobId) {
     try {
-      await BaseApi.delete(`/jobs/${jobId}`);
+      console.log(`DEBUG: Attempting to delete job with ID: ${jobId}`);
+      
+      // Log the request config that will be sent
+      const config = {
+        method: 'DELETE',
+        url: `/jobs/${jobId}`,
+        headers: { 'Content-Type': 'application/json' }
+      };
+      console.log('DELETE Request config:', config);
+      
+      const response = await BaseApi.delete(`/jobs/${jobId}`);
+      console.log('DELETE Response:', response);
       return true;
     } catch (error) {
       console.error(`Error deleting job ${jobId}:`, error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+        console.error('Error response headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      }
       throw error;
     }
   }
@@ -248,104 +393,14 @@ class JobService {
    */
   async updateJobStatus(jobId, newStatus, notes = "") {
     try {
-      console.log(`Updating job ${jobId} status to ${newStatus}`);
-
-      // First, get the current job to have access to any existing stages
-      const currentJob = await this.getJob(jobId);
-
-      if (!currentJob) {
-        throw new Error(`Job with ID ${jobId} not found`);
-      }
-
-      console.log("Current job data:", currentJob);
-
-      // Create a minimal update payload with just the status-related fields
-      // Use full ISO datetime string for Prisma DateTime fields
-      const now = new Date();
-      const isoDateTime = now.toISOString();
-      const today = now.toISOString().split("T")[0];
-
-      // Start with existing stages or create default ones
-      let stages = [];
-      if (currentJob.stages && Array.isArray(currentJob.stages)) {
-        stages = [...currentJob.stages];
-      } else {
-        stages = [
-          { name: "Applied", date: today, completed: true },
-          { name: "Screening", date: null, completed: false },
-          { name: "Technical Interview", date: null, completed: false },
-          { name: "Onsite", date: null, completed: false },
-          { name: "Offer", date: null, completed: false },
-        ];
-      }
-
-      // Update stages based on the new status
-      if (newStatus === "applied") {
-        stages = stages.map((stage) => ({
-          ...stage,
-          date: stage.name === "Applied" ? today : null,
-          completed: stage.name === "Applied",
-        }));
-      } else if (newStatus === "interview") {
-        stages = stages.map((stage) => {
-          if (stage.name === "Applied" || stage.name === "Screening") {
-            return { ...stage, date: stage.date || today, completed: true };
-          } else if (stage.name === "Technical Interview") {
-            return { ...stage, date: today, completed: false };
-          }
-          return { ...stage, completed: false };
-        });
-      } else if (newStatus === "assessment") {
-        stages = stages.map((stage) => {
-          if (
-            stage.name === "Applied" ||
-            stage.name === "Screening" ||
-            stage.name === "Technical Interview"
-          ) {
-            return { ...stage, date: stage.date || today, completed: true };
-          }
-          return { ...stage, completed: false };
-        });
-      } else if (newStatus === "offer") {
-        stages = stages.map((stage) => ({
-          ...stage,
-          date: stage.date || today,
-          completed: true,
-        }));
-      }
-
-      // Create the update payload
       const updateData = {
         status: newStatus,
-        // Use full ISO datetime string for lastUpdated (required by Prisma)
-        lastUpdated: isoDateTime,
-        notes: notes || currentJob.notes || "",
-        stages: stages.map((stage) => ({
-          ...stage,
-          date: stage.date || null, // Ensure no undefined values
-        })),
+        lastUpdated: new Date().toISOString(),
+        notes: notes || ""
       };
 
-      // Remove fields that should not be updated directly
-      delete updateData.id;
-      delete updateData.userId;
-      delete updateData.createdAt;
-      delete updateData.updatedAt;
-
-      console.log("Status update payload:", updateData);
-
-      // Make the update request
-      try {
-        const response = await BaseApi.put(`/jobs/${jobId}`, updateData);
-        console.log("Status update response:", response);
-        return response.data || null;
-      } catch (error) {
-        console.error(
-          "API Error updating job status:",
-          error.response || error
-        );
-        throw error;
-      }
+      const response = await BaseApi.put(`/jobs/${jobId}`, updateData);
+      return response.data || null;
     } catch (error) {
       console.error(`Error updating job status for job ${jobId}:`, error);
       throw error;

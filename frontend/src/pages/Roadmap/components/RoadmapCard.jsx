@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from '@iconify/react';
 
-const RoadmapCard = ({ roadmap, onClick, onEdit }) => {
+const RoadmapCard = ({ roadmap, onClick, onEdit, onDelete }) => {
   const { title, description, icon, color, progress, estimatedTime, difficulty, topics } = roadmap;
 
   return (
@@ -10,13 +10,22 @@ const RoadmapCard = ({ roadmap, onClick, onEdit }) => {
         <div className="roadmap-icon" style={{ backgroundColor: color }}>
           <Icon icon={icon} />
         </div>
-        <button 
-          className="btn-icon edit-button"
-          onClick={(e) => onEdit(roadmap, e)}
-          title="Edit Roadmap"
-        >
-          <Icon icon="mdi:pencil" />
-        </button>
+        <div className="roadmap-actions">
+          <button 
+            className="btn-icon edit-button"
+            onClick={(e) => onEdit(roadmap, e)}
+            title="Edit Roadmap"
+          >
+            <Icon icon="mdi:pencil" />
+          </button>
+          <button 
+            className="btn-icon delete-button"
+            onClick={(e) => onDelete(roadmap, e)}
+            title="Delete Roadmap"
+          >
+            <Icon icon="mdi:delete" />
+          </button>
+        </div>
       </div>
       
       <div className="roadmap-content" onClick={onClick}>

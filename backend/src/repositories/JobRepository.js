@@ -8,26 +8,47 @@ class JobRepository {
   /**
    * Create a new job
    * @param {string} userId - The user ID
-   * @param {Object} jobData - The job data
+   * @param {Object} data - The job data
    * @returns {Promise<Object>} - The created job
    */
-  async createJob(userId, jobData) {
+  async createJob(userId, data) {
     try {
-      // Parse skills and stages if they are provided as arrays
-      const parsedData = {
-        ...jobData,
-        skills: jobData.skills ? JSON.stringify(jobData.skills) : null,
-        stages: jobData.stages ? JSON.stringify(jobData.stages) : null,
-        appliedDate: jobData.appliedDate
-          ? new Date(jobData.appliedDate)
-          : new Date(),
-      };
+      const { id, skills, stages, ...jobData } = data;
 
-      return await prisma.job.create({
-        data: {
-          ...parsedData,
-          userId,
-        },
+      // Create the job with its skills in a transaction
+      return await prisma.$transaction(async (prisma) => {
+        const job = await prisma.job.create({
+          data: {
+            ...jobData,
+            appliedDate: jobData.appliedDate ? new Date(jobData.appliedDate) : new Date(),
+            lastUpdated: jobData.lastUpdated ? new Date(jobData.lastUpdated) : new Date(),
+            stages: stages ? JSON.stringify(stages) : null,
+            user: {
+              connect: {
+                id: userId
+              }
+            },
+            skills: {
+              create: skills.map(skill => ({
+                skillId: skill.skillId,
+                required: skill.required
+              }))
+            }
+          },
+          include: {
+            skills: {
+              include: {
+                skill: true
+              }
+            }
+          }
+        });
+
+        // Parse stages back to object for the response
+        return {
+          ...job,
+          stages: job.stages ? JSON.parse(job.stages) : null
+        };
       });
     } catch (error) {
       console.error("Error creating job:", error);
@@ -45,13 +66,22 @@ class JobRepository {
       const jobs = await prisma.job.findMany({
         where: { userId },
         orderBy: { lastUpdated: "desc" },
+        include: {
+          skills: {
+            include: {
+              skill: true
+            }
+          }
+        }
       });
 
-      // Parse JSON strings back to objects
-      return jobs.map((job) => ({
+      return jobs.map(job => ({
         ...job,
-        skills: job.skills ? JSON.parse(job.skills) : [],
-        stages: job.stages ? JSON.parse(job.stages) : [],
+        skills: job.skills.map(js => ({
+          skillId: js.skillId,
+          required: js.required,
+          skill: js.skill
+        }))
       }));
     } catch (error) {
       console.error("Error fetching jobs:", error);
@@ -72,15 +102,24 @@ class JobRepository {
           id: jobId,
           userId,
         },
+        include: {
+          skills: {
+            include: {
+              skill: true
+            }
+          }
+        }
       });
 
       if (!job) return null;
 
-      // Parse JSON strings back to objects
       return {
         ...job,
-        skills: job.skills ? JSON.parse(job.skills) : [],
-        stages: job.stages ? JSON.parse(job.stages) : [],
+        skills: job.skills.map(js => ({
+          skillId: js.skillId,
+          required: js.required,
+          skill: js.skill
+        }))
       };
     } catch (error) {
       console.error("Error fetching job:", error);
@@ -92,43 +131,164 @@ class JobRepository {
    * Update a job
    * @param {string} jobId - The job ID
    * @param {string} userId - The user ID (for security)
-   * @param {Object} jobData - The job data to update
+   * @param {Object} data - The job data to update
    * @returns {Promise<Object|null>} - The updated job or null if not found
    */
-  async updateJob(jobId, userId, jobData) {
+  async updateJob(jobId, userId, data) {
     try {
-      // Parse skills and stages if they are provided
-      const parsedData = { ...jobData };
-
-      if (jobData.skills) {
-        parsedData.skills = Array.isArray(jobData.skills)
-          ? JSON.stringify(jobData.skills)
-          : jobData.skills;
-      }
-
-      if (jobData.stages) {
-        parsedData.stages = Array.isArray(jobData.stages)
-          ? JSON.stringify(jobData.stages)
-          : jobData.stages;
-      }
-
-      if (jobData.appliedDate) {
-        parsedData.appliedDate = new Date(jobData.appliedDate);
-      }
-
-      const job = await prisma.job.updateMany({
-        where: {
-          id: jobId,
-          userId,
-        },
-        data: parsedData,
+      console.log('Debug - Update Job Input:', { jobId, userId });
+      
+      // First, verify the job exists and belongs to the user
+      const existingJob = await prisma.job.findUnique({
+        where: { 
+          id: jobId
+        }
       });
 
-      if (job.count === 0) return null;
+      console.log('Debug - Existing Job:', existingJob);
 
-      return this.getJobById(jobId, userId);
+      if (!existingJob) {
+        console.log('Debug - Job not found with ID:', jobId);
+        throw new Error('Job not found');
+      }
+
+      if (existingJob.userId !== userId) {
+        console.log('Debug - Job belongs to different user:', { 
+          jobUserId: existingJob.userId, 
+          requestUserId: userId 
+        });
+        throw new Error('Unauthorized: Job belongs to a different user');
+      }
+
+      // Extract skills data from the update data
+      const { skills, stages, ...jobData } = data;
+      console.log('Debug - Update Data:', { skills, stages, jobData });
+
+      try {
+        // Start a transaction
+        return await prisma.$transaction(async (prisma) => {
+          console.log('Debug - Starting transaction for job update');
+          
+          // First, delete all existing job skills
+          console.log('Debug - Deleting existing job skills for jobId:', jobId);
+          await prisma.jobSkill.deleteMany({
+            where: { jobId }
+          });
+          
+          console.log('Debug - Deleted existing job skills, now updating job');
+          
+          // Create skill objects ensuring no duplicates
+          const uniqueSkills = [];
+          const seenSkillIds = new Set();
+          
+          for (const skill of skills) {
+            if (!seenSkillIds.has(skill.skillId)) {
+              seenSkillIds.add(skill.skillId);
+              uniqueSkills.push({
+                skillId: skill.skillId,
+                required: skill.required === undefined ? true : skill.required
+              });
+            }
+          }
+          
+          console.log('Debug - Unique skills to create:', uniqueSkills);
+          
+          // Update the job
+          const updatedJob = await prisma.job.update({
+            where: { 
+              id: jobId
+            },
+            data: {
+              ...jobData,
+              lastUpdated: new Date(),
+              stages: stages ? JSON.stringify(stages) : null,
+              skills: {
+                create: uniqueSkills
+              }
+            },
+            include: {
+              skills: {
+                include: {
+                  skill: true
+                }
+              }
+            }
+          });
+
+          console.log('Debug - Successfully updated job:', updatedJob.id);
+
+          // Parse stages back to object for the response
+          return {
+            ...updatedJob,
+            stages: updatedJob.stages ? JSON.parse(updatedJob.stages) : null
+          };
+        });
+      } catch (transactionError) {
+        console.error('Transaction error during job update:', transactionError);
+        
+        // Handle the unique constraint violation specifically
+        if (transactionError.code === 'P2002') {
+          console.log('Unique constraint violation detected, attempting fallback update...');
+          
+          // Fallback approach - update job without skills first, then add skills individually
+          const updatedJobBase = await prisma.job.update({
+            where: { id: jobId },
+            data: {
+              ...jobData,
+              lastUpdated: new Date(),
+              stages: stages ? JSON.stringify(stages) : null
+            }
+          });
+          
+          // Delete all existing skills
+          await prisma.jobSkill.deleteMany({
+            where: { jobId }
+          });
+          
+          // Create unique skills one by one
+          const uniqueSkillIds = new Set();
+          for (const skill of skills) {
+            if (!uniqueSkillIds.has(skill.skillId)) {
+              uniqueSkillIds.add(skill.skillId);
+              
+              try {
+                await prisma.jobSkill.create({
+                  data: {
+                    jobId: jobId,
+                    skillId: skill.skillId,
+                    required: skill.required === undefined ? true : skill.required
+                  }
+                });
+              } catch (skillError) {
+                console.error(`Error adding skill ${skill.skillId} to job:`, skillError);
+                // Continue with other skills even if one fails
+              }
+            }
+          }
+          
+          // Fetch the updated job with skills
+          const refreshedJob = await prisma.job.findUnique({
+            where: { id: jobId },
+            include: {
+              skills: {
+                include: {
+                  skill: true
+                }
+              }
+            }
+          });
+          
+          return {
+            ...refreshedJob,
+            stages: refreshedJob.stages ? JSON.parse(refreshedJob.stages) : null
+          };
+        }
+        
+        // If it's not a unique constraint issue, rethrow
+        throw transactionError;
+      }
     } catch (error) {
-      console.error("Error updating job:", error);
+      console.error('Error in updateJob:', error);
       throw error;
     }
   }
@@ -141,16 +301,44 @@ class JobRepository {
    */
   async deleteJob(jobId, userId) {
     try {
-      const result = await prisma.job.deleteMany({
+      console.log(`Debug - Starting job deletion for jobId: ${jobId}, userId: ${userId}`);
+      
+      // First, check if the job exists and belongs to the user
+      const existingJob = await prisma.job.findFirst({
         where: {
           id: jobId,
-          userId,
-        },
+          userId
+        }
       });
-
-      return result.count > 0;
+      
+      if (!existingJob) {
+        console.log(`Debug - Job not found or doesn't belong to user: ${jobId}`);
+        return false;
+      }
+      
+      // Use a transaction to ensure all related records are deleted
+      await prisma.$transaction(async (prisma) => {
+        // First delete all job skills to avoid foreign key constraint issues
+        console.log(`Debug - Deleting job skills for jobId: ${jobId}`);
+        await prisma.jobSkill.deleteMany({
+          where: { jobId }
+        });
+        
+        // Then delete the job itself
+        console.log(`Debug - Deleting job: ${jobId}`);
+        await prisma.job.delete({
+          where: { id: jobId }
+        });
+      });
+      
+      console.log(`Debug - Job successfully deleted: ${jobId}`);
+      return true;
     } catch (error) {
-      console.error("Error deleting job:", error);
+      console.error(`Error deleting job ${jobId}:`, error);
+      // If it's a not found error from Prisma, return false instead of throwing
+      if (error.code === 'P2025') {
+        return false;
+      }
       throw error;
     }
   }

@@ -1322,4 +1322,245 @@ textarea.form-control {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+/* CreateRoadmapModal Enhancements */
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.alert-danger {
+  background-color: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  color: #d32f2f;
+}
+
+.alert-warning {
+  background-color: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  color: #f57c00;
+}
+
+.color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.color-label {
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.color-picker {
+  border: none;
+  border-radius: 4px;
+  height: 40px;
+  width: 60px;
+  cursor: pointer;
+}
+
+.topics-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.topics-count-badge {
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 16px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 24px;
+  text-align: center;
+}
+
+.topic-badges {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.status-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: capitalize;
+}
+
+.status-badge.pending {
+  background-color: var(--color-text-muted);
+  color: white;
+}
+
+.status-badge.in-progress {
+  background-color: #FF9800;
+  color: white;
+}
+
+.status-badge.completed {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.resources-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+}
+
+.topic-item {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: var(--color-bg-secondary);
+  transition: all 0.2s ease;
+}
+
+.topic-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.topic-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.topic-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+.resource-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+}
+
+.resource-item a {
+  color: var(--color-primary);
+  text-decoration: none;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  color: var(--color-danger);
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.add-topic-form {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  background-color: var(--color-bg-secondary);
+}
+
+/* Delete Button and Dialog Styles */
+.roadmap-actions {
+  display: flex;
+  gap: 0.5rem;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.delete-button {
+  background-color: var(--light-color) !important;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--text-muted);
+  transition: all 0.2s ease-in-out;
+}
+
+.delete-button:hover {
+  background-color: #f44336 !important;
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-danger {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #d32f2f;
+}
+
+.text-danger {
+  color: #f44336;
+}
+
+.delete-confirm-dialog {
+  max-width: 500px;
+}
+
+.confirm-message {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Position the roadmap icon to account for the action buttons */
+.roadmap-header {
+  position: relative;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-start;
 } 

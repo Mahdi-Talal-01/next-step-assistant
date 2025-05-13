@@ -2,12 +2,14 @@
 .env
 .env.local
 .env.*.local
+docker-compose.yaml
 
 # Dependencies
 node_modules/
 node_modules
 
 storage/cvs/*
+
 
 
 # Logs

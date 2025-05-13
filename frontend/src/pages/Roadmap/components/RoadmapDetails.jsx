@@ -34,7 +34,7 @@ const RoadmapDetails = ({
 
     setLocalRoadmap(updatedRoadmap);
     setHasUnsavedChanges(true);
-    onTopicStatusChange(topicId, newStatus);
+    onTopicStatusChange(localRoadmap.id, topicId, newStatus);
   };
 
   const handleSaveChanges = () => {

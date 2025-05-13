@@ -82,8 +82,8 @@ export const useApplications = () => {
         application.position.toLowerCase().includes(searchLower) ||
         (application.location && application.location.toLowerCase().includes(searchLower)) ||
         (Array.isArray(application.skills) && 
-          application.skills.some((skill) =>
-            skill.toLowerCase().includes(searchLower)
+          application.skills.some(skill => 
+            skill.skill?.name?.toLowerCase().includes(searchLower)
           ))
       );
     }
@@ -96,17 +96,58 @@ export const useApplications = () => {
   const addApplication = async (newApplication) => {
     try {
       setLoading(true);
-      // Ensure stages property exists and is in the expected format
-      if (!newApplication.stages) {
-        newApplication.stages = [...defaultStages];
+      
+      // Ensure skills are properly formatted - use name instead of skillId
+      const formattedApplication = {
+        ...newApplication,
+        skills: Array.isArray(newApplication.skills) 
+          ? newApplication.skills.map(skill => {
+              // If it's a string, convert to object with name
+              if (typeof skill === 'string') {
+                return {
+                  name: skill,
+                  required: true
+                };
+              }
+              
+              // If it already has a name property, keep it
+              if (skill.name) {
+                return {
+                  name: skill.name,
+                  required: skill.required ?? true
+                };
+              }
+              
+              // If it has skillId but no name, use skillId as name
+              if (skill.skillId) {
+                return {
+                  name: skill.skillId,
+                  required: skill.required ?? true
+                };
+              }
+              
+              // Fallback
+              return {
+                name: "Unnamed Skill",
+                required: true
+              };
+            })
+          : []
+      };
+      
+      console.log('DEBUG - addApplication - Formatted skills:', JSON.stringify(formattedApplication.skills));
+      
+      if (formattedApplication.skills.length === 0) {
+        console.error('Cannot add application with empty skills array');
+        setError('Skills information is required');
+        setLoading(false);
+        return false;
       }
       
-      const created = await jobService.createJob(newApplication);
+      const created = await jobService.createJob(formattedApplication);
       if (created && created.data) {
-        // If the API returns the created job, use it
         setApplications(prev => [...prev, created.data]);
       } else {
-        // Otherwise, refresh the list to get updated data
         await fetchApplications();
       }
       return true;
@@ -122,12 +163,60 @@ export const useApplications = () => {
   const updateApplication = async (id, updatedData) => {
     try {
       setLoading(true);
-      await jobService.updateJob(id, updatedData);
+      
+      // Ensure skills are properly formatted - use name instead of skillId
+      const formattedData = {
+        ...updatedData,
+        skills: Array.isArray(updatedData.skills) 
+          ? updatedData.skills.map(skill => {
+              // If it's a string, convert to object with name
+              if (typeof skill === 'string') {
+                return {
+                  name: skill,
+                  required: true
+                };
+              }
+              
+              // If it already has a name property, keep it
+              if (skill.name) {
+                return {
+                  name: skill.name,
+                  required: skill.required ?? true
+                };
+              }
+              
+              // If it has skillId but no name, use skillId as name
+              if (skill.skillId) {
+                return {
+                  name: skill.skillId,
+                  required: skill.required ?? true
+                };
+              }
+              
+              // Fallback
+              return {
+                name: "Unnamed Skill",
+                required: true
+              };
+            })
+          : []
+      };
+      
+      console.log('DEBUG - updateApplication - Formatted skills:', JSON.stringify(formattedData.skills));
+      
+      if (formattedData.skills.length === 0) {
+        console.error('Cannot update application with empty skills array');
+        setError('Skills information is required');
+        setLoading(false);
+        return false;
+      }
+      
+      await jobService.updateJob(id, formattedData);
       
       // Update local state
       setApplications(
         applications.map((app) =>
-          app.id === id ? { ...app, ...updatedData } : app
+          app.id === id ? { ...app, ...formattedData } : app
         )
       );
       return true;

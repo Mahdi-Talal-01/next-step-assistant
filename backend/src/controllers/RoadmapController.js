@@ -67,14 +67,20 @@ class RoadmapController {
       const { roadmapId, topicId } = req.params;
       const { status } = req.body;
       
+      console.log(`Received topic status update: Roadmap=${roadmapId}, Topic=${topicId}, Status=${status}, User=${userId}`);
+      
       const topic = await roadmapService.updateTopicStatus(
         roadmapId,
         topicId,
         userId,
         status
       );
+      
+      console.log('Topic status updated successfully');
       return ResponseTrait.success(res, "Topic status updated successfully", topic);
     } catch (error) {
+      console.error('Error in updateTopicStatus controller:', error);
+      
       if (error.message.includes("Topic not found")) {
         return ResponseTrait.notFound(res, error.message);
       }

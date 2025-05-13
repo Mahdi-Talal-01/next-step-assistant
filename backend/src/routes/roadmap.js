@@ -24,5 +24,7 @@ router.delete('/:id', RoadmapRequest.validateDelete, roadmapController.deleteRoa
 
 // Update topic status
 router.patch('/:roadmapId/topics/:topicId/status', RoadmapRequest.validateTopicStatus, roadmapController.updateTopicStatus);
+// Alternative POST route for topic status update (for browsers that don't support PATCH)
+router.post('/:roadmapId/topics/:topicId/status', RoadmapRequest.validateTopicStatus, roadmapController.updateTopicStatus);
 
 module.exports = router;

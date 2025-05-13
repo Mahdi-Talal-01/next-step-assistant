@@ -24,6 +24,7 @@ model User {
   token         Token?    // One-to-one relation with Token
   jobs          Job[]     // One-to-many relation with Job
   roadmaps      Roadmap[] // One-to-many relation with Roadmap
+  skills        UserSkill[] // Many-to-many relation with Skill
 }
 
 model Profile {
@@ -65,14 +66,14 @@ model Job {
   status        String    // "applied", "interview", "rejected", "offered", "accepted"
   appliedDate   DateTime
   lastUpdated   DateTime  @updatedAt
-  salary        String?
+  salary        Float?    // Changed from String? to Float?
   jobType       String?   // "Full-time", "Part-time", "Contract", "Internship"
   jobUrl        String?
   notes         String?   @db.Text
-  skills        String?   // Stored as JSON string
   stages        String?   @db.Text // Stored as JSON string
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  skills        JobSkill[] // Many-to-many relation with Skill
 }
 
 model Roadmap {
@@ -88,9 +89,11 @@ model Roadmap {
   difficulty    String
   isTemplate    Boolean   @default(false) // Whether this is a template or user-created
   topics        Topic[]
+  skills        RoadmapSkill[] // Many-to-many relation with Skill
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
 model Topic {
   id          String    @id @default(uuid())
   roadmapId   String
@@ -98,9 +101,11 @@ model Topic {
   name        String
   status      String    // "completed", "in-progress", "pending"
   resources   Resource[]
+  skills      TopicSkill[] // Many-to-many relation with Skill
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
 model Resource {
   id          String    @id @default(uuid())
   topicId     String
@@ -109,4 +114,70 @@ model Resource {
   url         String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+// New Skill-related models
+model Skill {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  category    String    // e.g., "Programming", "Design", "Soft Skills"
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  users       UserSkill[]
+  jobs        JobSkill[]
+  roadmaps    RoadmapSkill[]
+  topics      TopicSkill[]
+}
+
+model UserSkill {
+  id          String    @id @default(uuid())
+  userId      String
+  skillId     String
+  level       Int       @default(1) // Skill proficiency level (1-5)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, skillId])
+}
+
+model JobSkill {
+  id          String    @id @default(uuid())
+  jobId       String
+  skillId     String
+  required    Boolean   @default(true) // Whether the skill is required or preferred
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([jobId, skillId])
+}
+
+model RoadmapSkill {
+  id          String    @id @default(uuid())
+  roadmapId   String
+  skillId     String
+  level       Int       @default(1) // Target skill level to achieve
+  roadmap     Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([roadmapId, skillId])
+}
+
+model TopicSkill {
+  id          String    @id @default(uuid())
+  topicId     String
+  skillId     String
+  level       Int       @default(1) // Target skill level for this topic
+  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([topicId, skillId])
 } 

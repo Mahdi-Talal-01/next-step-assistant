@@ -5,8 +5,9 @@ import './Application.css';
 import ApplicationHeader from './components/ApplicationHeader';
 import ApplicationFilters from './components/ApplicationFilters';
 import ApplicationsContainer from './components/ApplicationsContainer';
-import ApplicationModal from './components/ApplicationModal';
 import ApplicationCard from './components/ApplicationCard';
+import ApplicationModal from './components/ApplicationModal';
+import StatusManager from './components/StatusManager';
 
 // Import hooks and utilities
 import { useApplications } from './hooks/useApplications';
@@ -88,11 +89,41 @@ const Applications = () => {
   };
 
   const handleUpdateApplication = async (updatedApplication) => {
+    console.log("DEBUG - index.jsx - Received application:", JSON.stringify(updatedApplication));
+    
+    // Create a deep copy
+    const applicationCopy = JSON.parse(JSON.stringify(updatedApplication));
+    
+    // Verify skills is an array and has content
+    if (!applicationCopy.skills || !Array.isArray(applicationCopy.skills)) {
+      console.error("ERROR - index.jsx - Missing skills array");
+      applicationCopy.skills = [{ name: "General", required: true }];
+    } else if (applicationCopy.skills.length === 0) {
+      console.error("ERROR - index.jsx - Empty skills array");
+      applicationCopy.skills = [{ name: "General", required: true }];
+    }
+    
+    // Ensure each skill has the correct format
+    applicationCopy.skills = applicationCopy.skills.map(skill => {
+      if (typeof skill === 'string') {
+        return { name: skill, required: true };
+      }
+      
+      if (skill && typeof skill === 'object' && skill.name) {
+        return { name: skill.name, required: skill.required ?? true };
+      }
+      
+      // Fallback
+      return { name: "General", required: true };
+    });
+    
+    console.log("DEBUG - index.jsx - Final application with skills:", JSON.stringify(applicationCopy.skills));
+    
     let success;
     if (isNew) {
-      success = await addApplication(updatedApplication);
+      success = await addApplication(applicationCopy);
     } else {
-      success = await updateApplication(updatedApplication.id, updatedApplication);
+      success = await updateApplication(applicationCopy.id, applicationCopy);
     }
     
     if (success) {
@@ -159,6 +190,14 @@ const Applications = () => {
         onSortChange={handleSortChange}
       />
 
+      {applications.length > 0 && (
+        <StatusManager 
+          currentStatus={filters.status !== 'all' ? filters.status : 'applied'}
+          applicationId=""
+          onStatusUpdate={(_, status) => handleFilterChange('status', status)}
+        />
+      )}
+
       {loading && applications.length > 0 && (
         <div className="loading-overlay">
           <div className="loading-spinner" />
@@ -170,6 +209,7 @@ const Applications = () => {
         viewMode={viewMode}
         onDelete={handleDeleteApplication}
         onView={handleViewApplication}
+        selectedCardId={selectedCardId}
       >
         {applications.map(application => (
           <ApplicationCard
