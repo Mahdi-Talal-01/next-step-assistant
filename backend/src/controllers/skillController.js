@@ -219,6 +219,14 @@ async getSkillsWithUserCount(req, res) {
     return ResponseTrait.error(res, error.message);
   }
 }
+async getSkillsWithJobCount(req, res) {
+  try {
+    const skills = await skillService.getSkillsWithJobCount();
+    return ResponseTrait.success(res, 'Skills with job count retrieved successfully', skills);
+  } catch (error) {
+    return ResponseTrait.error(res, error.message);
+  }
+}
 
 
 }
