@@ -12,6 +12,13 @@ const router = express.Router();
  * @access  Public
  */
 router.get('/types', ContentAssistantController.getContentTypes);
+/**
+ * @route   POST /api/content-assistant/generate
+ * @desc    Generate content based on provided data
+ * @access  Public
+ * @body    {contentType: string, formData: object}
+ */
+router.post('/generate', ContentAssistantValidation.validateGenerateRequest, ContentAssistantController.generateContent);
 
 
 
