@@ -40,5 +40,9 @@ router.get('/category/:category', skillController.getSkillsByCategory);
 router.get('/stats/users', skillController.getSkillsWithUserCount);
 router.get('/stats/jobs', skillController.getSkillsWithJobCount);
 
+// Skill matching and recommendations routes
+router.get('/gaps/user/:userId/job/:jobId', auth, skillController.getSkillGaps);
+router.get('/recommendations/user/:userId', auth, skillController.getRecommendedSkills);
+
 
 module.exports = router; 
