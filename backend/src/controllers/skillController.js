@@ -112,6 +112,15 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async removeJobSkill(req, res) {
+    try {
+      const { jobId, skillId } = req.params;
+      await skillService.removeJobSkill(jobId, skillId);
+      return ResponseTrait.success(res, 'Job skill removed successfully', {});
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
