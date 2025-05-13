@@ -229,5 +229,21 @@ class SkillRepository {
       orderBy: { name: 'asc' }
     });
   }
+  async getSkillsWithUserCount() {
+    return prisma.skill.findMany({
+      include: {
+        _count: {
+          select: {
+            users: true
+          }
+        }
+      },
+      orderBy: {
+        users: {
+          _count: 'desc'
+        }
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
