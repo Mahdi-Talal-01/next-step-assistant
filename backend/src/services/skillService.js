@@ -101,6 +101,9 @@ class SkillService {
     }
     return skillRepository.addJobSkill(jobId, skillId, required);
   }
+  async getJobSkills(jobId) {
+    return skillRepository.getJobSkills(jobId);
+  }
 }
 
 module.exports = new SkillService(); 
