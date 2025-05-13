@@ -18,4 +18,14 @@ const ContentForm = () => {
         </div>
     )
 }
+ContentForm.propTypes = {
+  contentType: PropTypes.oneOf(['jobDescription', 'emailReply', 'linkedinPost', 'blogPost']).isRequired,
+  formState: PropTypes.object.isRequired,
+  isGenerating: PropTypes.bool.isRequired,
+  isStreaming: PropTypes.bool,
+  handleChange: PropTypes.func.isRequired,
+  handleSkillChange: PropTypes.object.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func
+};
 export default ContentForm; 
