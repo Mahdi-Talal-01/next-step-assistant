@@ -31,7 +31,7 @@ export const navLinks = [
     },
     {
       path: '/app/job-description-helper',
-      label: 'Job Description Helper',
+      label: 'Content Assistant',
       icon: 'mdi:file-document-edit'
     },
     {

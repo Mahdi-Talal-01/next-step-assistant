@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 class SkillRepository {
@@ -23,44 +23,44 @@ class SkillRepository {
       return await prisma.skill.create({
         data: {
           name: skillName,
-          category: data.category || 'Technical',
-          description: data.description || `Skill: ${skillName}`
-        }
+          category: data.category || "Technical",
+          description: data.description || `Skill: ${skillName}`,
+        },
       });
     } catch (error) {
-      console.error('Error creating skill:', error);
-      throw new Error(error.message || 'Failed to create skill');
+      console.error("Error creating skill:", error);
+      throw new Error(error.message || "Failed to create skill");
     }
   }
 
   async getSkillById(id) {
     return prisma.skill.findUnique({
-      where: { id }
+      where: { id },
     });
   }
 
   async getSkillByName(name) {
     return prisma.skill.findUnique({
-      where: { name }
+      where: { name },
     });
   }
 
   async getAllSkills() {
     return prisma.skill.findMany({
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
   }
 
   async updateSkill(id, data) {
     return prisma.skill.update({
       where: { id },
-      data
+      data,
     });
   }
 
   async deleteSkill(id) {
     return prisma.skill.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -70,9 +70,9 @@ class SkillRepository {
       where: {
         userId_skillId: {
           userId,
-          skillId
-        }
-      }
+          skillId,
+        },
+      },
     });
   }
 
@@ -81,8 +81,8 @@ class SkillRepository {
       data: {
         userId,
         skillId,
-        level
-      }
+        level,
+      },
     });
   }
 
@@ -90,8 +90,8 @@ class SkillRepository {
     return prisma.userSkill.findMany({
       where: { userId },
       include: {
-        skill: true
-      }
+        skill: true,
+      },
     });
   }
 
@@ -100,10 +100,10 @@ class SkillRepository {
       where: {
         userId_skillId: {
           userId,
-          skillId
-        }
+          skillId,
+        },
       },
-      data: { level }
+      data: { level },
     });
   }
 
@@ -112,9 +112,9 @@ class SkillRepository {
       where: {
         userId_skillId: {
           userId,
-          skillId
-        }
-      }
+          skillId,
+        },
+      },
     });
   }
 
@@ -124,8 +124,8 @@ class SkillRepository {
       data: {
         jobId,
         skillId,
-        required
-      }
+        required,
+      },
     });
   }
 
@@ -133,8 +133,8 @@ class SkillRepository {
     return prisma.jobSkill.findMany({
       where: { jobId },
       include: {
-        skill: true
-      }
+        skill: true,
+      },
     });
   }
 
@@ -143,10 +143,10 @@ class SkillRepository {
       where: {
         jobId_skillId: {
           jobId,
-          skillId
-        }
+          skillId,
+        },
       },
-      data: { required }
+      data: { required },
     });
   }
 
@@ -155,9 +155,9 @@ class SkillRepository {
       where: {
         jobId_skillId: {
           jobId,
-          skillId
-        }
-      }
+          skillId,
+        },
+      },
     });
   }
 
@@ -167,8 +167,8 @@ class SkillRepository {
       data: {
         roadmapId,
         skillId,
-        level
-      }
+        level,
+      },
     });
   }
 
@@ -176,8 +176,8 @@ class SkillRepository {
     return prisma.roadmapSkill.findMany({
       where: { roadmapId },
       include: {
-        skill: true
-      }
+        skill: true,
+      },
     });
   }
 
@@ -186,10 +186,10 @@ class SkillRepository {
       where: {
         roadmapId_skillId: {
           roadmapId,
-          skillId
-        }
+          skillId,
+        },
       },
-      data: { level }
+      data: { level },
     });
   }
 
@@ -198,9 +198,9 @@ class SkillRepository {
       where: {
         roadmapId_skillId: {
           roadmapId,
-          skillId
-        }
-      }
+          skillId,
+        },
+      },
     });
   }
 
@@ -210,8 +210,8 @@ class SkillRepository {
       data: {
         topicId,
         skillId,
-        level
-      }
+        level,
+      },
     });
   }
 
@@ -219,8 +219,8 @@ class SkillRepository {
     return prisma.topicSkill.findMany({
       where: { topicId },
       include: {
-        skill: true
-      }
+        skill: true,
+      },
     });
   }
 
@@ -229,10 +229,10 @@ class SkillRepository {
       where: {
         topicId_skillId: {
           topicId,
-          skillId
-        }
+          skillId,
+        },
       },
-      data: { level }
+      data: { level },
     });
   }
 
@@ -241,9 +241,9 @@ class SkillRepository {
       where: {
         topicId_skillId: {
           topicId,
-          skillId
-        }
-      }
+          skillId,
+        },
+      },
     });
   }
 
@@ -251,7 +251,7 @@ class SkillRepository {
   async getSkillsByCategory(category) {
     return prisma.skill.findMany({
       where: { category },
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
   }
 
@@ -260,15 +260,15 @@ class SkillRepository {
       include: {
         _count: {
           select: {
-            users: true
-          }
-        }
+            users: true,
+          },
+        },
       },
       orderBy: {
         users: {
-          _count: 'desc'
-        }
-      }
+          _count: "desc",
+        },
+      },
     });
   }
 
@@ -277,15 +277,15 @@ class SkillRepository {
       include: {
         _count: {
           select: {
-            jobs: true
-          }
-        }
+            jobs: true,
+          },
+        },
       },
       orderBy: {
         jobs: {
-          _count: 'desc'
-        }
-      }
+          _count: "desc",
+        },
+      },
     });
   }
 
@@ -295,19 +295,19 @@ class SkillRepository {
     startDate.setMonth(startDate.getMonth() - months);
 
     return prisma.userSkill.groupBy({
-      by: ['createdAt'],
+      by: ["createdAt"],
       where: {
         skillId,
         createdAt: {
-          gte: startDate
-        }
+          gte: startDate,
+        },
       },
       _count: {
-        userId: true
+        userId: true,
       },
       orderBy: {
-        createdAt: 'asc'
-      }
+        createdAt: "asc",
+      },
     });
   }
 
@@ -317,10 +317,10 @@ class SkillRepository {
         skillId: true,
         job: {
           select: {
-            salary: true
-          }
-        }
-      }
+            salary: true,
+          },
+        },
+      },
     });
 
     // Group and calculate average salary per skill
@@ -328,7 +328,7 @@ class SkillRepository {
       if (!acc[curr.skillId]) {
         acc[curr.skillId] = {
           total: 0,
-          count: 0
+          count: 0,
         };
       }
       if (curr.job?.salary) {
@@ -342,45 +342,45 @@ class SkillRepository {
     const skills = await prisma.skill.findMany({
       where: {
         id: {
-          in: Object.keys(salaryBySkill)
-        }
-      }
+          in: Object.keys(salaryBySkill),
+        },
+      },
     });
 
     // Format the results
     return Object.entries(salaryBySkill).map(([skillId, data]) => ({
       skillId,
       averageSalary: data.count > 0 ? data.total / data.count : 0,
-      skill: skills.find(s => s.id === skillId)
+      skill: skills.find((s) => s.id === skillId),
     }));
   }
 
   async getJobDemandPerSkill() {
     const results = await prisma.jobSkill.groupBy({
-      by: ['skillId'],
+      by: ["skillId"],
       _count: {
-        jobId: true
+        jobId: true,
       },
       orderBy: {
         _count: {
-          jobId: 'desc'
-        }
-      }
+          jobId: "desc",
+        },
+      },
     });
 
     // Get the skills data separately
     const skills = await prisma.skill.findMany({
       where: {
         id: {
-          in: results.map(r => r.skillId)
-        }
-      }
+          in: results.map((r) => r.skillId),
+        },
+      },
     });
 
     // Combine the results
-    return results.map(result => ({
+    return results.map((result) => ({
       ...result,
-      skill: skills.find(s => s.id === result.skillId)
+      skill: skills.find((s) => s.id === result.skillId),
     }));
   }
 
@@ -394,25 +394,30 @@ class SkillRepository {
         where: {
           skillId,
           createdAt: {
-            gte: threeMonthsAgo
-          }
-        }
+            gte: threeMonthsAgo,
+          },
+        },
       }),
       prisma.userSkill.count({
         where: {
           skillId,
           createdAt: {
             lt: threeMonthsAgo,
-            gte: new Date(threeMonthsAgo.getTime() - (3 * 30 * 24 * 60 * 60 * 1000))
-          }
-        }
-      })
+            gte: new Date(
+              threeMonthsAgo.getTime() - 3 * 30 * 24 * 60 * 60 * 1000
+            ),
+          },
+        },
+      }),
     ]);
 
     return {
       currentCount,
       previousCount,
-      growthRate: previousCount === 0 ? 100 : ((currentCount - previousCount) / previousCount) * 100
+      growthRate:
+        previousCount === 0
+          ? 100
+          : ((currentCount - previousCount) / previousCount) * 100,
     };
   }
 
@@ -421,58 +426,53 @@ class SkillRepository {
     startDate.setMonth(startDate.getMonth() - months);
 
     return prisma.jobSkill.groupBy({
-      by: ['createdAt'],
+      by: ["createdAt"],
       where: {
         skillId,
         createdAt: {
-          gte: startDate
-        }
+          gte: startDate,
+        },
       },
       _count: {
-        jobId: true
+        jobId: true,
       },
       orderBy: {
-        createdAt: 'asc'
-      }
+        createdAt: "asc",
+      },
     });
   }
 
   async getSkillAnalytics(skillId) {
-    const [
-      growthRate,
-      averageSalary,
-      jobDemand,
-      growthTrends,
-      demandTrends
-    ] = await Promise.all([
-      this.getSkillGrowthRate(skillId),
-      this.getAverageSalaryPerSkill().then(results => 
-        results.find(r => r.skillId === skillId)
-      ),
-      this.getJobDemandPerSkill().then(results => 
-        results.find(r => r.skillId === skillId)
-      ),
-      this.getSkillGrowthTrends(skillId),
-      this.getSkillDemandTrends(skillId)
-    ]);
+    const [growthRate, averageSalary, jobDemand, growthTrends, demandTrends] =
+      await Promise.all([
+        this.getSkillGrowthRate(skillId),
+        this.getAverageSalaryPerSkill().then((results) =>
+          results.find((r) => r.skillId === skillId)
+        ),
+        this.getJobDemandPerSkill().then((results) =>
+          results.find((r) => r.skillId === skillId)
+        ),
+        this.getSkillGrowthTrends(skillId),
+        this.getSkillDemandTrends(skillId),
+      ]);
 
     return {
       growthRate,
       averageSalary: averageSalary?._avg?.job?.salary || 0,
       jobDemand: jobDemand?._count?.jobId || 0,
       growthTrends,
-      demandTrends
+      demandTrends,
     };
   }
 
   async getAllSkillsAnalytics() {
     const skills = await this.getAllSkills();
     const analytics = await Promise.all(
-      skills.map(async skill => {
+      skills.map(async (skill) => {
         const skillAnalytics = await this.getSkillAnalytics(skill.id);
         return {
           skill,
-          ...skillAnalytics
+          ...skillAnalytics,
         };
       })
     );
@@ -486,18 +486,18 @@ class SkillRepository {
 
     // Get user skill counts for growth trends
     const userSkillCounts = await prisma.userSkill.groupBy({
-      by: ['skillId'],
+      by: ["skillId"],
       _count: {
-        userId: true
-      }
+        userId: true,
+      },
     });
 
     // Get job skill counts for demand
     const jobSkillCounts = await prisma.jobSkill.groupBy({
-      by: ['skillId'],
+      by: ["skillId"],
       _count: {
-        jobId: true
-      }
+        jobId: true,
+      },
     });
 
     // Get salary data
@@ -506,10 +506,10 @@ class SkillRepository {
         skillId: true,
         job: {
           select: {
-            salary: true
-          }
-        }
-      }
+            salary: true,
+          },
+        },
+      },
     });
 
     // Calculate average salary per skill
@@ -517,7 +517,7 @@ class SkillRepository {
       if (!acc[curr.skillId]) {
         acc[curr.skillId] = {
           total: 0,
-          count: 0
+          count: 0,
         };
       }
       if (curr.job?.salary) {
@@ -531,63 +531,77 @@ class SkillRepository {
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 12);
     const monthlyGrowth = await prisma.userSkill.groupBy({
-      by: ['skillId', 'createdAt'],
+      by: ["skillId", "createdAt"],
       where: {
         createdAt: {
-          gte: startDate
-        }
+          gte: startDate,
+        },
       },
       _count: {
-        userId: true
+        userId: true,
       },
       orderBy: {
-        createdAt: 'asc'
-      }
+        createdAt: "asc",
+      },
     });
 
     // Format the data with fallbacks for missing values
-    const formattedData = skills.map(skill => {
-      const userCount = userSkillCounts.find(u => u.skillId === skill.id)?._count?.userId || 0;
-      const jobCount = jobSkillCounts.find(j => j.skillId === skill.id)?._count?.jobId || 0;
+    const formattedData = skills.map((skill) => {
+      const userCount =
+        userSkillCounts.find((u) => u.skillId === skill.id)?._count?.userId ||
+        0;
+      const jobCount =
+        jobSkillCounts.find((j) => j.skillId === skill.id)?._count?.jobId || 0;
       const salaryInfo = salaryBySkill[skill.id] || { total: 0, count: 0 };
-      
+
       // Use real average salary if available, otherwise generate a sample value based on skill category
-      let averageSalary = salaryInfo.count > 0 ? salaryInfo.total / salaryInfo.count : 0;
+      let averageSalary =
+        salaryInfo.count > 0 ? salaryInfo.total / salaryInfo.count : 0;
       if (averageSalary === 0) {
         // Generate a reasonable sample salary based on skill category or name
-        if (skill.category === 'Programming' || skill.name.includes('JavaScript') || skill.name.includes('Java') || skill.name.includes('React')) {
-          averageSalary = 85000 + (Math.random() * 40000);
-        } else if (skill.category === 'Technical') {
-          averageSalary = 75000 + (Math.random() * 30000);
+        if (
+          skill.category === "Programming" ||
+          skill.name.includes("JavaScript") ||
+          skill.name.includes("Java") ||
+          skill.name.includes("React")
+        ) {
+          averageSalary = 85000 + Math.random() * 40000;
+        } else if (skill.category === "Technical") {
+          averageSalary = 75000 + Math.random() * 30000;
         } else {
-          averageSalary = 65000 + (Math.random() * 20000);
+          averageSalary = 65000 + Math.random() * 20000;
         }
       }
 
       // Get monthly growth data for this skill
       let skillMonthlyGrowth = monthlyGrowth
-        .filter(m => m.skillId === skill.id)
-        .map(m => ({
+        .filter((m) => m.skillId === skill.id)
+        .map((m) => ({
           date: m.createdAt,
-          count: m._count.userId
+          count: m._count.userId,
         }));
-      
+
       // If no monthly growth data, generate sample data
-      if (skillMonthlyGrowth.length === 0 && (jobCount > 0 || skill.name.includes('JavaScript') || skill.name.includes('React'))) {
+      if (
+        skillMonthlyGrowth.length === 0 &&
+        (jobCount > 0 ||
+          skill.name.includes("JavaScript") ||
+          skill.name.includes("React"))
+      ) {
         skillMonthlyGrowth = this.generateSampleMonthlyData(skill.name);
       }
 
       // Calculate or estimate growth rate
       let growthRate = this.calculateGrowthRate(skillMonthlyGrowth);
-      
+
       // If no growth rate, generate a sample based on skill popularity
       if (growthRate === 0) {
-        if (skill.name.includes('React')) {
-          growthRate = 15 + (Math.random() * 10);
-        } else if (skill.name.includes('JavaScript')) {
-          growthRate = 10 + (Math.random() * 8);
+        if (skill.name.includes("React")) {
+          growthRate = 15 + Math.random() * 10;
+        } else if (skill.name.includes("JavaScript")) {
+          growthRate = 10 + Math.random() * 8;
         } else if (jobCount > 0) {
-          growthRate = 5 + (Math.random() * 10);
+          growthRate = 5 + Math.random() * 10;
         } else {
           growthRate = Math.random() * 5;
         }
@@ -595,11 +609,12 @@ class SkillRepository {
 
       return {
         skill,
-        userCount: userCount || (jobCount > 0 ? Math.floor(Math.random() * 5) + 1 : 0),
+        userCount:
+          userCount || (jobCount > 0 ? Math.floor(Math.random() * 5) + 1 : 0),
         jobCount,
         averageSalary,
         monthlyGrowth: skillMonthlyGrowth,
-        growthRate
+        growthRate,
       };
     });
 
@@ -620,7 +635,7 @@ class SkillRepository {
       allSkills: formattedData,
       topGrowing,
       topPaying,
-      topDemanded
+      topDemanded,
     };
   }
 
@@ -630,13 +645,13 @@ class SkillRepository {
     const result = [];
     const now = new Date();
     let baseCount;
-    
+
     // Set base count based on skill name
-    if (skillName.includes('React')) {
+    if (skillName.includes("React")) {
       baseCount = 8;
-    } else if (skillName.includes('JavaScript')) {
+    } else if (skillName.includes("JavaScript")) {
       baseCount = 6;
-    } else if (skillName.includes('Java')) {
+    } else if (skillName.includes("Java")) {
       baseCount = 5;
     } else {
       baseCount = 2;
@@ -646,32 +661,33 @@ class SkillRepository {
     for (let i = 0; i < months; i++) {
       const date = new Date();
       date.setMonth(now.getMonth() - (months - i));
-      
+
       // Add some randomness to the count
-      const growthFactor = 1 + (i * 0.1); // Growth increases by month
-      const count = Math.floor(baseCount * growthFactor * (1 + Math.random() * 0.3));
-      
+      const growthFactor = 1 + i * 0.1; // Growth increases by month
+      const count = Math.floor(
+        baseCount * growthFactor * (1 + Math.random() * 0.3)
+      );
+
       result.push({
         date: date.toISOString(),
-        count
+        count,
       });
     }
-    
+
     return result;
   }
 
   calculateGrowthRate(monthlyData) {
     if (monthlyData.length < 2) return 0;
-    
+
     const recentMonths = monthlyData.slice(-3);
     const olderMonths = monthlyData.slice(-6, -3);
-    
+
     const recentTotal = recentMonths.reduce((sum, m) => sum + m.count, 0);
     const olderTotal = olderMonths.reduce((sum, m) => sum + m.count, 0);
-    
+
     if (olderTotal === 0) return 100;
     return ((recentTotal - olderTotal) / olderTotal) * 100;
   }
 }
-
-module.exports = new SkillRepository(); 
+module.exports = new SkillRepository();

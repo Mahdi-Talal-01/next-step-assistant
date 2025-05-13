@@ -1,7 +1,3 @@
-/**
- * Form options and constants for the Content Assistant
- */
-
 // List of industries for the dropdown
 export const INDUSTRIES = [
   'Technology',

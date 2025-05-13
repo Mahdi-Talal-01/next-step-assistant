@@ -8,6 +8,7 @@ const gmailRoutes = require('./routes/gmailRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const roadmapRoutes = require('./routes/roadmap');
 const skillRoutes = require('./routes/skillRoutes');
+const contentAssistantRoutes = require('./routes/contentAssistantRoutes');
 // Import the environment setup script
 const { checkAndSetGoogleEnv } = require('../setup-env');
 
@@ -18,7 +19,12 @@ const envVarsSet = checkAndSetGoogleEnv();
 console.log('Environment variables configured:', envVarsSet ? 'Yes' : 'No');
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Add debug middleware for request bodies
@@ -49,6 +55,7 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/roadmaps', roadmapRoutes);
 app.use('/api/skills', skillRoutes);
+app.use('/api/content-assistant', contentAssistantRoutes);
 
 // Special case for OAuth routes that need to be at root level
 app.use('/', oauthRoutes);

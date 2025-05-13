@@ -1,19 +1,19 @@
-import React from 'react';
-import { Icon } from '@iconify/react';
-import PropTypes from 'prop-types';
-import styles from '../styles/ContentAssistant.module.css';
+import React from "react";
+import { Icon } from "@iconify/react";
+import PropTypes from "prop-types";
+import styles from "../styles/ContentAssistant.module.css";
 
-const FormInput = ({ 
-  id, 
-  name, 
-  label, 
-  type = 'text', 
-  value, 
-  onChange, 
-  placeholder, 
-  required = false, 
-  icon, 
-  children 
+const FormInput = ({
+  id,
+  name,
+  label,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  required = false,
+  icon,
+  children,
 }) => {
   return (
     <div className={styles.formGroup}>
@@ -47,13 +47,13 @@ FormInput.propTypes = {
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.number,
-    PropTypes.bool
+    PropTypes.bool,
   ]),
   onChange: PropTypes.func,
   placeholder: PropTypes.string,
   required: PropTypes.bool,
   icon: PropTypes.string,
-  children: PropTypes.node
+  children: PropTypes.node,
 };
 
-export default FormInput; 
+export default FormInput;
