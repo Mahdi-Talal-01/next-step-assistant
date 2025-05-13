@@ -49,5 +49,21 @@ class ContentAssistantValidation {
     additionalContext: Joi.string().allow(''),
     skills: Joi.array().items(Joi.string()).default([])
   });
+  /**
+   * Schema for LinkedIn post form data
+   */
+  static linkedinPostSchema = Joi.object({
+    topic: Joi.string().required().messages({
+      'any.required': 'Topic is required',
+      'string.empty': 'Topic cannot be empty'
+    }),
+    goal: Joi.string().required().messages({
+      'any.required': 'Goal is required',
+      'string.empty': 'Goal cannot be empty'
+    }),
+    tone: Joi.string().valid('professional', 'casual', 'enthusiastic', 'informative', 'persuasive').default('professional'),
+    includeHashtags: Joi.boolean().default(true),
+    skills: Joi.array().items(Joi.string()).default([])
+  });
 }
 module.exports = ContentAssistantValidation;
