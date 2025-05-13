@@ -588,5 +588,40 @@ class SkillRepository {
       topDemanded
     };
   }
+  // Helper to generate sample monthly data for a skill
+  generateSampleMonthlyData(skillName) {
+    const months = 6; // Generate last 6 months of data
+    const result = [];
+    const now = new Date();
+    let baseCount;
+    
+    // Set base count based on skill name
+    if (skillName.includes('React')) {
+      baseCount = 8;
+    } else if (skillName.includes('JavaScript')) {
+      baseCount = 6;
+    } else if (skillName.includes('Java')) {
+      baseCount = 5;
+    } else {
+      baseCount = 2;
+    }
+
+    // Generate sample monthly data points
+    for (let i = 0; i < months; i++) {
+      const date = new Date();
+      date.setMonth(now.getMonth() - (months - i));
+      
+      // Add some randomness to the count
+      const growthFactor = 1 + (i * 0.1); // Growth increases by month
+      const count = Math.floor(baseCount * growthFactor * (1 + Math.random() * 0.3));
+      
+      result.push({
+        date: date.toISOString(),
+        count
+      });
+    }
+    
+    return result;
+  }
 }
 module.exports = new SkillRepository();
