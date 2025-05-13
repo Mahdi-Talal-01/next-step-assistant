@@ -69,5 +69,14 @@ class SkillRepository {
       }
     });
   }
+  async addUserSkill(userId, skillId, level) {
+    return prisma.userSkill.create({
+      data: {
+        userId,
+        skillId,
+        level
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
