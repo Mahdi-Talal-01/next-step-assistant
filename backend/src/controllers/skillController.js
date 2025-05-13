@@ -237,7 +237,14 @@ async getSkillGaps(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
-
+async getRecommendedSkills(req, res) {
+  try {
+    const skills = await skillService.getRecommendedSkills(req.params.userId);
+    return ResponseTrait.success(res, 'Recommended skills retrieved successfully', skills);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 }
 
