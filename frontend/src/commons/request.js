@@ -41,12 +41,31 @@ instance.interceptors.response.use(
 
 const request = async (method, url, data = null, config = {}) => {
   try {
-    const response = await instance({
+    // Don't include data in the request config for DELETE method
+    const requestConfig = {
       method,
       url,
-      data,
       ...config,
+    };
+    
+    // Only include data for methods that typically have a request body
+    if (method.toLowerCase() !== 'delete' && data !== undefined) {
+      requestConfig.data = data;
+    }
+    
+    // Log detailed information for all request types
+    console.log(`[REQUEST ${method.toUpperCase()} ${url}]`, { 
+      method,
+      url,
+      config: requestConfig,
+      headers: requestConfig.headers,
+      hasData: !!requestConfig.data 
     });
+    
+    const response = await instance(requestConfig);
+    
+    // Log detailed response for all request types
+    console.log(`[RESPONSE ${method.toUpperCase()} ${url}] Status: ${response.status}`, response.data);
     
     // Extract the data from the response to handle our API format
     if (response && response.data) {
@@ -77,7 +96,19 @@ const request = async (method, url, data = null, config = {}) => {
     // Fallback for unexpected response format
     return response;
   } catch (error) {
-    console.error('Request error:', error);
+    console.error(`[ERROR ${method.toUpperCase()} ${url}]`, error);
+    
+    // Log more details about the error
+    if (error.response) {
+      console.error('Error response details:', {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers
+      });
+    } else if (error.request) {
+      console.error('Error request details:', error.request);
+    }
+    
     throw error.response?.data || error;
   }
 };
@@ -87,4 +118,5 @@ export default {
   post: (url, data, config) => request('post', url, data, config),
   put: (url, data, config) => request('put', url, data, config),
   delete: (url, config) => request('delete', url, null, config),
+  patch: (url, data, config) => request('patch', url, data, config),
 };
