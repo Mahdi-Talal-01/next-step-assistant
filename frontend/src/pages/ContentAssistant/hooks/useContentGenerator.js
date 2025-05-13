@@ -76,5 +76,13 @@ export const useContentGenerator = (contentType, formData) => {
       }
     };
   }, []);
+  // Handle regular form input changes
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormState(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
 
 }
