@@ -104,6 +104,14 @@ class SkillService {
   async getJobSkills(jobId) {
     return skillRepository.getJobSkills(jobId);
   }
+  async updateJobSkillRequirement(jobId, skillId, required) {
+    const jobSkills = await skillRepository.getJobSkills(jobId);
+    const skillExists = jobSkills.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('Job does not have this skill');
+    }
+    return skillRepository.updateJobSkillRequirement(jobId, skillId, required);
+  }
 }
 
 module.exports = new SkillService(); 
