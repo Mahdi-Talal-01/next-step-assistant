@@ -62,6 +62,7 @@ class ContentAssistantController {
       });
     }
   }
+
   /**
    * Stream content generation to the client
    *
@@ -145,6 +146,62 @@ class ContentAssistantController {
           message: error.message || "Failed to stream content",
         });
       }
+    }
+  }
+
+  /**
+   * Get available content types and their descriptions
+   *
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @returns {Object} HTTP response with content types information
+   */
+  getContentTypes(req, res) {
+    try {
+      const contentTypes = [
+        {
+          id: "jobDescription",
+          name: "Job Description",
+          description:
+            "Professional job listings with responsibilities, requirements, and company information",
+          icon: "mdi:file-document-edit",
+        },
+        {
+          id: "emailReply",
+          name: "Email Reply",
+          description:
+            "Professional email responses to customer inquiries, colleague messages, or business communications",
+          icon: "mdi:email",
+        },
+        {
+          id: "linkedinPost",
+          name: "LinkedIn Post",
+          description:
+            "Engaging professional content for sharing on LinkedIn to build your personal brand",
+          icon: "mdi:linkedin",
+        },
+        {
+          id: "blogPost",
+          name: "Blog Post",
+          description:
+            "Well-structured articles optimized for your target audience and topic",
+          icon: "mdi:text-box",
+        },
+      ];
+
+      return res.status(200).json({
+        success: true,
+        contentTypes,
+      });
+    } catch (error) {
+      console.error(
+        "Error in ContentAssistantController.getContentTypes:",
+        error
+      );
+      return res.status(500).json({
+        success: false,
+        message: error.message || "Failed to get content types",
+      });
     }
   }
 }
