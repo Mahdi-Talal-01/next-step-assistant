@@ -77,6 +77,14 @@ class SkillService {
   async getUserSkills(userId) {
     return skillRepository.getUserSkills(userId);
   }
+  async updateUserSkillLevel(userId, skillId, level) {
+    const userSkill = await skillRepository.getUserSkills(userId);
+    const skillExists = userSkill.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('User does not have this skill');
+    }
+    return skillRepository.updateUserSkillLevel(userId, skillId, level);
+  }
 }
 
 module.exports = new SkillService(); 
