@@ -1,0 +1,77 @@
+.application-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.header-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-toggle-btn,
+.export-btn {
+  background-color: #f2f2f2;
+  color: #666;
+}
+
+.view-toggle-btn:hover,
+.export-btn:hover {
+  background-color: #e2e2e2;
+}
+
+.primary-btn {
+  background-color: #4a6cf7;
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #3b5cde;
+  box-shadow: 0 4px 10px rgba(74, 108, 247, 0.2);
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .application-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .header-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+} 
