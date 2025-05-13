@@ -404,5 +404,32 @@ class SkillRepository {
       }
     });
   }
+  async getSkillAnalytics(skillId) {
+    const [
+      growthRate,
+      averageSalary,
+      jobDemand,
+      growthTrends,
+      demandTrends
+    ] = await Promise.all([
+      this.getSkillGrowthRate(skillId),
+      this.getAverageSalaryPerSkill().then(results => 
+        results.find(r => r.skillId === skillId)
+      ),
+      this.getJobDemandPerSkill().then(results => 
+        results.find(r => r.skillId === skillId)
+      ),
+      this.getSkillGrowthTrends(skillId),
+      this.getSkillDemandTrends(skillId)
+    ]);
+
+    return {
+      growthRate,
+      averageSalary: averageSalary?._avg?.job?.salary || 0,
+      jobDemand: jobDemand?._count?.jobId || 0,
+      growthTrends,
+      demandTrends
+    };
+  }
 }
 module.exports = new SkillRepository();
