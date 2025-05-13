@@ -163,3 +163,31 @@ ${isRemote ? '• Flexible remote work arrangement' : ''}
 Please submit your resume and a cover letter explaining why you're the perfect fit for this role. We look forward to hearing from you!
 `;
 };
+/**
+ * Create an email reply
+ */
+const createEmailReply = (data) => {
+  const { originalEmail, tone, additionalContext, skills } = data;
+  
+  const toneText = toneDescriptions[tone] || 'professional';
+  const skillsText = skills.length > 0 
+    ? `\n\nBy the way, I have expertise in ${skills.join(', ')}, which may be relevant to this conversation.` 
+    : '';
+  
+  // Extract greeting and sender name (simplified)
+  const senderName = "Sender";
+  
+  return `Dear ${senderName},
+
+Thank you for your email regarding ${originalEmail.substring(0, 30)}...
+
+I appreciate you reaching out. Let me address your message in a ${toneText} manner.
+
+${additionalContext}${skillsText}
+
+Looking forward to your response.
+
+Best regards,
+[Your name]
+`;
+};
