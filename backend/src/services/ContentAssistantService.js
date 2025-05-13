@@ -1,19 +1,19 @@
-const OpenAI = require('openai');
-class ContentAssistantService{
+const OpenAI = require("openai");
+class ContentAssistantService {
   constructor() {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-    
+
     // Default models for different content types
     this.models = {
-      default: 'gpt-3.5-turbo',
-      advanced: 'gpt-4-turbo'
+      default: "gpt-3.5-turbo",
+      advanced: "gpt-4-turbo",
     };
   }
   /**
    * Generate content using OpenAI API
-   * 
+   *
    * @param {string} contentType - Type of content to generate (e.g., 'jobDescription', 'emailReply')
    * @param {Object} formData - Form data with content parameters
    * @returns {Promise<string>} Generated content
@@ -22,115 +22,157 @@ class ContentAssistantService{
     try {
       // Get system prompt based on content type
       const systemPrompt = this.getSystemPrompt(contentType);
-      
+
       // Create user prompt from form data
       const userPrompt = this.createUserPrompt(contentType, formData);
-      
+
       // Determine which model to use (could base on content complexity or user tier)
       const modelToUse = this.determineModel(contentType, formData);
-      
+
       // Call OpenAI API
       const response = await this.openai.chat.completions.create({
         model: modelToUse,
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
         max_tokens: 1500,
       });
-      
+
       return response.choices[0].message.content.trim();
     } catch (error) {
-      console.error('Error generating content with OpenAI:', error);
-      throw new Error('Failed to generate content');
+      console.error("Error generating content with OpenAI:", error);
+      throw new Error("Failed to generate content");
     }
   }
-   /**
+  /**
    * Stream content generation using OpenAI API
-   * 
+   *
    * @param {string} contentType - Type of content to generate
    * @param {Object} formData - Form data with content parameters
    * @param {Object} res - Express response object for streaming
    */
-   async streamContent(contentType, formData, res) {
+  async streamContent(contentType, formData, res) {
     try {
       // Set appropriate headers for Server-Sent Events (SSE)
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('X-Accel-Buffering', 'no'); // Disable buffering for Nginx
-      
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      res.setHeader("X-Accel-Buffering", "no"); // Disable buffering for Nginx
+
       // Send initial event to client
       res.write(`data: ${JSON.stringify({ status: "started" })}\n\n`);
-      
+
       // Get system prompt based on content type
       const systemPrompt = this.getSystemPrompt(contentType);
-      
+
       // Create user prompt from form data
       const userPrompt = this.createUserPrompt(contentType, formData);
-      
+
       // Determine which model to use
       const modelToUse = this.determineModel(contentType, formData);
-      
+
       // Keep track of full content
-      let fullContent = '';
-      
+      let fullContent = "";
+
       try {
         // Call OpenAI API with stream option
         const stream = await this.openai.chat.completions.create({
           model: modelToUse,
           messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
           ],
           temperature: 0.7,
           max_tokens: 1500,
           stream: true,
         });
-        
+
         // Process the stream
         for await (const chunk of stream) {
           // Check if client disconnected
           if (res.writableEnded) {
-            console.log('Client disconnected, stopping stream');
+            console.log("Client disconnected, stopping stream");
             break;
           }
-          
+
           // Get the content delta
-          const content = chunk.choices[0]?.delta?.content || '';
+          const content = chunk.choices[0]?.delta?.content || "";
           if (content) {
             fullContent += content;
             // Send content as SSE
             res.write(`data: ${JSON.stringify({ content })}\n\n`);
           }
         }
-        
+
         // Send completion event
-        res.write(`data: ${JSON.stringify({ status: "complete", fullContent })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({ status: "complete", fullContent })}\n\n`
+        );
       } catch (error) {
-        console.error('Error during OpenAI streaming:', error);
+        console.error("Error during OpenAI streaming:", error);
         // Send error as SSE
-        res.write(`data: ${JSON.stringify({ status: "error", message: error.message })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({
+            status: "error",
+            message: error.message,
+          })}\n\n`
+        );
       }
-      
+
       // End the response
       res.end();
-      
     } catch (error) {
-      console.error('Error setting up OpenAI stream:', error);
-      
+      console.error("Error setting up OpenAI stream:", error);
+
       // If response hasn't been started yet, send error as SSE
       if (!res.headersSent) {
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
       }
-      
+
       // Send error as SSE
-      res.write(`data: ${JSON.stringify({ status: "error", message: error.message })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({
+          status: "error",
+          message: error.message,
+        })}\n\n`
+      );
       res.end();
     }
   }
+  /**
+   * Get system prompt based on content type
+   *
+   * @param {string} contentType - Type of content to generate
+   * @returns {string} System prompt
+   */
+  getSystemPrompt(contentType) {
+    const prompts = {
+      jobDescription: `You are an expert recruiter with years of experience writing effective job descriptions. 
+Create a professional, detailed, and engaging job description that will attract qualified candidates.
+Make sure to include sections for responsibilities, qualifications, benefits, and company culture.
+Use a professional tone and be specific about requirements.`,
+
+      emailReply: `You are a professional email communication expert.
+Create a thoughtful, clear, and appropriate email reply based on the original email provided.
+Maintain a professional tone while being conversational and personable.
+Be concise but thorough in addressing all points from the original email.`,
+
+      linkedinPost: `You are a social media content expert specializing in LinkedIn professional content.
+Create an engaging, informative LinkedIn post that will resonate with professional audiences.
+Include appropriate hooks, calls to action, and maintain a professional but conversational tone.
+Focus on value and insights rather than self-promotion.`,
+
+      blogPost: `You are an expert content writer specializing in blog posts.
+Create engaging, well-structured content that provides value to the target audience.
+Use headings, bullet points, and short paragraphs for readability.
+Balance informative content with an engaging style appropriate for the target audience.`,
+    };
+
+    return prompts[contentType] || prompts.jobDescription;
+  }
 }
-module.exports = new ContentAssistantService(); 
+module.exports = new ContentAssistantService();
