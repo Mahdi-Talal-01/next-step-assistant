@@ -37,5 +37,10 @@ class SkillRepository {
       where: { id }
     });
   }
+  async getSkillByName(name) {
+    return prisma.skill.findUnique({
+      where: { name }
+    });
+  }
 }
 module.exports = new SkillRepository();
