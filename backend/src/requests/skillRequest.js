@@ -36,6 +36,20 @@ const validateUserSkill = (req, res, next) => {
   }
   next();
 };
+const validateJobSkill = (req, res, next) => {
+  const { error } = jobSkillSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  next();
+};
+const validateRoadmapSkill = (req, res, next) => {
+  const { error } = roadmapSkillSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  next();
+};
 
 module.exports = {
   skillSchema,
@@ -44,6 +58,8 @@ module.exports = {
   roadmapSkillSchema,
   topicSkillSchema,
   validateSkill,
-  validateUserSkill
+  validateUserSkill,
+  validateJobSkill,
+  validateRoadmapSkill,
 };
 
