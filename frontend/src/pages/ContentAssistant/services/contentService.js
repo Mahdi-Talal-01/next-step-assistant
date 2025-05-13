@@ -191,3 +191,32 @@ Best regards,
 [Your name]
 `;
 };
+/**
+ * Create a LinkedIn post
+ */
+const createLinkedInPost = (data) => {
+  const { topic, goal, tone, includeHashtags, skills } = data;
+  
+  const toneText = toneDescriptions[tone] || 'professional';
+  
+  // Create hashtags from skills and topic
+  let hashtags = '';
+  if (includeHashtags) {
+    const words = [...topic.split(' '), ...skills];
+    const hashtagList = words
+      .filter(word => word.length > 3)
+      .map(word => '#' + word.replace(/[^\w]/g, ''))
+      .slice(0, 5);
+    
+    hashtags = '\n\n' + hashtagList.join(' ');
+  }
+  
+  return `I'm excited to share some thoughts about ${topic}!
+
+As a professional focusing on this area, I believe ${goal}.
+
+This is especially important because it can help drive results and create meaningful impact in your professional life.
+
+What are your thoughts on this topic? I'd love to hear your experiences in the comments below.${hashtags}
+`;
+};
