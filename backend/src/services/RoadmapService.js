@@ -1,4 +1,11 @@
 const roadmapRepository = require("../repositories/RoadmapRepository");
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+// Helper function to ensure IDs are strings
+const ensureStringId = (id) => {
+  return typeof id === 'string' ? id : String(id);
+};
 
 class RoadmapService {
   async createRoadmap(userId, roadmapData) {
@@ -48,25 +55,36 @@ class RoadmapService {
   }
 
   async updateTopicStatus(roadmapId, topicId, userId, status) {
-    const roadmap = await roadmapRepository.findById(roadmapId);
-    if (!roadmap) {
-      throw new Error("Roadmap not found");
+    try {
+      console.log(`Service: Updating topic status. Roadmap=${roadmapId}, Topic=${topicId}, Status=${status}`);
+      
+      const roadmap = await roadmapRepository.findById(roadmapId);
+      if (!roadmap) {
+        throw new Error("Roadmap not found");
+      }
+      if (roadmap.userId !== userId) {
+        throw new Error("Unauthorized to update this roadmap");
+      }
+
+      // Update the topic status
+      const updatedTopic = await roadmapRepository.updateTopicStatus(
+        roadmapId,
+        topicId,
+        status
+      );
+
+      // Calculate the new progress
+      const progress = await roadmapRepository.calculateProgress(roadmapId);
+      console.log(`Calculated new progress: ${progress}%`);
+
+      // Use the dedicated method to update just the progress field
+      await roadmapRepository.updateProgress(roadmapId, progress);
+
+      return updatedTopic;
+    } catch (error) {
+      console.error('Error in updateTopicStatus service:', error);
+      throw error;
     }
-    if (roadmap.userId !== userId) {
-      throw new Error("Unauthorized to update this roadmap");
-    }
-
-    const updatedTopic = await roadmapRepository.updateTopicStatus(
-      roadmapId,
-      topicId,
-      status
-    );
-    const progress = await roadmapRepository.calculateProgress(roadmapId);
-
-    // Update roadmap progress
-    await roadmapRepository.update(roadmapId, { progress });
-
-    return updatedTopic;
   }
 }
 
