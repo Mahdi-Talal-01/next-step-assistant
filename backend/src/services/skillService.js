@@ -161,6 +161,59 @@ class SkillService {
   async getTopicSkills(topicId) {
     return skillRepository.getTopicSkills(topicId);
   }
+   async updateTopicSkillLevel(topicId, skillId, level) {
+    const topicSkills = await skillRepository.getTopicSkills(topicId);
+    const skillExists = topicSkills.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('Topic does not have this skill');
+    }
+    return skillRepository.updateTopicSkillLevel(topicId, skillId, level);
+  }
+
+  async removeTopicSkill(topicId, skillId) {
+    const topicSkills = await skillRepository.getTopicSkills(topicId);
+    const skillExists = topicSkills.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('Topic does not have this skill');
+    }
+    return skillRepository.removeTopicSkill(topicId, skillId);
+  }
+
+  // Skill matching and statistics
+  async getSkillsByCategory(category) {
+    return skillRepository.getSkillsByCategory(category);
+  }
+
+  async getSkillsWithUserCount() {
+    return skillRepository.getSkillsWithUserCount();
+  }
+
+  async getSkillsWithJobCount() {
+    return skillRepository.getSkillsWithJobCount();
+  }
+
+  // Skill matching and recommendations
+  async getSkillGaps(userId, jobId) {
+    const userSkills = await this.getUserSkills(userId);
+    const jobSkills = await this.getJobSkills(jobId);
+    
+    const userSkillMap = new Map(userSkills.map(skill => [skill.skillId, skill.level]));
+    const gaps = [];
+
+    for (const jobSkill of jobSkills) {
+      const userLevel = userSkillMap.get(jobSkill.skillId) || 0;
+      if (userLevel < jobSkill.level) {
+        gaps.push({
+          skill: jobSkill.skill,
+          requiredLevel: jobSkill.level,
+          currentLevel: userLevel,
+          gap: jobSkill.level - userLevel
+        });
+      }
+    }
+
+    return gaps;
+  }
 }
 
 module.exports = new SkillService(); 
