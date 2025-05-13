@@ -58,6 +58,22 @@ class SkillService {
     }
     return skillRepository.deleteSkill(id);
   }
+  async addUserSkill(userId, skillId, level) {
+    const skill = await skillRepository.getSkillById(skillId);
+    if (!skill) {
+      throw new Error('Skill not found');
+    }
+
+    // Check if user already has this skill
+    const existingUserSkill = await skillRepository.getUserSkill(userId, skillId);
+    if (existingUserSkill) {
+      // Update the level if skill already exists
+      return skillRepository.updateUserSkillLevel(userId, skillId, level);
+    }
+
+    // Create new user-skill relationship if it doesn't exist
+    return skillRepository.addUserSkill(userId, skillId, level);
+  }
 }
 
 module.exports = new SkillService(); 
