@@ -44,5 +44,17 @@ router.get('/stats/jobs', skillController.getSkillsWithJobCount);
 router.get('/gaps/user/:userId/job/:jobId', auth, skillController.getSkillGaps);
 router.get('/recommendations/user/:userId', auth, skillController.getRecommendedSkills);
 
+// Skill Analytics routes
+router.get('/analytics/trends', skillController.getSkillsTrendsData);
+router.get('/analytics/growth-trends/:skillId', skillController.getSkillGrowthTrends);
+router.get('/analytics/average-salary', skillController.getAverageSalaryPerSkill);
+router.get('/analytics/job-demand', skillController.getJobDemandPerSkill);
+router.get('/analytics/growth-rate/:skillId', skillController.getSkillGrowthRate);
+router.get('/analytics/demand-trends/:skillId', skillController.getSkillDemandTrends);
+router.get('/analytics/skill/:skillId', skillController.getSkillAnalytics);
+router.get('/analytics/all', skillController.getAllSkillsAnalytics);
+router.get('/analytics/top/growing', skillController.getTopGrowingSkills);
+router.get('/analytics/top/paying', skillController.getTopPayingSkills);
+router.get('/analytics/top/demanded', skillController.getMostDemandedSkills);
 
 module.exports = router; 
