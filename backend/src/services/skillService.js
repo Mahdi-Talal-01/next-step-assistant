@@ -93,6 +93,14 @@ class SkillService {
     }
     return skillRepository.removeUserSkill(userId, skillId);
   }
+  // Job Skill operations
+  async addJobSkill(jobId, skillId, required) {
+    const skill = await skillRepository.getSkillById(skillId);
+    if (!skill) {
+      throw new Error('Skill not found');
+    }
+    return skillRepository.addJobSkill(jobId, skillId, required);
+  }
 }
 
 module.exports = new SkillService(); 
