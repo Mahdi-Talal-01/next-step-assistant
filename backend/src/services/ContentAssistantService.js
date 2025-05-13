@@ -294,5 +294,48 @@ Balance informative content with an engaging style appropriate for the target au
     
     return prompt;
   }
+  /**
+   * Create blog post prompt from form data
+   * 
+   * @param {Object} formData - Blog post form data
+   * @returns {string} Blog post prompt
+   */
+  createBlogPostPrompt(formData) {
+    const { title, targetAudience, keyPoints, tone, desiredLength, skills } = formData;
+    
+    let prompt = `Write a blog post titled "${title}".\n\n`;
+    
+    // Target audience
+    if (targetAudience) {
+      prompt += `The target audience is ${targetAudience}.\n\n`;
+    }
+    
+    // Key points to include
+    if (keyPoints) {
+      prompt += `Include these key points:\n${keyPoints}\n\n`;
+    }
+    
+    // Tone
+    if (tone) {
+      prompt += `Use a ${tone} tone throughout the post.\n\n`;
+    }
+    
+    // Length
+    if (desiredLength) {
+      const lengthMap = {
+        'short': 'short (300-500 words)',
+        'medium': 'medium (600-900 words)',
+        'long': 'long (1000+ words)'
+      };
+      prompt += `The post should be ${lengthMap[desiredLength] || desiredLength}.\n\n`;
+    }
+    
+    // Skills/topics to mention
+    if (skills && skills.length > 0) {
+      prompt += `Incorporate these relevant skills/topics if applicable: ${skills.join(', ')}.\n\n`;
+    }
+    
+    return prompt;
+  }
 }
 module.exports = new ContentAssistantService();
