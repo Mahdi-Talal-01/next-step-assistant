@@ -7,6 +7,7 @@ const oauthRoutes = require('./routes/oauthRoutes');
 const gmailRoutes = require('./routes/gmailRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const roadmapRoutes = require('./routes/roadmap');
+const skillRoutes = require('./routes/skillRoutes');
 // Import the environment setup script
 const { checkAndSetGoogleEnv } = require('../setup-env');
 
@@ -19,6 +20,17 @@ console.log('Environment variables configured:', envVarsSet ? 'Yes' : 'No');
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Add debug middleware for request bodies
+app.use((req, res, next) => {
+  if (req.method === 'DELETE') {
+    console.log('DEBUG - DELETE request received:');
+    console.log('  Path:', req.path);
+    console.log('  Headers:', JSON.stringify(req.headers));
+    console.log('  Raw body:', req.body); // Will be undefined before body-parser
+  }
+  next();
+});
 
 // Test route to verify Gmail callback URL
 app.get('/test-gmail-callback', (req, res) => {
@@ -36,6 +48,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/roadmaps', roadmapRoutes);
+app.use('/api/skills', skillRoutes);
 
 // Special case for OAuth routes that need to be at root level
 app.use('/', oauthRoutes);
