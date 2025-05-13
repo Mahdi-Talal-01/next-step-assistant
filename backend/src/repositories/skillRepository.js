@@ -42,5 +42,10 @@ class SkillRepository {
       where: { name }
     });
   }
+  async getAllSkills() {
+    return prisma.skill.findMany({
+      orderBy: { name: 'asc' }
+    });
+  }
 }
 module.exports = new SkillRepository();
