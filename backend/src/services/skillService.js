@@ -120,6 +120,18 @@ class SkillService {
     }
     return skillRepository.removeJobSkill(jobId, skillId);
   }
+   // Roadmap Skill operations
+   async addRoadmapSkill(roadmapId, skillId, level) {
+    const skill = await skillRepository.getSkillById(skillId);
+    if (!skill) {
+      throw new Error('Skill not found');
+    }
+    return skillRepository.addRoadmapSkill(roadmapId, skillId, level);
+  }
+
+  async getRoadmapSkills(roadmapId) {
+    return skillRepository.getRoadmapSkills(roadmapId);
+  }
 }
 
 module.exports = new SkillService(); 
