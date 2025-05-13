@@ -121,6 +121,17 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+
+  // Roadmap Skill operations
+  async addRoadmapSkill(req, res) {
+    try {
+      const { roadmapId, skillId, level } = req.body;
+      const roadmapSkill = await skillService.addRoadmapSkill(roadmapId, skillId, level);
+      return ResponseTrait.success(res, 'Roadmap skill added successfully', roadmapSkill, 201);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
