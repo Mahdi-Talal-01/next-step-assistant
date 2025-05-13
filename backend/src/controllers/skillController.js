@@ -282,6 +282,16 @@ async getSkillGrowthRate(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async getSkillDemandTrends(req, res) {
+  try {
+    const { skillId } = req.params;
+    const { months } = req.query;
+    const trends = await skillService.getSkillDemandTrends(skillId, parseInt(months));
+    return ResponseTrait.success(res, 'Skill demand trends retrieved successfully', trends);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 }
 
