@@ -25,3 +25,10 @@ export const JOB_TYPE_OPTIONS = [
     'Internship',
     'Freelance'
   ];
+  /**
+ * Filter job type options (includes 'all')
+ */
+export const FILTER_JOB_TYPE_OPTIONS = [
+    { value: 'all', label: 'All Types' },
+    ...JOB_TYPE_OPTIONS.map(type => ({ value: type, label: type }))
+  ];
