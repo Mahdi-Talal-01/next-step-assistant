@@ -309,6 +309,15 @@ async getAllSkillsAnalytics(req, res) {
     return ResponseTrait.error(res, error.message);
   }
 }
+async getTopGrowingSkills(req, res) {
+  try {
+    const { limit } = req.query;
+    const skills = await skillService.getTopGrowingSkills(parseInt(limit));
+    return ResponseTrait.success(res, 'Top growing skills retrieved successfully', skills);
+  } catch (error) {
+    return ResponseTrait.error(res, error.message);
+  }
+}
 
 }
 
