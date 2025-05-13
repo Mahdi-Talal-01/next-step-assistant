@@ -214,6 +214,26 @@ class SkillService {
 
     return gaps;
   }
+  async getRecommendedSkills(userId) {
+    const userSkills = await this.getUserSkills(userId);
+    const allSkills = await this.getAllSkills();
+    const userSkillIds = new Set(userSkills.map(skill => skill.skillId));
+
+    // Get skills that the user doesn't have
+    const potentialSkills = allSkills.filter(skill => !userSkillIds.has(skill.id));
+
+    // Get skills with job count to prioritize in-demand skills
+    const skillsWithJobCount = await this.getSkillsWithJobCount();
+    const jobCountMap = new Map(skillsWithJobCount.map(skill => [skill.id, skill._count.jobs]));
+
+    // Sort potential skills by job count
+    return potentialSkills
+      .map(skill => ({
+        ...skill,
+        jobCount: jobCountMap.get(skill.id) || 0
+      }))
+      .sort((a, b) => b.jobCount - a.jobCount);
+  }
 }
 
 module.exports = new SkillService(); 
