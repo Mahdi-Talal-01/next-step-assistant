@@ -202,6 +202,15 @@ async removeTopicSkill(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+ // Skill matching and statistics
+ async getSkillsByCategory(req, res) {
+  try {
+    const skills = await skillService.getSkillsByCategory(req.params.category);
+    return ResponseTrait.success(res, 'Skills retrieved by category successfully', skills);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 
 }
