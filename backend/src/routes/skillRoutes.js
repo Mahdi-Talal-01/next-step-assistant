@@ -23,4 +23,11 @@ router.get('/job/:jobId', skillController.getJobSkills);
 router.put('/job/:jobId/skill/:skillId', auth, validateJobSkill, skillController.updateJobSkillRequirement);
 router.delete('/job/:jobId/skill/:skillId', auth, skillController.removeJobSkill);
 
+// Roadmap Skill routes
+router.post('/roadmap', auth, validateRoadmapSkill, skillController.addRoadmapSkill);
+router.get('/roadmap/:roadmapId', skillController.getRoadmapSkills);
+router.put('/roadmap/:roadmapId/skill/:skillId', auth, validateRoadmapSkill, skillController.updateRoadmapSkillLevel);
+router.delete('/roadmap/:roadmapId/skill/:skillId', auth, skillController.removeRoadmapSkill);
+
+
 module.exports = router; 
