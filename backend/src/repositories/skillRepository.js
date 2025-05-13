@@ -155,5 +155,13 @@ class SkillRepository {
       }
     });
   }
+  async getRoadmapSkills(roadmapId) {
+    return prisma.roadmapSkill.findMany({
+      where: { roadmapId },
+      include: {
+        skill: true
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
