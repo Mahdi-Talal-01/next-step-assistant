@@ -146,3 +146,16 @@ model JobSkill {
 
   @@unique([jobId, skillId])
 }
+
+model RoadmapSkill {
+  id          String    @id @default(uuid())
+  roadmapId   String
+  skillId     String
+  level       Int       @default(1) // Target skill level to achieve
+  roadmap     Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([roadmapId, skillId])
+}
