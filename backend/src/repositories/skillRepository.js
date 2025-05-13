@@ -184,5 +184,15 @@ class SkillRepository {
       }
     });
   }
+   // Topic Skill operations
+   async addTopicSkill(topicId, skillId, level) {
+    return prisma.topicSkill.create({
+      data: {
+        topicId,
+        skillId,
+        level
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
