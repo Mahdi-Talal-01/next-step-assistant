@@ -268,6 +268,12 @@ class SkillService {
         .sort((a, b) => b.growthRate.growthRate - a.growthRate.growthRate)
         .slice(0, limit);
     }
+    async getTopPayingSkills(limit = 10) {
+      const analytics = await this.getAllSkillsAnalytics();
+      return analytics
+        .sort((a, b) => b.averageSalary - a.averageSalary)
+        .slice(0, limit);
+    }
 }
 
 module.exports = new SkillService(); 
