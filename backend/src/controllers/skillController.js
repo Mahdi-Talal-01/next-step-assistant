@@ -211,6 +211,14 @@ async removeTopicSkill(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async getSkillsWithUserCount(req, res) {
+  try {
+    const skills = await skillService.getSkillsWithUserCount();
+    return ResponseTrait.success(res, 'Skills with user count retrieved successfully', skills);
+  } catch (error) {
+    return ResponseTrait.error(res, error.message);
+  }
+}
 
 
 }
