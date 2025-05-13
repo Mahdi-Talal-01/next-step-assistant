@@ -97,5 +97,15 @@ class SkillRepository {
       data: { level }
     });
   }
+  async removeUserSkill(userId, skillId) {
+    return prisma.userSkill.delete({
+      where: {
+        userId_skillId: {
+          userId,
+          skillId
+        }
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
