@@ -14,10 +14,15 @@ const jobSkillSchema = Joi.object({
   skillId: Joi.string().uuid().required(),
   required: Joi.boolean().required()
 });
+const roadmapSkillSchema = Joi.object({
+  skillId: Joi.string().uuid().required(),
+  level: Joi.number().integer().min(1).max(5).required()
+});
 
 module.exports = {
   skillSchema,
   userSkillSchema,
-  jobSkillSchema
+  jobSkillSchema,
+  roadmapSkillSchema
 };
 
