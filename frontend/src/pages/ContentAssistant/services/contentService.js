@@ -35,4 +35,84 @@ export const generateContent = async (contentType, data) => {
     console.error('Error generating content:', error);
     throw error;
   }
+  
+};
+/**
+ * Stream content generation in real-time using axios for better chunking
+ * 
+ * @param {string} contentType - Type of content to generate
+ * @param {Object} data - Form data for generating content
+ * @param {Function} onChunk - Callback for each text chunk received
+ * @param {Function} onComplete - Callback when streaming is complete
+ * @param {Function} onError - Callback for error handling
+ */
+export const streamContent = async (contentType, data, onChunk, onComplete, onError) => {
+  try {
+    let lastProcessedLength = 0;
+    
+    // Use axios for simulated streaming
+    const response = await axios.post(`${API_URL}/generate`, {
+      contentType,
+      formData: data
+    }, {
+      onDownloadProgress: (progressEvent) => {
+        // This will be called whenever new chunks are downloaded
+        if (progressEvent.event && progressEvent.event.target && progressEvent.event.target.responseText) {
+          try {
+            const fullResponse = progressEvent.event.target.responseText;
+            
+            // Only process new content since last update
+            if (fullResponse.length > lastProcessedLength) {
+              // Try to parse the response as JSON
+              try {
+                // It could be partial JSON, so we need to be careful
+                // Extract what looks like the content part
+                const contentMatch = fullResponse.match(/"content"\s*:\s*"([^"]*)"/);
+                
+                if (contentMatch && contentMatch[1]) {
+                  // Remove escape characters in the JSON string
+                  let processedContent = contentMatch[1]
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\"/g, '"')
+                    .replace(/\\\\/g, '\\');
+                    
+                  onChunk && onChunk('chunk', processedContent);
+                  
+                  // Update progress indicator
+                  const progress = Math.min(100, (progressEvent.loaded / (progressEvent.total || 10000)) * 100);
+                  if (progress > 0) {
+                    onChunk && onChunk('progress', processedContent, progress);
+                  }
+                }
+              } catch (jsonError) {
+                // If we can't parse as JSON yet, just show a loading indicator
+                onChunk && onChunk('chunk', `Loading content... ${Math.round(progressEvent.loaded / 1024)} KB received`);
+              }
+              
+              lastProcessedLength = fullResponse.length;
+            }
+          } catch (e) {
+            console.error('Error processing download chunk:', e);
+          }
+        }
+      }
+    });
+
+    // Once completed, provide the full content
+    if (response.data && response.data.content) {
+      onComplete && onComplete(response.data.content);
+    } else {
+      onError && onError(new Error('No content returned from API'));
+    }
+
+    // Return a cleanup function
+    return () => {
+      // Currently, axios doesn't support aborting ongoing requests in an easy way
+      // but we return a function for consistency with the interface
+    };
+  } catch (error) {
+    console.error('Error setting up content stream:', error);
+    onError && onError(error);
+    return () => {}; // Empty cleanup function
+  }
 };
