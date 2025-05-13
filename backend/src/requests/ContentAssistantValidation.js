@@ -17,5 +17,25 @@ class ContentAssistantValidation {
       'any.required': 'Form data is required'
     })
   });
+    /**
+   * Schema for job description form data
+   */
+    static jobDescriptionSchema = Joi.object({
+      jobTitle: Joi.string().required().messages({
+        'any.required': 'Job title is required',
+        'string.empty': 'Job title cannot be empty'
+      }),
+      industry: Joi.string().required().messages({
+        'any.required': 'Industry is required',
+        'string.empty': 'Industry cannot be empty'
+      }),
+      experience: Joi.string().valid('entry', 'mid', 'senior', 'executive').required(),
+      skills: Joi.array().items(Joi.string()).min(1).required().messages({
+        'any.required': 'Skills are required',
+        'array.min': 'At least one skill is required'
+      }),
+      responsibilities: Joi.string().allow(''),
+      isRemote: Joi.boolean().default(false)
+    });
 }
 module.exports = ContentAssistantValidation;
