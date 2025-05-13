@@ -431,5 +431,19 @@ class SkillRepository {
       demandTrends
     };
   }
+  async getAllSkillsAnalytics() {
+    const skills = await this.getAllSkills();
+    const analytics = await Promise.all(
+      skills.map(async skill => {
+        const skillAnalytics = await this.getSkillAnalytics(skill.id);
+        return {
+          skill,
+          ...skillAnalytics
+        };
+      })
+    );
+
+    return analytics;
+  }
 }
 module.exports = new SkillRepository();
