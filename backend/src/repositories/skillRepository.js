@@ -245,5 +245,21 @@ class SkillRepository {
       }
     });
   }
+  async getSkillsWithJobCount() {
+    return prisma.skill.findMany({
+      include: {
+        _count: {
+          select: {
+            jobs: true
+          }
+        }
+      },
+      orderBy: {
+        jobs: {
+          _count: 'desc'
+        }
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
