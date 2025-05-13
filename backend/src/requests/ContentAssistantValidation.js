@@ -65,5 +65,25 @@ class ContentAssistantValidation {
     includeHashtags: Joi.boolean().default(true),
     skills: Joi.array().items(Joi.string()).default([])
   });
+   /**
+   * Schema for blog post form data
+   */
+   static blogPostSchema = Joi.object({
+    title: Joi.string().required().messages({
+      'any.required': 'Title is required',
+      'string.empty': 'Title cannot be empty'
+    }),
+    targetAudience: Joi.string().required().messages({
+      'any.required': 'Target audience is required',
+      'string.empty': 'Target audience cannot be empty'
+    }),
+    keyPoints: Joi.string().required().messages({
+      'any.required': 'Key points are required',
+      'string.empty': 'Key points cannot be empty'
+    }),
+    tone: Joi.string().valid('professional', 'casual', 'enthusiastic', 'informative', 'persuasive').default('informative'),
+    desiredLength: Joi.string().valid('short', 'medium', 'long').default('medium'),
+    skills: Joi.array().items(Joi.string()).default([])
+  });
 }
 module.exports = ContentAssistantValidation;
