@@ -63,13 +63,20 @@ const ContentAssistant = () => {
     navigator.clipboard.writeText(text);
     showNotification("Copied to clipboard!");
   };
+  // Cancel generation
+  const handleCancelGeneration = () => {
+    cancelGeneration();
+    showNotification("Content generation canceled");
+  };
   return (
     <div className={styles.container}>
       <Header />
       <TabNavigation />
       <ContentForm />
       <ContentPreview />
-  return <div>ContentAssistant</div>;
+      <Notification />
+    </div>
+  );
 };
 
 export default ContentAssistant;
