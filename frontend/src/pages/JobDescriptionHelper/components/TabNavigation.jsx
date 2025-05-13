@@ -1,26 +1,31 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import PropTypes from 'prop-types';
-import styles from '../styles/JobDescriptionHelper.module.css';
+import styles from '../styles/ContentAssistant.module.css';
 
-const TabNavigation = ({ activeTab, setActiveTab, hasDescription }) => {
+const TabNavigation = ({ activeTab, setActiveTab, hasContent }) => {
   return (
     <div className={styles.tabsContainer}>
-      <button 
-        className={`${styles.tabButton} ${activeTab === 'editor' ? styles.activeTab : ''}`}
+      <motion.div 
+        className={`${styles.tabButton} ${activeTab === 'editor' ? styles.active : ''}`}
         onClick={() => setActiveTab('editor')}
+        whileHover={{ y: -2 }}
+        whileTap={{ y: 0 }}
       >
-        <Icon icon="mdi:pencil" className={styles.tabIcon} />
+        <Icon icon="mdi:pencil" style={{ marginRight: '8px' }} />
         Editor
-      </button>
-      <button 
-        className={`${styles.tabButton} ${activeTab === 'preview' ? styles.activeTab : ''}`}
-        onClick={() => setActiveTab('preview')}
-        disabled={!hasDescription}
+      </motion.div>
+      
+      <motion.div 
+        className={`${styles.tabButton} ${activeTab === 'preview' ? styles.active : ''} ${!hasContent ? styles.disabled : ''}`}
+        onClick={() => hasContent && setActiveTab('preview')}
+        whileHover={hasContent ? { y: -2 } : {}}
+        whileTap={hasContent ? { y: 0 } : {}}
       >
-        <Icon icon="mdi:eye" className={styles.tabIcon} />
+        <Icon icon="mdi:eye" style={{ marginRight: '8px' }} />
         Preview
-      </button>
+      </motion.div>
     </div>
   );
 };
@@ -28,7 +33,7 @@ const TabNavigation = ({ activeTab, setActiveTab, hasDescription }) => {
 TabNavigation.propTypes = {
   activeTab: PropTypes.string.isRequired,
   setActiveTab: PropTypes.func.isRequired,
-  hasDescription: PropTypes.bool.isRequired
+  hasContent: PropTypes.bool.isRequired
 };
 
 export default TabNavigation; 
