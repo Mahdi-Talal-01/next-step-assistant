@@ -122,3 +122,15 @@ model Skill {
   roadmaps    RoadmapSkill[]
   topics      TopicSkill[]
 }
+model UserSkill {
+  id          String    @id @default(uuid())
+  userId      String
+  skillId     String
+  level       Int       @default(1) // Skill proficiency level (1-5)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, skillId])
+}
