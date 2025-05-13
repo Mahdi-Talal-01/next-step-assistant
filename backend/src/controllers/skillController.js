@@ -273,6 +273,15 @@ async getJobDemandPerSkill(req, res) {
     return ResponseTrait.error(res, error.message);
   }
 }
+async getSkillGrowthRate(req, res) {
+  try {
+    const { skillId } = req.params;
+    const growthRate = await skillService.getSkillGrowthRate(skillId);
+    return ResponseTrait.success(res, 'Skill growth rate retrieved successfully', growthRate);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 }
 
