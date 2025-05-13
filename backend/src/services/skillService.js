@@ -149,6 +149,18 @@ class SkillService {
     }
     return skillRepository.removeRoadmapSkill(roadmapId, skillId);
   }
+  // Topic Skill operations
+  async addTopicSkill(topicId, skillId, level) {
+    const skill = await skillRepository.getSkillById(skillId);
+    if (!skill) {
+      throw new Error('Skill not found');
+    }
+    return skillRepository.addTopicSkill(topicId, skillId, level);
+  }
+
+  async getTopicSkills(topicId) {
+    return skillRepository.getTopicSkills(topicId);
+  }
 }
 
 module.exports = new SkillService(); 
