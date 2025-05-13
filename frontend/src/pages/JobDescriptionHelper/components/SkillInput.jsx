@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import PropTypes from 'prop-types';
-import styles from '../styles/JobDescriptionHelper.module.css';
+import styles from '../styles/ContentAssistant.module.css';
 
 const SkillInput = ({ value, onChange, onKeyPress, onAdd, inputRef }) => {
   return (
