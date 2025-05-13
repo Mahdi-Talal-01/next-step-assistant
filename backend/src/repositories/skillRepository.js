@@ -325,5 +325,33 @@ class SkillRepository {
       skill: skills.find(s => s.id === skillId)
     }));
   }
+  async getJobDemandPerSkill() {
+    const results = await prisma.jobSkill.groupBy({
+      by: ['skillId'],
+      _count: {
+        jobId: true
+      },
+      orderBy: {
+        _count: {
+          jobId: 'desc'
+        }
+      }
+    });
+
+    // Get the skills data separately
+    const skills = await prisma.skill.findMany({
+      where: {
+        id: {
+          in: results.map(r => r.skillId)
+        }
+      }
+    });
+
+    // Combine the results
+    return results.map(result => ({
+      ...result,
+      skill: skills.find(s => s.id === result.skillId)
+    }));
+  }
 }
 module.exports = new SkillRepository();
