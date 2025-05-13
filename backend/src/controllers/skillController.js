@@ -50,6 +50,14 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async getUserSkills(req, res) {
+    try {
+      const skills = await skillService.getUserSkills(req.params.userId);
+      return ResponseTrait.success(res, 'User skills retrieved successfully', skills);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
