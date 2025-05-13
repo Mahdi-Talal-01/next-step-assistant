@@ -146,5 +146,14 @@ class SkillRepository {
       }
     });
   }
+  async addRoadmapSkill(roadmapId, skillId, level) {
+    return prisma.roadmapSkill.create({
+      data: {
+        roadmapId,
+        skillId,
+        level
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
