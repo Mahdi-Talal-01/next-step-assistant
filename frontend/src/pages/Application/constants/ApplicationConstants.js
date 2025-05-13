@@ -49,3 +49,20 @@ export const SORT_OPTIONS = [
     { value: 'company', label: 'Company' },
     { value: 'status', label: 'Status' },
   ];
+  /**
+ * Default new application template
+ */
+export const DEFAULT_NEW_APPLICATION = {
+    id: null,
+    company: '',
+    position: '',
+    location: '',
+    status: 'applied',
+    appliedDate: new Date().toISOString().split('T')[0],
+    lastUpdated: new Date().toISOString().split('T')[0],
+    jobType: 'Full-time',
+    skills: [],
+    notes: '',
+    jobUrl: '',
+    salary: '',
+  };
