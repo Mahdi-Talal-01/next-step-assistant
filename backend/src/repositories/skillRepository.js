@@ -136,5 +136,15 @@ class SkillRepository {
       data: { required }
     });
   }
+  async removeJobSkill(jobId, skillId) {
+    return prisma.jobSkill.delete({
+      where: {
+        jobId_skillId: {
+          jobId,
+          skillId
+        }
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
