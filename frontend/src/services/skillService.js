@@ -10,7 +10,12 @@ export default skillService{
       console.error('Error in getSkillsTrendsData:', error);
       throw error;
     }
-  }
+  },
+   // Get all skills analytics
+   getAllSkillsAnalytics: async () => {
+    const response = await request.get('/skills/analytics/all');
+    return response.data;
+  },
 }
 
 
