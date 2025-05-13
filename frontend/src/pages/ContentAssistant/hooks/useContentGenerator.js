@@ -68,5 +68,13 @@ export const useContentGenerator = (contentType, formData) => {
       streamCleanupRef.current = null;
     }
   }, [contentType]);
-  
+  // Clean up streaming on unmount
+  useEffect(() => {
+    return () => {
+      if (streamCleanupRef.current) {
+        streamCleanupRef.current();
+      }
+    };
+  }, []);
+
 }
