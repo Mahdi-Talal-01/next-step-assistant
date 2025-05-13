@@ -115,4 +115,19 @@ export const streamContent = async (contentType, data, onChunk, onComplete, onEr
     onError && onError(error);
     return () => {}; // Empty cleanup function
   }
+  
+};
+/**
+ * Fetch available content types
+ * 
+ * @returns {Promise<Array>} List of content types with metadata
+ */
+export const getContentTypes = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/types`);
+    return response.data.contentTypes;
+  } catch (error) {
+    console.error('Error fetching content types:', error);
+    throw error;
+  }
 };
