@@ -257,6 +257,22 @@ async getRecommendedSkills(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async getAverageSalaryPerSkill(req, res) {
+  try {
+    const salaries = await skillService.getAverageSalaryPerSkill();
+    return ResponseTrait.success(res, 'Average salary per skill retrieved successfully', salaries);
+  } catch (error) {
+    return ResponseTrait.error(res, error.message);
+  }
+}
+async getJobDemandPerSkill(req, res) {
+  try {
+    const demands = await skillService.getJobDemandPerSkill();
+    return ResponseTrait.success(res, 'Job demand per skill retrieved successfully', demands);
+  } catch (error) {
+    return ResponseTrait.error(res, error.message);
+  }
+}
 
 }
 
