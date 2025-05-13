@@ -35,5 +35,10 @@ router.get('/topic/:topicId', skillController.getTopicSkills);
 router.put('/topic/:topicId/skill/:skillId', auth, validateTopicSkill, skillController.updateTopicSkillLevel);
 router.delete('/topic/:topicId/skill/:skillId', auth, skillController.removeTopicSkill);
 
+// Skill matching and statistics routes
+router.get('/category/:category', skillController.getSkillsByCategory);
+router.get('/stats/users', skillController.getSkillsWithUserCount);
+router.get('/stats/jobs', skillController.getSkillsWithJobCount);
+
 
 module.exports = router; 
