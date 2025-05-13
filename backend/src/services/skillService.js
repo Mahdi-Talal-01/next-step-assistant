@@ -38,6 +38,19 @@ class SkillService {
   async getAllSkills() {
     return skillRepository.getAllSkills();
   }
+  async updateSkill(id, data) {
+    const skill = await skillRepository.getSkillById(id);
+    if (!skill) {
+      throw new Error('Skill not found');
+    }
+    if (data.name && data.name !== skill.name) {
+      const existingSkill = await skillRepository.getSkillByName(data.name);
+      if (existingSkill) {
+        throw new Error('Skill with this name already exists');
+      }
+    }
+    return skillRepository.updateSkill(id, data);
+  }
 }
 
 module.exports = new SkillService(); 
