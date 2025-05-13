@@ -213,5 +213,15 @@ class SkillRepository {
       data: { level }
     });
   }
+  async removeTopicSkill(topicId, skillId) {
+    return prisma.topicSkill.delete({
+      where: {
+        topicId_skillId: {
+          topicId,
+          skillId
+        }
+      }
+    });
+  }
 }
 module.exports = new SkillRepository();
