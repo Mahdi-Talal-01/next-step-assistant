@@ -262,6 +262,12 @@ class SkillService {
     async getAllSkillsAnalytics() {
       return skillRepository.getAllSkillsAnalytics();
     }
+    async getTopGrowingSkills(limit = 10) {
+      const analytics = await this.getAllSkillsAnalytics();
+      return analytics
+        .sort((a, b) => b.growthRate.growthRate - a.growthRate.growthRate)
+        .slice(0, limit);
+    }
 }
 
 module.exports = new SkillService(); 
