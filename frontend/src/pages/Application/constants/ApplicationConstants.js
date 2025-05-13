@@ -15,3 +15,13 @@ export const FILTER_STATUS_OPTIONS = [
     { value: 'all', label: 'All Status' },
     ...STATUS_OPTIONS
   ];
+  /**
+ * Job type options
+ */
+export const JOB_TYPE_OPTIONS = [
+    'Full-time',
+    'Part-time',
+    'Contract',
+    'Internship',
+    'Freelance'
+  ];
