@@ -132,6 +132,23 @@ class SkillService {
   async getRoadmapSkills(roadmapId) {
     return skillRepository.getRoadmapSkills(roadmapId);
   }
+  async updateRoadmapSkillLevel(roadmapId, skillId, level) {
+    const roadmapSkills = await skillRepository.getRoadmapSkills(roadmapId);
+    const skillExists = roadmapSkills.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('Roadmap does not have this skill');
+    }
+    return skillRepository.updateRoadmapSkillLevel(roadmapId, skillId, level);
+  }
+
+  async removeRoadmapSkill(roadmapId, skillId) {
+    const roadmapSkills = await skillRepository.getRoadmapSkills(roadmapId);
+    const skillExists = roadmapSkills.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('Roadmap does not have this skill');
+    }
+    return skillRepository.removeRoadmapSkill(roadmapId, skillId);
+  }
 }
 
 module.exports = new SkillService(); 
