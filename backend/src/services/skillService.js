@@ -85,6 +85,14 @@ class SkillService {
     }
     return skillRepository.updateUserSkillLevel(userId, skillId, level);
   }
+  async removeUserSkill(userId, skillId) {
+    const userSkill = await skillRepository.getUserSkills(userId);
+    const skillExists = userSkill.some(skill => skill.skillId === skillId);
+    if (!skillExists) {
+      throw new Error('User does not have this skill');
+    }
+    return skillRepository.removeUserSkill(userId, skillId);
+  }
 }
 
 module.exports = new SkillService(); 
