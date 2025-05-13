@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-class SkillRepository {
 
+class SkillRepository {
   // Skill CRUD operations
   async createSkill(data) {
     try {
@@ -32,34 +32,40 @@ class SkillRepository {
       throw new Error(error.message || 'Failed to create skill');
     }
   }
+
   async getSkillById(id) {
     return prisma.skill.findUnique({
       where: { id }
     });
   }
+
   async getSkillByName(name) {
     return prisma.skill.findUnique({
       where: { name }
     });
   }
+
   async getAllSkills() {
     return prisma.skill.findMany({
       orderBy: { name: 'asc' }
     });
   }
+
   async updateSkill(id, data) {
     return prisma.skill.update({
       where: { id },
       data
     });
   }
+
   async deleteSkill(id) {
     return prisma.skill.delete({
       where: { id }
     });
   }
-   // User Skill operations
-   async getUserSkill(userId, skillId) {
+
+  // User Skill operations
+  async getUserSkill(userId, skillId) {
     return prisma.userSkill.findUnique({
       where: {
         userId_skillId: {
@@ -69,6 +75,7 @@ class SkillRepository {
       }
     });
   }
+
   async addUserSkill(userId, skillId, level) {
     return prisma.userSkill.create({
       data: {
@@ -78,6 +85,7 @@ class SkillRepository {
       }
     });
   }
+
   async getUserSkills(userId) {
     return prisma.userSkill.findMany({
       where: { userId },
@@ -86,6 +94,7 @@ class SkillRepository {
       }
     });
   }
+
   async updateUserSkillLevel(userId, skillId, level) {
     return prisma.userSkill.update({
       where: {
@@ -97,6 +106,7 @@ class SkillRepository {
       data: { level }
     });
   }
+
   async removeUserSkill(userId, skillId) {
     return prisma.userSkill.delete({
       where: {
@@ -107,6 +117,7 @@ class SkillRepository {
       }
     });
   }
+
   // Job Skill operations
   async addJobSkill(jobId, skillId, required) {
     return prisma.jobSkill.create({
@@ -117,6 +128,7 @@ class SkillRepository {
       }
     });
   }
+
   async getJobSkills(jobId) {
     return prisma.jobSkill.findMany({
       where: { jobId },
@@ -125,6 +137,7 @@ class SkillRepository {
       }
     });
   }
+
   async updateJobSkillRequirement(jobId, skillId, required) {
     return prisma.jobSkill.update({
       where: {
@@ -136,6 +149,7 @@ class SkillRepository {
       data: { required }
     });
   }
+
   async removeJobSkill(jobId, skillId) {
     return prisma.jobSkill.delete({
       where: {
@@ -146,6 +160,8 @@ class SkillRepository {
       }
     });
   }
+
+  // Roadmap Skill operations
   async addRoadmapSkill(roadmapId, skillId, level) {
     return prisma.roadmapSkill.create({
       data: {
@@ -155,6 +171,7 @@ class SkillRepository {
       }
     });
   }
+
   async getRoadmapSkills(roadmapId) {
     return prisma.roadmapSkill.findMany({
       where: { roadmapId },
@@ -163,6 +180,7 @@ class SkillRepository {
       }
     });
   }
+
   async updateRoadmapSkillLevel(roadmapId, skillId, level) {
     return prisma.roadmapSkill.update({
       where: {
@@ -174,6 +192,7 @@ class SkillRepository {
       data: { level }
     });
   }
+
   async removeRoadmapSkill(roadmapId, skillId) {
     return prisma.roadmapSkill.delete({
       where: {
@@ -184,8 +203,9 @@ class SkillRepository {
       }
     });
   }
-   // Topic Skill operations
-   async addTopicSkill(topicId, skillId, level) {
+
+  // Topic Skill operations
+  async addTopicSkill(topicId, skillId, level) {
     return prisma.topicSkill.create({
       data: {
         topicId,
@@ -194,6 +214,7 @@ class SkillRepository {
       }
     });
   }
+
   async getTopicSkills(topicId) {
     return prisma.topicSkill.findMany({
       where: { topicId },
@@ -202,6 +223,7 @@ class SkillRepository {
       }
     });
   }
+
   async updateTopicSkillLevel(topicId, skillId, level) {
     return prisma.topicSkill.update({
       where: {
@@ -213,6 +235,7 @@ class SkillRepository {
       data: { level }
     });
   }
+
   async removeTopicSkill(topicId, skillId) {
     return prisma.topicSkill.delete({
       where: {
@@ -223,12 +246,15 @@ class SkillRepository {
       }
     });
   }
+
+  // Skill matching and statistics
   async getSkillsByCategory(category) {
     return prisma.skill.findMany({
       where: { category },
       orderBy: { name: 'asc' }
     });
   }
+
   async getSkillsWithUserCount() {
     return prisma.skill.findMany({
       include: {
@@ -245,6 +271,7 @@ class SkillRepository {
       }
     });
   }
+
   async getSkillsWithJobCount() {
     return prisma.skill.findMany({
       include: {
@@ -261,8 +288,9 @@ class SkillRepository {
       }
     });
   }
-   // Skill Analytics methods
-   async getSkillGrowthTrends(skillId, months = 12) {
+
+  // Skill Analytics methods
+  async getSkillGrowthTrends(skillId, months = 12) {
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
 
@@ -282,6 +310,7 @@ class SkillRepository {
       }
     });
   }
+
   async getAverageSalaryPerSkill() {
     const results = await prisma.jobSkill.findMany({
       select: {
@@ -325,6 +354,7 @@ class SkillRepository {
       skill: skills.find(s => s.id === skillId)
     }));
   }
+
   async getJobDemandPerSkill() {
     const results = await prisma.jobSkill.groupBy({
       by: ['skillId'],
@@ -353,6 +383,7 @@ class SkillRepository {
       skill: skills.find(s => s.id === result.skillId)
     }));
   }
+
   async getSkillGrowthRate(skillId) {
     const now = new Date();
     const threeMonthsAgo = new Date();
@@ -384,6 +415,7 @@ class SkillRepository {
       growthRate: previousCount === 0 ? 100 : ((currentCount - previousCount) / previousCount) * 100
     };
   }
+
   async getSkillDemandTrends(skillId, months = 12) {
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
@@ -404,6 +436,7 @@ class SkillRepository {
       }
     });
   }
+
   async getSkillAnalytics(skillId) {
     const [
       growthRate,
@@ -431,6 +464,7 @@ class SkillRepository {
       demandTrends
     };
   }
+
   async getAllSkillsAnalytics() {
     const skills = await this.getAllSkills();
     const analytics = await Promise.all(
@@ -445,6 +479,7 @@ class SkillRepository {
 
     return analytics;
   }
+
   async getSkillsTrendsData() {
     // Get all skills
     const skills = await this.getAllSkills();
@@ -588,6 +623,7 @@ class SkillRepository {
       topDemanded
     };
   }
+
   // Helper to generate sample monthly data for a skill
   generateSampleMonthlyData(skillName) {
     const months = 6; // Generate last 6 months of data
@@ -623,5 +659,19 @@ class SkillRepository {
     
     return result;
   }
+
+  calculateGrowthRate(monthlyData) {
+    if (monthlyData.length < 2) return 0;
+    
+    const recentMonths = monthlyData.slice(-3);
+    const olderMonths = monthlyData.slice(-6, -3);
+    
+    const recentTotal = recentMonths.reduce((sum, m) => sum + m.count, 0);
+    const olderTotal = olderMonths.reduce((sum, m) => sum + m.count, 0);
+    
+    if (olderTotal === 0) return 100;
+    return ((recentTotal - olderTotal) / olderTotal) * 100;
+  }
 }
-module.exports = new SkillRepository();
+
+module.exports = new SkillRepository(); 
