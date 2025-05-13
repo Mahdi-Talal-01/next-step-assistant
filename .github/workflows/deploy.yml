@@ -1,0 +1,99 @@
+name: Push and Run Backend
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  Build-Node-And-Push-Dockerhub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_KEY }}
+
+      - name: Build Docker image
+        working-directory: ./backend
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest .
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
+
+  Deploy-to-EC2:
+    needs: Build-Node-And-Push-Dockerhub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            # Debug: Print current user and groups
+            echo "Current user: $USER"
+            echo "Current groups:"
+            groups
+            
+            # Debug: Print Docker and Docker Compose versions
+            echo "Docker version:"
+            docker --version
+            echo "Docker Compose version:"
+            docker-compose --version
+            
+            # Create and setup app directory
+            echo "Setting up app directory..."
+            rm -rf ~/app
+            mkdir -p ~/app
+            cd ~/app
+            
+            # Copy docker-compose.yaml from repository
+            echo "Copying docker-compose.yaml..."
+            cp /home/${{ secrets.EC2_USER }}/app/docker-compose.yaml .
+            
+            # Create .env file with secrets
+            echo "Creating .env file..."
+            cat > .env << 'EOL'
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            EOL
+            
+            # Debug: List files and show contents
+            echo "Listing files in ~/app:"
+            ls -la
+            echo "Contents of docker-compose.yaml:"
+            cat docker-compose.yaml
+            
+            # Pull latest image
+            echo "Pulling latest image..."
+            docker pull ${{ secrets.DOCKER_USERNAME }}/nextstep-backend:latest
+            
+            # Stop existing containers
+            echo "Stopping existing containers..."
+            docker-compose down || true
+            
+            # Remove old images
+            echo "Cleaning up old images..."
+            docker image prune -f
+            
+            # Start new containers
+            echo "Starting new containers..."
+            docker-compose up -d
+            
+            # Verify deployment
+            echo "Verifying deployment..."
+            docker-compose ps
