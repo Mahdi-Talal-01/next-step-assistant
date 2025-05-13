@@ -134,3 +134,15 @@ model UserSkill {
 
   @@unique([userId, skillId])
 }
+model JobSkill {
+  id          String    @id @default(uuid())
+  jobId       String
+  skillId     String
+  required    Boolean   @default(true) // Whether the skill is required or preferred
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([jobId, skillId])
+}
