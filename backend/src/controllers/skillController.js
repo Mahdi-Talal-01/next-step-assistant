@@ -292,6 +292,15 @@ async getSkillDemandTrends(req, res) {
     return ResponseTrait.badRequest(res, error.message);
   }
 }
+async getSkillAnalytics(req, res) {
+  try {
+    const { skillId } = req.params;
+    const analytics = await skillService.getSkillAnalytics(skillId);
+    return ResponseTrait.success(res, 'Skill analytics retrieved successfully', analytics);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
 
 }
 
