@@ -132,6 +132,14 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async getRoadmapSkills(req, res) {
+    try {
+      const skills = await skillService.getRoadmapSkills(req.params.roadmapId);
+      return ResponseTrait.success(res, 'Roadmap skills retrieved successfully', skills);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
