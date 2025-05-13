@@ -140,6 +140,19 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async updateRoadmapSkillLevel(req, res) {
+    try {
+      const { roadmapId, skillId } = req.params;
+      const { level } = req.body;
+      const roadmapSkill = await skillService.updateRoadmapSkillLevel(roadmapId, skillId, level);
+      if (!roadmapSkill) {
+        return ResponseTrait.notFound(res, 'Roadmap skill not found');
+      }
+      return ResponseTrait.success(res, 'Roadmap skill level updated successfully', roadmapSkill);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
