@@ -174,5 +174,26 @@ Balance informative content with an engaging style appropriate for the target au
 
     return prompts[contentType] || prompts.jobDescription;
   }
+  /**
+   * Create user prompt from form data
+   * 
+   * @param {string} contentType - Type of content to generate
+   * @param {Object} formData - Form data with content parameters
+   * @returns {string} User prompt
+   */
+  createUserPrompt(contentType, formData) {
+    switch (contentType) {
+      case 'jobDescription':
+        return this.createJobDescriptionPrompt(formData);
+      case 'emailReply':
+        return this.createEmailReplyPrompt(formData);
+      case 'linkedinPost':
+        return this.createLinkedInPostPrompt(formData);
+      case 'blogPost':
+        return this.createBlogPostPrompt(formData);
+      default:
+        return JSON.stringify(formData);
+    }
+  }
 }
 module.exports = new ContentAssistantService();
