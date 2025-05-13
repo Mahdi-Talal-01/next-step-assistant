@@ -58,6 +58,19 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async updateUserSkillLevel(req, res) {
+    try {
+      const { userId, skillId } = req.params;
+      const { level } = req.body;
+      const userSkill = await skillService.updateUserSkillLevel(userId, skillId, level);
+      if (!userSkill) {
+        return ResponseTrait.notFound(res, 'User skill not found');
+      }
+      return ResponseTrait.success(res, 'User skill level updated successfully', userSkill);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
