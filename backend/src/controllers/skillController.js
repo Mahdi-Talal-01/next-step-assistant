@@ -99,6 +99,19 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async updateJobSkillRequirement(req, res) {
+    try {
+      const { jobId, skillId } = req.params;
+      const { required } = req.body;
+      const jobSkill = await skillService.updateJobSkillRequirement(jobId, skillId, required);
+      if (!jobSkill) {
+        return ResponseTrait.notFound(res, 'Job skill not found');
+      }
+      return ResponseTrait.success(res, 'Job skill requirement updated successfully', jobSkill);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
