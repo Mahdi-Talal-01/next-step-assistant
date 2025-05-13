@@ -56,4 +56,17 @@ export const useContentGenerator = (contentType, formData) => {
    const streamCleanupRef = useRef(null);
    const skillInputRef = useRef(null);
  
+    // Reset form when content type changes
+  useEffect(() => {
+    setFormState(getInitialState());
+    setGeneratedContent('');
+    setStreamProgress(0);
+    
+    // Clean up any ongoing streams when content type changes
+    if (streamCleanupRef.current) {
+      streamCleanupRef.current();
+      streamCleanupRef.current = null;
+    }
+  }, [contentType]);
+  
 }
