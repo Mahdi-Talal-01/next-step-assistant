@@ -8,3 +8,10 @@ export const STATUS_OPTIONS = [
     { value: 'offer', label: 'Offer', icon: 'mdi:handshake' },
     { value: 'rejected', label: 'Rejected', icon: 'mdi:close' }
   ];
+  /**
+ * Filter status options (includes 'all')
+ */
+export const FILTER_STATUS_OPTIONS = [
+    { value: 'all', label: 'All Status' },
+    ...STATUS_OPTIONS
+  ];
