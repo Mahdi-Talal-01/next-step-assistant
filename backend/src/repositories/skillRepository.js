@@ -202,5 +202,16 @@ class SkillRepository {
       }
     });
   }
+  async updateTopicSkillLevel(topicId, skillId, level) {
+    return prisma.topicSkill.update({
+      where: {
+        topicId_skillId: {
+          topicId,
+          skillId
+        }
+      },
+      data: { level }
+    });
+  }
 }
 module.exports = new SkillRepository();
