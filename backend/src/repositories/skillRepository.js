@@ -53,5 +53,10 @@ class SkillRepository {
       data
     });
   }
+  async deleteSkill(id) {
+    return prisma.skill.delete({
+      where: { id }
+    });
+  }
 }
 module.exports = new SkillRepository();
