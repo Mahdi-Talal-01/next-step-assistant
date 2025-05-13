@@ -24,6 +24,14 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async getAllSkills(req, res) {
+    try {
+      const skills = await skillService.getAllSkills();
+      return ResponseTrait.success(res, 'Skills retrieved successfully', skills);
+    } catch (error) {
+      return ResponseTrait.error(res, error.message);
+    }
+  }
 }
 
 
