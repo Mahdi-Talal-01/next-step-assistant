@@ -233,5 +233,33 @@ Balance informative content with an engaging style appropriate for the target au
     
     return prompt;
   }
+  /**
+   * Create email reply prompt from form data
+   * 
+   * @param {Object} formData - Email reply form data
+   * @returns {string} Email reply prompt
+   */
+  createEmailReplyPrompt(formData) {
+    const { originalEmail, tone, additionalContext, skills } = formData;
+    
+    let prompt = `Write a reply to the following email:\n\n${originalEmail}\n\n`;
+    
+    // Tone
+    if (tone) {
+      prompt += `Use a ${tone} tone in the response.\n\n`;
+    }
+    
+    // Additional context
+    if (additionalContext) {
+      prompt += `Include this information in your reply: ${additionalContext}\n\n`;
+    }
+    
+    // Skills to mention
+    if (skills && skills.length > 0) {
+      prompt += `Mention these relevant skills/topics if appropriate: ${skills.join(', ')}.\n\n`;
+    }
+    
+    return prompt;
+  }
 }
 module.exports = new ContentAssistantService();
