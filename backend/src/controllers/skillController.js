@@ -80,6 +80,17 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+
+   // Job Skill operations
+   async addJobSkill(req, res) {
+    try {
+      const { jobId, skillId, required } = req.body;
+      const jobSkill = await skillService.addJobSkill(jobId, skillId, required);
+      return ResponseTrait.success(res, 'Job skill added successfully', jobSkill, 201);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
