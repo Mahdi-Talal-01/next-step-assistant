@@ -353,5 +353,36 @@ class SkillRepository {
       skill: skills.find(s => s.id === result.skillId)
     }));
   }
+  async getSkillGrowthRate(skillId) {
+    const now = new Date();
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(now.getMonth() - 3);
+
+    const [currentCount, previousCount] = await Promise.all([
+      prisma.userSkill.count({
+        where: {
+          skillId,
+          createdAt: {
+            gte: threeMonthsAgo
+          }
+        }
+      }),
+      prisma.userSkill.count({
+        where: {
+          skillId,
+          createdAt: {
+            lt: threeMonthsAgo,
+            gte: new Date(threeMonthsAgo.getTime() - (3 * 30 * 24 * 60 * 60 * 1000))
+          }
+        }
+      })
+    ]);
+
+    return {
+      currentCount,
+      previousCount,
+      growthRate: previousCount === 0 ? 100 : ((currentCount - previousCount) / previousCount) * 100
+    };
+  }
 }
 module.exports = new SkillRepository();
