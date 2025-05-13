@@ -259,6 +259,9 @@ class SkillService {
       const skill = await this.getSkillById(skillId);
       return skillRepository.getSkillAnalytics(skillId);
     }
+    async getAllSkillsAnalytics() {
+      return skillRepository.getAllSkillsAnalytics();
+    }
 }
 
 module.exports = new SkillService(); 
