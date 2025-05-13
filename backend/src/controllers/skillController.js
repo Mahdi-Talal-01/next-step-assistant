@@ -318,6 +318,15 @@ async getTopGrowingSkills(req, res) {
     return ResponseTrait.error(res, error.message);
   }
 }
+async getTopPayingSkills(req, res) {
+  try {
+    const { limit } = req.query;
+    const skills = await skillService.getTopPayingSkills(parseInt(limit));
+    return ResponseTrait.success(res, 'Top paying skills retrieved successfully', skills);
+  } catch (error) {
+    return ResponseTrait.error(res, error.message);
+  }
+}
 
 }
 
