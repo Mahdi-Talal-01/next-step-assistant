@@ -60,6 +60,11 @@ export  const  skillService = {
     const response = await request.get(`/skills/analytics/growth-rate/${skillId}`);
     return response.data;
   },
+   // Get skill demand trends
+   getSkillDemandTrends: async (skillId, months = 12) => {
+    const response = await request.get(`/skills/analytics/demand-trends/${skillId}`);
+    return response.data;
+  },
 }
 
 
