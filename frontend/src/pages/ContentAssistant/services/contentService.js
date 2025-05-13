@@ -6,3 +6,11 @@ const experienceTexts = {
   'senior': 'senior-level professionals (6+ years of experience)',
   'executive': 'executive-level professionals'
 };
+// Dictionary of tone descriptions
+const toneDescriptions = {
+  'professional': 'professional and formal',
+  'casual': 'casual and conversational',
+  'enthusiastic': 'enthusiastic and engaging',
+  'informative': 'informative and educational',
+  'persuasive': 'persuasive and compelling'
+};
