@@ -28,6 +28,13 @@ class SkillService {
       throw new Error(error.message || 'Failed to create skill');
     }
   }
+  async getSkillById(id) {
+    const skill = await skillRepository.getSkillById(id);
+    if (!skill) {
+      throw new Error('Skill not found');
+    }
+    return skill;
+  }
 }
 
 module.exports = new SkillService(); 
