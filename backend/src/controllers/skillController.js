@@ -91,6 +91,14 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+  async getJobSkills(req, res) {
+    try {
+      const skills = await skillService.getJobSkills(req.params.jobId);
+      return ResponseTrait.success(res, 'Job skills retrieved successfully', skills);
+    } catch (error) {
+      return ResponseTrait.badRequest(res, error.message);
+    }
+  }
 }
 
 
