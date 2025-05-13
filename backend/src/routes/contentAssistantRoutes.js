@@ -19,6 +19,13 @@ router.get('/types', ContentAssistantController.getContentTypes);
  * @body    {contentType: string, formData: object}
  */
 router.post('/generate', ContentAssistantValidation.validateGenerateRequest, ContentAssistantController.generateContent);
+/**
+ * @route   POST /api/content-assistant/stream
+ * @desc    Stream content generation to client in real-time
+ * @access  Public
+ * @body    {contentType: string, formData: object}
+ */
+router.post('/stream', ContentAssistantValidation.validateGenerateRequest, ContentAssistantController.streamContent);
 
 
 
