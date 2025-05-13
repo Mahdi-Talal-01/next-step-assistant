@@ -125,5 +125,16 @@ class SkillRepository {
       }
     });
   }
+  async updateJobSkillRequirement(jobId, skillId, required) {
+    return prisma.jobSkill.update({
+      where: {
+        jobId_skillId: {
+          jobId,
+          skillId
+        }
+      },
+      data: { required }
+    });
+  }
 }
 module.exports = new SkillRepository();
