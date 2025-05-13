@@ -58,6 +58,17 @@ const ContentAssistant = () => {
     };
     return labels[type] || type;
   };
+  // Copy to clipboard handler for the preview
+  const handleCopyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    showNotification("Copied to clipboard!");
+  };
+  return (
+    <div className={styles.container}>
+      <Header />
+      <TabNavigation />
+      <ContentForm />
+      <ContentPreview />
   return <div>ContentAssistant</div>;
 };
 
