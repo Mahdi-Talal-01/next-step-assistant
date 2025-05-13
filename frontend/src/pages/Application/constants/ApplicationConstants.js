@@ -32,3 +32,11 @@ export const FILTER_JOB_TYPE_OPTIONS = [
     { value: 'all', label: 'All Types' },
     ...JOB_TYPE_OPTIONS.map(type => ({ value: type, label: type }))
   ];
+  /**
+ * Date range filter options
+ */
+export const DATE_RANGE_OPTIONS = [
+    { value: 'all', label: 'All Time' },
+    { value: 'last7days', label: 'Last 7 Days' },
+    { value: 'last30days', label: 'Last 30 Days' },
+  ];
