@@ -74,6 +74,9 @@ class SkillService {
     // Create new user-skill relationship if it doesn't exist
     return skillRepository.addUserSkill(userId, skillId, level);
   }
+  async getUserSkills(userId) {
+    return skillRepository.getUserSkills(userId);
+  }
 }
 
 module.exports = new SkillService(); 
