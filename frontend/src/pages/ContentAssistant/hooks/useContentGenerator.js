@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { generateContent, streamContent } from '../services/contentService';
-export const useContentGenerator = (contentType, formData) => {
+
+export const useContentGenerator = (contentType) => {
   // Initial form state based on content type
   const getInitialState = () => {
     const baseState = {
@@ -45,18 +46,19 @@ export const useContentGenerator = (contentType, formData) => {
       default:
         return baseState;
     }
-    const [formState, setFormState] = useState(getInitialState());
-    const [generatedContent, setGeneratedContent] = useState('');
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [isStreaming, setIsStreaming] = useState(false);
-    const [streamProgress, setStreamProgress] = useState(0);
-    
   };
-   // Keep track of the streaming connection
-   const streamCleanupRef = useRef(null);
-   const skillInputRef = useRef(null);
- 
-    // Reset form when content type changes
+  
+  const [formState, setFormState] = useState(getInitialState());
+  const [generatedContent, setGeneratedContent] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamProgress, setStreamProgress] = useState(0);
+  
+  // Keep track of the streaming connection
+  const streamCleanupRef = useRef(null);
+  const skillInputRef = useRef(null);
+
+  // Reset form when content type changes
   useEffect(() => {
     setFormState(getInitialState());
     setGeneratedContent('');
@@ -68,6 +70,7 @@ export const useContentGenerator = (contentType, formData) => {
       streamCleanupRef.current = null;
     }
   }, [contentType]);
+
   // Clean up streaming on unmount
   useEffect(() => {
     return () => {
@@ -76,6 +79,7 @@ export const useContentGenerator = (contentType, formData) => {
       }
     };
   }, []);
+
   // Handle regular form input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -84,6 +88,7 @@ export const useContentGenerator = (contentType, formData) => {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
+
   // Dedicated handlers for skills management
   const handleSkillChange = {
     // Update skill input field value
@@ -126,6 +131,7 @@ export const useContentGenerator = (contentType, formData) => {
     // Provide reference to the input field
     inputRef: skillInputRef
   };
+
   // Validate form based on content type
   const validateForm = () => {
     switch(contentType) {
@@ -142,4 +148,100 @@ export const useContentGenerator = (contentType, formData) => {
     }
   };
 
-}
+  // Generate content from form data
+  const generateContentFromForm = async (e, useStreaming = true) => {
+    if (e) e.preventDefault();
+    
+    // Form validation
+    if (!validateForm()) {
+      return false;
+    }
+    
+    setIsGenerating(true);
+    
+    // Clean up any previous stream
+    if (streamCleanupRef.current) {
+      streamCleanupRef.current();
+      streamCleanupRef.current = null;
+    }
+    
+    // Reset content and progress
+    setGeneratedContent('');
+    setStreamProgress(0);
+    
+    // Remove skillInput from the form data
+    const apiFormData = { ...formState };
+    delete apiFormData.skillInput;
+
+    try {
+      if (useStreaming) {
+        // Use streaming mode
+        setIsStreaming(true);
+        
+        // Start the streaming process with simulated chunks
+        const cleanup = await streamContent(
+          contentType, 
+          apiFormData,
+          // On chunk callback - handles different types of updates
+          (updateType, content, progressValue) => {
+            if (updateType === 'chunk' && content) {
+              setGeneratedContent(content);
+            } else if (updateType === 'progress' && progressValue) {
+              setStreamProgress(progressValue);
+            }
+          },
+          // On complete callback - we get the final content
+          (fullContent) => {
+            if (fullContent && typeof fullContent === 'string') {
+              setGeneratedContent(fullContent);
+            }
+            setIsGenerating(false);
+            setIsStreaming(false);
+            streamCleanupRef.current = null;
+          },
+          // On error callback
+          (error) => {
+            console.error(`Error streaming ${contentType}:`, error);
+            setIsGenerating(false);
+            setIsStreaming(false);
+            streamCleanupRef.current = null;
+          }
+        );
+        
+        // Store cleanup function
+        streamCleanupRef.current = cleanup;
+      } else {
+        // Use traditional non-streaming generation
+        const content = await generateContent(contentType, apiFormData);
+        setGeneratedContent(content);
+        setIsGenerating(false);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error(`Error generating ${contentType}:`, error);
+      setIsGenerating(false);
+      setIsStreaming(false);
+      return false;
+    }
+  };
+
+  return {
+    formState,
+    isGenerating,
+    isStreaming,
+    streamProgress,
+    generatedContent,
+    handleChange,
+    handleSkillChange,
+    generateContent: generateContentFromForm,
+    cancelGeneration: () => {
+      if (streamCleanupRef.current) {
+        streamCleanupRef.current();
+        streamCleanupRef.current = null;
+        setIsGenerating(false);
+        setIsStreaming(false);
+      }
+    }
+  };
+}; 
