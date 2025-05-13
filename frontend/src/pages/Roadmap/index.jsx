@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Icon } from "@iconify/react";
 import useRoadmap from "./hooks/useRoadmap";
 import RoadmapCard from "./components/RoadmapCard";
 import RoadmapDetails from "./components/RoadmapDetails";
 import RoadmapFilters from "./components/RoadmapFilters";
 import CreateRoadmapModal from "./components/CreateRoadmapModal";
+import DeleteConfirmDialog from "./components/DeleteConfirmDialog";
 import "./Roadmaps.css";
 
 const Roadmap = () => {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [roadmapToDelete, setRoadmapToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const {
     roadmaps,
     selectedRoadmap,
@@ -27,14 +32,62 @@ const Roadmap = () => {
     handleSortOrderChange,
     handleCreateRoadmap,
     handleEditRoadmap,
+    handleDeleteRoadmap,
     handleEditClick,
     handleTopicStatusChange,
     getStatusBadgeClass,
     getStatusLabel,
     setShowCreateModal,
     setShowEditModal,
-    setRoadmapToEdit
+    setRoadmapToEdit,
+    fetchRoadmaps
   } = useRoadmap();
+
+  const handleDeleteClick = (roadmap, e) => {
+    e.stopPropagation();
+    console.log('Delete button clicked for roadmap:', roadmap.id, roadmap.title);
+    setRoadmapToDelete(roadmap);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!roadmapToDelete) return;
+    
+    console.log('Confirming deletion of roadmap:', roadmapToDelete.id, roadmapToDelete.title);
+    setIsDeleting(true);
+    
+    try {
+      // First try to delete the roadmap
+      const success = await handleDeleteRoadmap(roadmapToDelete.id);
+      
+      if (success) {
+        console.log('Roadmap successfully deleted, refreshing roadmap list');
+      } else {
+        console.error('Failed to delete roadmap - server returned an error');
+        // You could show a notification error here
+      }
+      
+      // Regardless of success or failure with the deletion, refresh the roadmap list
+      // This ensures our UI is in sync with the server state
+      console.log('Refreshing roadmap list');
+      await fetchRoadmaps();
+      
+    } catch (error) {
+      console.error('Exception during deletion process:', error);
+      // You could show a notification error here
+    } finally {
+      // Clean up state regardless of success/failure
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
+      setRoadmapToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    console.log('Deletion cancelled');
+    setShowDeleteDialog(false);
+    setRoadmapToDelete(null);
+  };
 
   if (isLoading) {
     return (
@@ -94,6 +147,7 @@ const Roadmap = () => {
                 roadmap={roadmap}
                 onClick={() => handleRoadmapClick(roadmap)}
                 onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
               />
             ))}
           </div>
@@ -127,6 +181,14 @@ const Roadmap = () => {
           initialData={roadmapToEdit}
         />
       )}
+
+      <DeleteConfirmDialog
+        isOpen={showDeleteDialog}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        roadmapTitle={roadmapToDelete?.title || ''}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };
