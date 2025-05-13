@@ -246,6 +246,18 @@ async getRecommendedSkills(req, res) {
   }
 }
 
+ // Skill Analytics endpoints
+ async getSkillGrowthTrends(req, res) {
+  try {
+    const { skillId } = req.params;
+    const { months } = req.query;
+    const trends = await skillService.getSkillGrowthTrends(skillId, parseInt(months));
+    return ResponseTrait.success(res, 'Skill growth trends retrieved successfully', trends);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
+
 }
 
 
