@@ -51,6 +51,13 @@ class SkillService {
     }
     return skillRepository.updateSkill(id, data);
   }
+  async deleteSkill(id) {
+    const skill = await skillRepository.getSkillById(id);
+    if (!skill) {
+      throw new Error('Skill not found');
+    }
+    return skillRepository.deleteSkill(id);
+  }
 }
 
 module.exports = new SkillService(); 
