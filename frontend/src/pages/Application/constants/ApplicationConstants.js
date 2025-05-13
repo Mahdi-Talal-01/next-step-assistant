@@ -40,3 +40,12 @@ export const DATE_RANGE_OPTIONS = [
     { value: 'last7days', label: 'Last 7 Days' },
     { value: 'last30days', label: 'Last 30 Days' },
   ];
+  /**
+ * Sort options for applications
+ */
+export const SORT_OPTIONS = [
+    { value: 'lastUpdated', label: 'Last Updated' },
+    { value: 'appliedDate', label: 'Applied Date' },
+    { value: 'company', label: 'Company' },
+    { value: 'status', label: 'Status' },
+  ];
