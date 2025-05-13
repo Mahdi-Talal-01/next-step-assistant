@@ -126,5 +126,20 @@ export const useContentGenerator = (contentType, formData) => {
     // Provide reference to the input field
     inputRef: skillInputRef
   };
+  // Validate form based on content type
+  const validateForm = () => {
+    switch(contentType) {
+      case 'jobDescription':
+        return (formState.jobTitle && formState.industry && formState.skills.length > 0);
+      case 'emailReply':
+        return !!formState.originalEmail;
+      case 'linkedinPost':
+        return (formState.topic && formState.goal);
+      case 'blogPost':
+        return (formState.title && formState.targetAudience && formState.keyPoints);
+      default:
+        return false;
+    }
+  };
 
 }
