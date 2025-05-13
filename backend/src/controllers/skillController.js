@@ -162,6 +162,18 @@ class SkillController {
       return ResponseTrait.badRequest(res, error.message);
     }
   }
+ // Topic Skill operations
+ async addTopicSkill(req, res) {
+  try {
+    const { topicId, skillId, level } = req.body;
+    const topicSkill = await skillService.addTopicSkill(topicId, skillId, level);
+    return ResponseTrait.success(res, 'Topic skill added successfully', topicSkill, 201);
+  } catch (error) {
+    return ResponseTrait.badRequest(res, error.message);
+  }
+}
+
+
 }
 
 
