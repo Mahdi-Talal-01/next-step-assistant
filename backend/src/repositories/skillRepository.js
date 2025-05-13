@@ -47,5 +47,11 @@ class SkillRepository {
       orderBy: { name: 'asc' }
     });
   }
+  async updateSkill(id, data) {
+    return prisma.skill.update({
+      where: { id },
+      data
+    });
+  }
 }
 module.exports = new SkillRepository();
