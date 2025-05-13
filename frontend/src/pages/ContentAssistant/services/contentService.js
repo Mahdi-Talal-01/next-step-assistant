@@ -14,3 +14,25 @@ const toneDescriptions = {
   'informative': 'informative and educational',
   'persuasive': 'persuasive and compelling'
 };
+
+/**
+ * Generate content based on the provided type and data
+ * 
+ * @param {string} contentType - Type of content to generate
+ * @param {Object} data - Form data for generating content
+ * @returns {Promise<string>} Generated content
+ */
+export const generateContent = async (contentType, data) => {
+  try {
+    // Ensure data has the correct structure for the API
+    const response = await axios.post(`${API_URL}/generate`, {
+      contentType,
+      formData: data
+    });
+
+    return response.data.content;
+  } catch (error) {
+    console.error('Error generating content:', error);
+    throw error;
+  }
+};
