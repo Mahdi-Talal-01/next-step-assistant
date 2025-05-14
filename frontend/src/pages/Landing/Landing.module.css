@@ -113,7 +113,7 @@ html {
 }
 
 .navLink:after {
-  content: '';
+  content: "";
   position: absolute;
   width: 0;
   height: 2px;
@@ -177,8 +177,16 @@ html {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.1), transparent 70%),
-              radial-gradient(circle at bottom left, rgba(37, 99, 235, 0.05), transparent 70%);
+  background: radial-gradient(
+      circle at top right,
+      rgba(37, 99, 235, 0.1),
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      rgba(37, 99, 235, 0.05),
+      transparent 70%
+    );
   z-index: -1;
 }
 
@@ -192,7 +200,9 @@ html {
   z-index: 0;
 }
 
-.shape1, .shape2, .shape3 {
+.shape1,
+.shape2,
+.shape3 {
   position: absolute;
   border-radius: 50%;
   filter: blur(40px);
@@ -228,7 +238,8 @@ html {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
@@ -243,29 +254,8 @@ html {
   position: relative;
 }
 
-.heroBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: rgba(37, 99, 235, 0.1);
-  border-radius: 50px;
-  margin-bottom: 2rem;
-}
-
-.badgeIcon {
-  color: #2563eb;
-  font-size: 1.2rem;
-}
-
-.heroBadge span {
-  color: #2563eb;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
 .heroTitle {
-  font-size: 4rem;
+  font-size: 2rem;
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 1.5rem;
@@ -277,6 +267,7 @@ html {
   display: inline-block;
   color: #2563eb;
   position: relative;
+  font-size: 1.5rem;
   font-weight: 900;
   background: linear-gradient(135deg, #2563eb, #3b82f6);
   -webkit-background-clip: text;
@@ -284,7 +275,7 @@ html {
 }
 
 .animatedText::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -4px;
   left: 0;
@@ -297,7 +288,8 @@ html {
 }
 
 @keyframes lineWidth {
-  0%, 100% {
+  0%,
+  100% {
     transform: scaleX(1);
   }
   50% {
@@ -391,7 +383,12 @@ html {
 .statDivider {
   width: 1px;
   height: 40px;
-  background: linear-gradient(to bottom, transparent, rgba(37, 99, 235, 0.2), transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(37, 99, 235, 0.2),
+    transparent
+  );
 }
 
 .heroImage {
@@ -424,7 +421,11 @@ html {
   transform: translate(-50%, -50%);
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.2), transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(37, 99, 235, 0.2),
+    transparent 70%
+  );
   border-radius: 50%;
   z-index: 0;
 }
@@ -597,13 +598,14 @@ html {
 }
 
 .stepsContainer::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, 
+  background: linear-gradient(
+    90deg,
     transparent 0%,
     rgba(37, 99, 235, 0.2) 20%,
     rgba(37, 99, 235, 0.2) 80%,
@@ -860,15 +862,15 @@ html {
   .testimonialsSection {
     padding: 6rem 5%;
   }
-  
+
   .testimonialsGrid {
     grid-template-columns: 1fr;
     max-width: 500px;
     margin: 4rem auto;
   }
-  
+
   .testimonialCard {
-    padding: 2rem;
+    padding: 2.5rem 2rem;
   }
 }
 
@@ -876,24 +878,24 @@ html {
   .testimonialCard {
     padding: 1.5rem;
   }
-  
+
   .quoteIcon {
     font-size: 3rem;
   }
-  
+
   .testimonialQuote {
     font-size: 1rem;
   }
-  
+
   .authorImage {
     width: 40px;
     height: 40px;
   }
-  
+
   .authorName {
     font-size: 1rem;
   }
-  
+
   .authorRole {
     font-size: 0.85rem;
   }
@@ -909,7 +911,7 @@ html {
 }
 
 .footer::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
@@ -964,7 +966,7 @@ html {
 }
 
 .footerLinks a::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -5px;
   left: 0;
@@ -1076,9 +1078,9 @@ html {
 
 /* Enhanced responsive design */
 @media (max-width: 1200px) {
-  .heroSection, 
-  .featuresSection, 
-  .howItWorksSection, 
+  .heroSection,
+  .featuresSection,
+  .howItWorksSection,
   .testimonialsSection {
     padding-left: 8%;
     padding-right: 8%;
@@ -1098,7 +1100,7 @@ html {
   }
 
   .heroTitle {
-    font-size: 3rem;
+    font-size: 2rem;
   }
 
   .ctaContainer {
@@ -1116,7 +1118,7 @@ html {
   .sectionTitle {
     font-size: 3rem;
   }
-  
+
   .featuresGrid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
@@ -1125,7 +1127,7 @@ html {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
   }
-  
+
   .stepsContainer::before {
     display: none;
   }
@@ -1135,45 +1137,45 @@ html {
   .navContainer {
     padding: 0 2rem;
   }
-  
+
   .desktopNavLinks {
     display: none;
   }
-  
+
   .mobileMenuToggle {
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+
   .mobileMenu {
     display: block;
   }
-  
+
   .logo {
     font-size: 1.2rem;
   }
-  
+
   .logoIcon {
     width: 35px;
     height: 35px;
   }
-  
+
   .heroSection {
     flex-direction: column;
     text-align: center;
     padding-top: 8rem;
     gap: 3rem;
   }
-  
+
   .heroContent {
     max-width: 100%;
   }
-  
+
   .heroContent h1 {
     font-size: 3rem;
   }
-  
+
   .ctaButton {
     margin: 0 auto;
   }
@@ -1183,11 +1185,11 @@ html {
   .heroContent h1 {
     font-size: 2.5rem;
   }
-  
+
   .heroContent p {
     font-size: 1.1rem;
   }
-  
+
   .heroSection,
   .featuresSection,
   .howItWorksSection,
@@ -1198,22 +1200,22 @@ html {
     padding-top: 6rem;
     padding-bottom: 6rem;
   }
-  
+
   .testimonialCard {
     padding: 2.5rem 2rem;
   }
-  
+
   .footerContent {
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 2rem;
   }
-  
+
   .footerLinks {
     justify-content: center;
   }
-  
+
   .footerLogo p {
     max-width: 100%;
   }
@@ -1221,11 +1223,11 @@ html {
   .sectionTitle {
     font-size: 2.5rem;
   }
-  
+
   .sectionDescription {
     font-size: 1.1rem;
   }
-  
+
   .featureCard {
     padding: 2rem;
   }
@@ -1233,13 +1235,13 @@ html {
   .howItWorksSection {
     padding: 6rem 5%;
   }
-  
+
   .stepsContainer {
     grid-template-columns: 1fr;
     max-width: 500px;
     margin: 4rem auto;
   }
-  
+
   .step {
     padding: 2rem;
   }
@@ -1258,7 +1260,8 @@ html {
     flex-direction: column;
   }
 
-  .ctaButton, .secondaryButton {
+  .ctaButton,
+  .secondaryButton {
     width: 100%;
     justify-content: center;
   }
@@ -1276,11 +1279,11 @@ html {
   .sectionTitle {
     font-size: 2rem;
   }
-  
+
   .featuresGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .featureCard {
     padding: 1.5rem;
   }
@@ -1288,21 +1291,21 @@ html {
   .step {
     padding: 1.5rem;
   }
-  
+
   .stepNumber {
     width: 50px;
     height: 50px;
     font-size: 1.25rem;
   }
-  
+
   .stepIcon {
     font-size: 2rem;
   }
-  
+
   .step h3 {
     font-size: 1.25rem;
   }
-  
+
   .step p {
     font-size: 1rem;
   }
@@ -1312,21 +1315,21 @@ html {
   .navContainer {
     padding: 0 1rem;
   }
-  
+
   .logo span {
     display: none;
   }
-  
+
   .featuresSection h2,
   .howItWorksSection h2,
   .testimonialsSection h2 {
     font-size: 2.25rem;
   }
-  
+
   .stepsContainer::before {
     display: none;
   }
-  
+
   .testimonialCard::before {
     font-size: 4rem;
     top: 10px;
@@ -1334,3 +1337,27 @@ html {
   }
 }
 
+/* Compact hero content styles */
+.heroContentCompact {
+  max-width: 600px;
+}
+
+.heroTitleCompact {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+}
+
+.heroDescriptionCompact {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 1.8rem;
+  max-width: 90%;
+}
+
+.customIllustration {
+  width: 100%;
+  height: auto;
+  position: relative;
+  overflow: visible;
+}
