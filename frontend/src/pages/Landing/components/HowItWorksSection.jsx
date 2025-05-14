@@ -6,23 +6,23 @@ import styles from '../Landing.module.css';
 const steps = [
   {
     number: '01',
-    icon: 'tabler:user-plus',
+    icon: 'tabler:user-circle',
     title: 'Create Your Profile',
-    description: 'Sign up and create your personalized profile with your skills, experience, and career goals.',
+    description: 'Sign up and build your comprehensive profile with your skills, experience, and career aspirations.',
     color: '#2563eb'
   },
   {
     number: '02',
-    icon: 'tabler:target',
-    title: 'Set Your Goals',
-    description: 'Define your career objectives and let our AI analyze the best path to achieve them.',
+    icon: 'tabler:file-upload',
+    title: 'Upload Your CV',
+    description: 'Upload your resume to enable our AI to understand your background and provide personalized guidance.',
     color: '#7c3aed'
   },
   {
     number: '03',
-    icon: 'tabler:rocket',
-    title: 'Get Started',
-    description: 'Begin your journey with personalized recommendations and automated tracking.',
+    icon: 'tabler:dashboard',
+    title: 'Start Your Journey',
+    description: 'Track applications, follow your custom learning roadmap, and get AI-powered career advice.',
     color: '#059669'
   }
 ];
@@ -76,7 +76,7 @@ const HowItWorksSection = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            Your Journey to <span className={styles.gradientText}>Success</span> in Three Steps
+            Your Path to <span className={styles.gradientText}>Career Growth</span> in Three Steps
           </motion.h2>
           <motion.p 
             className={styles.sectionDescription}
@@ -85,7 +85,7 @@ const HowItWorksSection = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
           >
-            Start your career transformation with our simple and effective process
+            Begin your data-backed career journey with our seamless onboarding process
           </motion.p>
         </motion.div>
 

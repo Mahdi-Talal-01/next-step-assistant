@@ -5,39 +5,39 @@ import styles from '../Landing.module.css';
 
 const features = [
   {
-    icon: 'tabler:brain',
-    title: 'AI-Powered Insights',
-    description: 'Get personalized career recommendations and insights powered by advanced AI algorithms.',
+    icon: 'tabler:notebook',
+    title: 'Job Application Tracking',
+    description: 'Centralize and manage all your job applications in one place with automated status updates and reminders.',
     color: '#2563eb'
   },
   {
-    icon: 'tabler:chart-bar',
-    title: 'Smart Analytics',
-    description: 'Track your progress with detailed analytics and visualizations of your career journey.',
+    icon: 'tabler:route',
+    title: 'Learning Roadmaps',
+    description: 'Visualize personalized learning paths with clear progress metrics to advance your career goals.',
     color: '#7c3aed'
   },
   {
-    icon: 'tabler:target',
-    title: 'Goal Tracking',
-    description: 'Set and track your career goals with our intuitive goal management system.',
+    icon: 'tabler:chart-pie',
+    title: 'Market Skill Analytics',
+    description: 'Access real-time analytics on in-demand skills to stay competitive in your industry.',
     color: '#059669'
   },
   {
-    icon: 'tabler:rocket',
-    title: 'Career Roadmap',
-    description: 'Generate personalized career roadmaps based on your skills and aspirations.',
+    icon: 'tabler:robot',
+    title: 'AI Career Agent',
+    description: 'Get personalized advice from an AI assistant that knows your profile, CV, applications, and roadmaps.',
     color: '#dc2626'
   },
   {
-    icon: 'tabler:users',
-    title: 'Community Support',
-    description: 'Connect with like-minded professionals and get support from our growing community.',
+    icon: 'tabler:file-description',
+    title: 'AI Job Description Builder',
+    description: 'Recruiters can create optimized job descriptions powered by AI to attract top talent.',
     color: '#ea580c'
   },
   {
-    icon: 'tabler:certificate',
-    title: 'Skill Validation',
-    description: 'Validate and showcase your skills with our comprehensive certification system.',
+    icon: 'tabler:users-group',
+    title: 'Talent Browser',
+    description: 'A searchable platform that helps recruiters discover and engage with qualified candidates.',
     color: '#0891b2'
   }
 ];
@@ -91,7 +91,7 @@ const FeaturesSection = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
           >
-            Everything You Need to <span className={styles.gradientText}>Succeed</span>
+            Transform Your <span className={styles.gradientText}>Career Journey</span>
           </motion.h2>
           <motion.p 
             className={styles.sectionDescription}
@@ -100,7 +100,7 @@ const FeaturesSection = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
           >
-            Discover powerful tools and features designed to accelerate your career growth
+            Turn scattered job-hunting tasks into a seamless, data-backed workflow
           </motion.p>
         </motion.div>
 
