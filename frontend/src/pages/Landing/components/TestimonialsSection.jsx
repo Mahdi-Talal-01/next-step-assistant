@@ -5,26 +5,26 @@ import styles from '../Landing.module.css';
 const testimonials = [
   {
     name: "Sarah Johnson",
-    role: "Software Engineer",
+    role: "Full Stack Developer",
     company: "TechCorp",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-    quote: "This AI career assistant transformed my job search. The personalized guidance and real-time feedback helped me land my dream role at a top tech company.",
+    quote: "The job application tracking system transformed my job search. Having everything in one place with the AI agent giving me personalized advice made all the difference.",
     rating: 5
   },
   {
     name: "Michael Chen",
-    role: "Product Manager",
+    role: "Data Scientist",
     company: "InnovateX",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-    quote: "The AI-powered resume analysis and interview preparation were game-changers. I received offers from multiple companies within weeks of using the platform.",
+    quote: "The custom learning roadmaps with progress metrics helped me identify exactly which skills to focus on. The real-time market skill analytics were eye-opening.",
     rating: 5
   },
   {
     name: "Emily Rodriguez",
-    role: "UX Designer",
+    role: "UX/UI Designer",
     company: "DesignHub",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=256&q=80",
-    quote: "As someone transitioning careers, the personalized roadmap and skill gap analysis were invaluable. The AI coach helped me identify and develop the right skills.",
+    quote: "Having a personal AI Career Agent that knows my profile, CV, and applications was like having a career coach available 24/7. The tailored advice was invaluable.",
     rating: 5
   }
 ];
@@ -67,10 +67,10 @@ const TestimonialsSection = () => {
         >
           <span className={styles.sectionBadge}>Success Stories</span>
           <h2 className={styles.sectionTitle}>
-            Trusted by <span className={styles.gradientText}>10,000+</span> Professionals
+            Transforming <span className={styles.gradientText}>Career Journeys</span>
           </h2>
           <p className={styles.sectionDescription}>
-            Join thousands of successful professionals who have transformed their careers with our AI-powered platform
+            See how professionals are using NextStep Assistant to transform scattered job-hunting tasks into a seamless workflow
           </p>
         </motion.div>
 
@@ -125,7 +125,7 @@ const TestimonialsSection = () => {
           className={styles.testimonialsCTA}
         >
           <button className={styles.ctaButton}>
-            Start Your Success Story
+            Start Your Career Journey
             <span className={styles.buttonIcon}>→</span>
           </button>
         </motion.div>
