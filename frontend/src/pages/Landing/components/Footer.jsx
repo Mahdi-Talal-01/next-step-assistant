@@ -33,7 +33,7 @@ const Footer = () => {
           viewport={{ once: true }}
         >
           <h3>NextStep Assistant</h3>
-          <p>Your Smart Career Companion</p>
+          <p>Your AI-Driven Career Companion</p>
         </motion.div>
         
         <div className={styles.footerLinks}>
