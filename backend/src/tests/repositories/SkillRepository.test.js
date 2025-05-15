@@ -241,4 +241,34 @@ describe('skillRepository', () => {
       expect(result.length).toBe(skills.length);
     });
   });
+  describe('updateSkill', () => {
+    it('should update a skill', async () => {
+      // Setup
+      const skillId = 'skill-1';
+      const updateData = {
+        name: 'JavaScript ES6',
+        description: 'Updated description'
+      };
+      
+      const updatedSkill = {
+        id: skillId,
+        ...updateData,
+        category: 'Programming',
+        updatedAt: new Date()
+      };
+      
+      prisma.skill.update.mockResolvedValue(updatedSkill);
+      
+      // Call the repository method
+      const result = await skillRepository.updateSkill(skillId, updateData);
+      
+      // Assertions
+      expect(prisma.skill.update).toHaveBeenCalledWith({
+        where: { id: skillId },
+        data: updateData
+      });
+      
+      expect(result).toEqual(updatedSkill);
+    });
+  });
 });
