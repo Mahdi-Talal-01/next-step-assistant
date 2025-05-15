@@ -170,4 +170,70 @@ describe("JobRepository", () => {
       await expect(JobRepository.createJob(userId, jobData)).rejects.toThrow(error);
     });
   });
+  describe('getJobsByUserId', () => {
+    it('should return all jobs for a user', async () => {
+      // Setup test data
+      const userId = 'user-1';
+      const mockJobs = [
+        {
+          id: 'job-1',
+          company: 'Acme Inc',
+          position: 'Software Engineer',
+          status: 'Applied',
+          userId,
+          skills: [
+            { 
+              skillId: 'skill-1',
+              required: true,
+              skill: { id: 'skill-1', name: 'JavaScript' }
+            }
+          ]
+        },
+        {
+          id: 'job-2',
+          company: 'Beta Corp',
+          position: 'Full Stack Developer',
+          status: 'Interview',
+          userId,
+          skills: []
+        }
+      ];
+      
+      // Mock the prisma response
+      prisma.job.findMany.mockResolvedValue(mockJobs);
+      
+      // Call the repository method
+      const result = await JobRepository.getJobsByUserId(userId);
+      
+      // Assertions
+      expect(prisma.job.findMany).toHaveBeenCalledWith({
+        where: { userId },
+        orderBy: { lastUpdated: 'desc' },
+        include: expect.any(Object)
+      });
+      
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('job-1');
+      expect(result[1].id).toBe('job-2');
+      
+      // Check skills are mapped correctly
+      expect(result[0].skills).toEqual([
+        expect.objectContaining({
+          skillId: 'skill-1',
+          required: true,
+          skill: expect.objectContaining({ id: 'skill-1', name: 'JavaScript' })
+        })
+      ]);
+    });
+    
+    it('should throw an error if fetching jobs fails', async () => {
+      // Setup
+      const userId = 'user-1';
+      const error = new Error('Database error');
+      prisma.job.findMany.mockRejectedValue(error);
+      
+      // Call and assert
+      await expect(JobRepository.getJobsByUserId(userId)).rejects.toThrow(error);
+    });
+  });
 });
