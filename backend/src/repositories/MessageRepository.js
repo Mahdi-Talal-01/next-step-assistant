@@ -50,6 +50,33 @@ class MessageRepository {
       throw error;
     }
   }
+  /**
+   * Get conversation history (as pairs of user and assistant messages)
+   * @param {string} userId - The user ID
+   * @param {number} limit - Maximum number of conversation pairs to return
+   * @returns {Promise<Array>} - List of conversation pairs
+   */
+  async getConversationHistory(userId, limit = 10) {
+    try {
+      const messages = await prisma.message.findMany({
+        where: { userId },
+        orderBy: { timestamp: "desc" },
+        take: limit * 2, // Get enough messages for the requested number of pairs
+      });
+
+      // Sort by timestamp in ascending order
+      messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
+      // Parse metadata JSON if it exists
+      return messages.map((message) => ({
+        ...message,
+        metadata: message.metadata ? JSON.parse(message.metadata) : null,
+      }));
+    } catch (error) {
+      console.error("Error fetching conversation history:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new MessageRepository();
