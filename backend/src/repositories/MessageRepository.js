@@ -26,6 +26,30 @@ class MessageRepository {
       throw error;
     }
   }
+  /**
+   * Get messages for a user
+   * @param {string} userId - The user ID
+   * @param {number} limit - Maximum number of messages to return
+   * @returns {Promise<Array>} - List of messages
+   */
+  async getMessagesByUserId(userId, limit = 50) {
+    try {
+      const messages = await prisma.message.findMany({
+        where: { userId },
+        orderBy: { timestamp: "desc" },
+        take: limit,
+      });
+
+      // Parse metadata JSON if it exists
+      return messages.map((message) => ({
+        ...message,
+        metadata: message.metadata ? JSON.parse(message.metadata) : null,
+      }));
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new MessageRepository();
