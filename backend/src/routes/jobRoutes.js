@@ -6,14 +6,17 @@ const auth = require("../middleware/auth");
 // All job routes require authentication
 router.use(auth);
 
+// Get job statistics - specific route should come before parameterized routes
+router.get("/stats", JobController.getJobStats);
+
 // Get all jobs for the authenticated user
 router.get("/", JobController.getJobs);
 
+// Get jobs by skill - specific route should come before parameterized routes 
+router.get("/skills/:skillId", JobController.getJobsBySkill);
+
 // Get a specific job
 router.get("/:jobId", JobController.getJob);
-
-// Get job statistics
-router.get("/stats", JobController.getJobStats);
 
 // Create a new job
 router.post("/", JobController.createJob);
@@ -36,8 +39,5 @@ router.put("/:jobId/skills/:skillId", JobController.updateJobSkill);
 
 // Remove a skill from a job
 router.delete("/:jobId/skills/:skillId", JobController.removeJobSkill);
-
-// Get jobs by skill
-router.get("/skills/:skillId", JobController.getJobsBySkill);
 
 module.exports = router;
