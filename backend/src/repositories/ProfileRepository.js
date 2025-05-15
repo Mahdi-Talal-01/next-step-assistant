@@ -89,6 +89,17 @@ class ProfileRepository {
           }
         }
       });
+      // Get user's skills (from roadmaps)
+      const roadmapSkills = await prisma.roadmapSkill.findMany({
+        where: {
+          roadmap: {
+            userId
+          }
+        },
+        include: {
+          skill: true
+        }
+      });
 
     
 
@@ -96,6 +107,11 @@ class ProfileRepository {
       return {
         profile,
         roadmaps,
+        skills: roadmapSkills.map(rs => ({
+          ...rs.skill,
+          roadmapId: rs.roadmapId,
+          topicId: rs.topicId
+        }))
       };
     } catch (error) {
       throw error;
