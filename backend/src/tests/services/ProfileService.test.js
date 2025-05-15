@@ -1,124 +1,171 @@
-const ProfileService = require('../../services/ProfileService');
-const ProfileRepository = require('../../repositories/ProfileRepository');
+const ProfileService = require("../../services/ProfileService");
+const ProfileRepository = require("../../repositories/ProfileRepository");
 
 // Mock dependencies
-jest.mock('../../repositories/ProfileRepository');
+jest.mock("../../repositories/ProfileRepository");
 
-describe('ProfileService', () => {
+describe("ProfileService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('getProfile', () => {
-    it('should return profile when found', async () => {
+  describe("getProfile", () => {
+    it("should return profile when found", async () => {
       // Setup
-      const userId = 'test-user-id';
+      const userId = "test-user-id";
       const mockProfile = {
-        id: 'profile-id',
+        id: "profile-id",
         userId,
-        bio: 'Test bio',
-        location: 'Test location'
+        bio: "Test bio",
+        location: "Test location",
       };
-      
+
       ProfileRepository.getProfile = jest.fn().mockResolvedValue(mockProfile);
-      
+
       // Execute
       const result = await ProfileService.getProfile(userId);
-      
+
       // Assert
       expect(ProfileRepository.getProfile).toHaveBeenCalledWith(userId);
       expect(result).toEqual({
         success: true,
-        data: mockProfile
+        data: mockProfile,
       });
     });
 
-    it('should throw error when profile not found', async () => {
+    it("should throw error when profile not found", async () => {
       // Setup
-      const userId = 'nonexistent-user-id';
+      const userId = "nonexistent-user-id";
       ProfileRepository.getProfile = jest.fn().mockResolvedValue(null);
-      
+
       // Execute & Assert
-      await expect(ProfileService.getProfile(userId)).rejects.toThrow('Profile not found');
+      await expect(ProfileService.getProfile(userId)).rejects.toThrow(
+        "Profile not found"
+      );
     });
   });
 
-  describe('updateProfile', () => {
-    it('should update profile successfully', async () => {
+  describe("updateProfile", () => {
+    it("should update profile successfully", async () => {
       // Setup
-      const userId = 'test-user-id';
+      const userId = "test-user-id";
       const profileData = {
-        bio: 'Updated bio',
-        location: 'Updated location'
+        bio: "Updated bio",
+        location: "Updated location",
       };
-      
+
       const updatedProfile = {
-        id: 'profile-id',
+        id: "profile-id",
         userId,
-        ...profileData
+        ...profileData,
       };
-      
-      ProfileRepository.updateProfile = jest.fn().mockResolvedValue(updatedProfile);
-      
+
+      ProfileRepository.updateProfile = jest
+        .fn()
+        .mockResolvedValue(updatedProfile);
+
       // Execute
       const result = await ProfileService.updateProfile(userId, profileData);
-      
+
       // Assert
-      expect(ProfileRepository.updateProfile).toHaveBeenCalledWith(userId, profileData);
+      expect(ProfileRepository.updateProfile).toHaveBeenCalledWith(
+        userId,
+        profileData
+      );
       expect(result).toEqual({
         success: true,
-        data: updatedProfile
+        data: updatedProfile,
       });
     });
   });
-  describe('updateResume', () => {
-    it('should update resume URL and name successfully', async () => {
+  describe("updateResume", () => {
+    it("should update resume URL and name successfully", async () => {
       // Setup
-      const userId = 'test-user-id';
-      const resumeUrl = 'http://example.com/storage/test-cv.pdf';
-      const resumeName = 'test-cv.pdf';
-      
+      const userId = "test-user-id";
+      const resumeUrl = "http://example.com/storage/test-cv.pdf";
+      const resumeName = "test-cv.pdf";
+
       const updatedProfile = {
-        id: 'profile-id',
+        id: "profile-id",
+        userId,
+        resumeUrl,
+        resumeName,
+      };
+
+      ProfileRepository.updateResume = jest
+        .fn()
+        .mockResolvedValue(updatedProfile);
+
+      // Execute
+      const result = await ProfileService.updateResume(
         userId,
         resumeUrl,
         resumeName
-      };
-      
-      ProfileRepository.updateResume = jest.fn().mockResolvedValue(updatedProfile);
-      
-      // Execute
-      const result = await ProfileService.updateResume(userId, resumeUrl, resumeName);
-      
+      );
+
       // Assert
-      expect(ProfileRepository.updateResume).toHaveBeenCalledWith(userId, resumeUrl, resumeName);
+      expect(ProfileRepository.updateResume).toHaveBeenCalledWith(
+        userId,
+        resumeUrl,
+        resumeName
+      );
       expect(result).toEqual({
         success: true,
-        data: updatedProfile
+        data: updatedProfile,
       });
     });
 
-    it('should remove resume when null values provided', async () => {
+    it("should remove resume when null values provided", async () => {
       // Setup
-      const userId = 'test-user-id';
-      
+      const userId = "test-user-id";
+
       const updatedProfile = {
-        id: 'profile-id',
+        id: "profile-id",
         userId,
         resumeUrl: null,
-        resumeName: null
+        resumeName: null,
       };
-      
-      ProfileRepository.updateResume = jest.fn().mockResolvedValue(updatedProfile);
-      
+
+      ProfileRepository.updateResume = jest
+        .fn()
+        .mockResolvedValue(updatedProfile);
+
       // Execute
       const result = await ProfileService.updateResume(userId, null, null);
-      
+
       // Assert
-      expect(ProfileRepository.updateResume).toHaveBeenCalledWith(userId, null, null);
+      expect(ProfileRepository.updateResume).toHaveBeenCalledWith(
+        userId,
+        null,
+        null
+      );
       expect(result).toEqual({
         success: true,
-        data: updatedProfile
+        data: updatedProfile,
+      });
+    });
+  });
+  describe("getCV", () => {
+    it("should return profile with CV data", async () => {
+      // Setup
+      const userId = "test-user-id";
+      const mockProfile = {
+        id: "profile-id",
+        userId,
+        resumeUrl: "http://example.com/storage/test-cv.pdf",
+        resumeName: "test-cv.pdf",
+      };
+
+      ProfileRepository.getCV = jest.fn().mockResolvedValue(mockProfile);
+
+      // Execute
+      const result = await ProfileService.getCV(userId);
+
+      // Assert
+      expect(ProfileRepository.getCV).toHaveBeenCalledWith(userId);
+      expect(result).toEqual({
+        success: true,
+        data: mockProfile,
       });
     });
   });
