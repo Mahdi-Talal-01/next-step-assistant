@@ -160,4 +160,94 @@ describe("SkillController", () => {
       expect(ResponseTrait.error).toHaveBeenCalledWith(res, "Database error");
     });
   });
+  describe("updateSkill", () => {
+    it("should update a skill successfully", async () => {
+      // Setup
+      req.params.id = "skill-1";
+      req.body = { name: "JavaScript Updated", category: "Programming" };
+      const updatedSkill = { id: "skill-1", ...req.body };
+      skillService.updateSkill.mockResolvedValue(updatedSkill);
+
+      // Call the method
+      await SkillController.updateSkill(req, res);
+
+      // Assert
+      expect(skillService.updateSkill).toHaveBeenCalledWith(
+        "skill-1",
+        req.body
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Skill updated successfully",
+        updatedSkill
+      );
+    });
+
+    it("should return not found when skill does not exist", async () => {
+      // Setup
+      req.params.id = "non-existent-skill";
+      req.body = { name: "JavaScript Updated" };
+      skillService.updateSkill.mockResolvedValue(null);
+
+      // Call the method
+      await SkillController.updateSkill(req, res);
+
+      // Assert
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(
+        res,
+        "Skill not found"
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.params.id = "skill-1";
+      req.body = { name: "JavaScript Updated" };
+      const error = new Error("Database error");
+      skillService.updateSkill.mockRejectedValue(error);
+
+      // Call the method
+      await SkillController.updateSkill(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Database error"
+      );
+    });
+  });
+  describe("deleteSkill", () => {
+    it("should delete a skill successfully", async () => {
+      // Setup
+      req.params.id = "skill-1";
+      skillService.deleteSkill.mockResolvedValue({ id: "skill-1" });
+
+      // Call the method
+      await SkillController.deleteSkill(req, res);
+
+      // Assert
+      expect(skillService.deleteSkill).toHaveBeenCalledWith("skill-1");
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Skill deleted successfully",
+        {}
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.params.id = "skill-1";
+      const error = new Error("Database error");
+      skillService.deleteSkill.mockRejectedValue(error);
+
+      // Call the method
+      await SkillController.deleteSkill(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Database error"
+      );
+    });
+  });
 });
