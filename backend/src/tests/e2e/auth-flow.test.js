@@ -135,3 +135,15 @@ jest.mock("../../repositories/UserRepository", () => ({
     },
   }),
 }));
+// Mock user service
+jest.mock("../../services/UserService", () => ({
+  register: jest.fn().mockResolvedValue({
+    user: { id: "test-id", name: "E2E Test User", email: "test@example.com" },
+    token: "mock-jwt-token",
+  }),
+  login: jest.fn().mockResolvedValue({
+    user: { id: "test-id", name: "E2E Test User", email: "test@example.com" },
+    token: "mock-jwt-token",
+  }),
+  generateToken: jest.fn().mockReturnValue("mock-jwt-token"),
+}));
