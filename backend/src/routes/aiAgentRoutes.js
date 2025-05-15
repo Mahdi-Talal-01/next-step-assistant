@@ -9,5 +9,7 @@ router.post("/message", auth, AIAgentController.processMessage);
 // Get conversation history
 router.get("/history", auth, AIAgentController.getConversationHistory);
 
+// Clear all conversation history
+router.delete("/history", auth, AIAgentController.clearUserMessages);
 
 module.exports = router; 
