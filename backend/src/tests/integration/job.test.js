@@ -167,4 +167,54 @@ describe("Job Routes", () => {
       expect(response.body.success).toBe(false);
     });
   });
+  describe("POST /api/jobs", () => {
+    it("should create a new job", async () => {
+      const newJob = {
+        company: "New Company",
+        position: "Senior Engineer",
+        status: "Applied",
+        skills: [
+          { name: "JavaScript", required: true },
+          { name: "React", required: false },
+        ],
+      };
+
+      const response = await request(app)
+        .post(BASE_ROUTE)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(newJob);
+
+      expect(response.status).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toHaveProperty("id");
+      expect(response.body.data.company).toBe(newJob.company);
+      expect(response.body.data.position).toBe(newJob.position);
+      expect(JobRepository.createJob).toHaveBeenCalledWith(
+        testUser.id,
+        expect.objectContaining({
+          company: newJob.company,
+          position: newJob.position,
+          status: newJob.status,
+          skills: expect.any(Array),
+        })
+      );
+    });
+
+    it("should return 400 when required fields are missing", async () => {
+      const invalidJob = {
+        company: "New Company",
+        // Missing position
+        status: "Applied",
+      };
+
+      const response = await request(app)
+        .post(BASE_ROUTE)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(invalidJob);
+
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(JobRepository.createJob).not.toHaveBeenCalled();
+    });
+  });
 });
