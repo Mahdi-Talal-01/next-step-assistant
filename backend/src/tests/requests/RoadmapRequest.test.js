@@ -409,4 +409,52 @@ describe("RoadmapRequest", () => {
       );
     });
   });
+  describe('validateDelete', () => {
+    it('should call next() for valid roadmap ID', () => {
+      // Setup valid roadmap ID (UUID format)
+      req.params.id = '123e4567-e89b-12d3-a456-426614174000';
+      
+      // Call the validator
+      RoadmapRequest.validateDelete(req, res, next);
+      
+      // Assert
+      expect(next).toHaveBeenCalled();
+      expect(ResponseTrait.validationError).not.toHaveBeenCalled();
+    });
+    
+    it('should validate roadmap ID format', () => {
+      // Test missing ID
+      req.params = {};
+      
+      // Call the validator
+      RoadmapRequest.validateDelete(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          id: expect.any(String)
+        })
+      );
+      
+      // Reset mocks
+      jest.clearAllMocks();
+      
+      // Test invalid ID format
+      req.params.id = 'not-a-uuid';
+      
+      // Call the validator
+      RoadmapRequest.validateDelete(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          id: expect.any(String)
+        })
+      );
+    });
+  });
 });
