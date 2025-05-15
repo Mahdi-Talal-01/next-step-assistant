@@ -223,4 +223,142 @@ describe("RoadmapRequest", () => {
       );
     });
   });
+  describe('validateGetAll', () => {
+    it('should call next() for valid query parameters', () => {
+      // Setup valid query parameters
+      req.query = {
+        page: '1',
+        limit: '10',
+        search: 'test',
+        sort: 'title:asc',
+        filter: JSON.stringify({ difficulty: 'medium' })
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateGetAll(req, res, next);
+      
+      // Assert
+      expect(next).toHaveBeenCalled();
+      expect(ResponseTrait.validationError).not.toHaveBeenCalled();
+    });
+    
+    it('should validate pagination parameters', () => {
+      // Test invalid page
+      req.query = {
+        page: '-1',
+        limit: '10'
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateGetAll(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          page: expect.any(String)
+        })
+      );
+      
+      // Reset mocks
+      jest.clearAllMocks();
+      
+      // Test invalid limit
+      req.query = {
+        page: '1',
+        limit: '200' // Exceeds max limit
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateGetAll(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          limit: expect.any(String)
+        })
+      );
+    });
+    
+    it('should validate sort parameter', () => {
+      // Test invalid sort field
+      req.query = {
+        sort: 'invalid-field:asc'
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateGetAll(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          sort: expect.any(String)
+        })
+      );
+      
+      // Reset mocks
+      jest.clearAllMocks();
+      
+      // Test invalid sort order
+      req.query = {
+        sort: 'title:invalid'
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateGetAll(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          sort: expect.any(String)
+        })
+      );
+    });
+    
+    it('should validate filter parameter', () => {
+      // Test invalid filter format
+      req.query = {
+        filter: 'invalid-json'
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateGetAll(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          filter: expect.any(String)
+        })
+      );
+      
+      // Reset mocks
+      jest.clearAllMocks();
+      
+      // Test invalid filter fields
+      req.query = {
+        filter: JSON.stringify({ invalidField: 'value' })
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateGetAll(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          filter: expect.any(String)
+        })
+      );
+    });
+  });
 });
