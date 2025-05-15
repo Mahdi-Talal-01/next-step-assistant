@@ -105,5 +105,50 @@ describe('RoadmapService', () => {
       expect(roadmapRepository.findAll).toHaveBeenCalledWith(userId);
     });
   });
+  describe('getRoadmapById', () => {
+    it('should return a roadmap by its ID', async () => {
+      // Setup
+      const roadmapId = 'roadmap-1';
+      const roadmap = {
+        id: roadmapId,
+        title: 'Test Roadmap',
+        userId: 'test-user-id'
+      };
+      
+      roadmapRepository.findById.mockResolvedValue(roadmap);
+      
+      // Call the service method
+      const result = await roadmapService.getRoadmapById(roadmapId);
+      
+      // Assert
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+      expect(result).toEqual(roadmap);
+    });
+    
+    it('should throw an error when roadmap is not found', async () => {
+      // Setup
+      const roadmapId = 'non-existent-roadmap';
+      
+      roadmapRepository.findById.mockResolvedValue(null);
+      
+      // Call and assert
+      await expect(roadmapService.getRoadmapById(roadmapId))
+        .rejects.toThrow('Roadmap not found');
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+    });
+    
+    it('should handle errors from the repository', async () => {
+      // Setup
+      const roadmapId = 'roadmap-1';
+      const error = new Error('Database error');
+      
+      roadmapRepository.findById.mockRejectedValue(error);
+      
+      // Call and assert
+      await expect(roadmapService.getRoadmapById(roadmapId))
+        .rejects.toThrow(error);
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+    });
+  });
 
 });
