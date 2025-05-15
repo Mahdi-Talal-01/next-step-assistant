@@ -78,5 +78,61 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+  describe("getJob", () => {
+    it("should return a specific job", async () => {
+      // Mock data
+      const job = { id: "job-1", title: "Software Engineer" };
+      req.params.jobId = "job-1";
+
+      // Setup mocks
+      JobRepository.getJobById.mockResolvedValue(job);
+
+      // Call the method
+      await JobController.getJob(req, res);
+
+      // Assert
+      expect(JobRepository.getJobById).toHaveBeenCalledWith(
+        "job-1",
+        "test-user-id"
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job fetched successfully",
+        job
+      );
+    });
+
+    it("should return not found when job does not exist", async () => {
+      // Setup
+      req.params.jobId = "non-existent-job";
+      JobRepository.getJobById.mockResolvedValue(null);
+
+      // Call the method
+      await JobController.getJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(res, "Job not found");
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      const error = new Error("Database error");
+      JobRepository.getJobById.mockRejectedValue(error);
+
+      // Spy on console.error
+      jest.spyOn(console, "error").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.getJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(
+        res,
+        "Failed to fetch job"
+      );
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
 });
 
