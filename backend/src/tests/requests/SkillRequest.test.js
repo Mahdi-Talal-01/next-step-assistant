@@ -109,4 +109,97 @@ describe("Skill Request Validators", () => {
       }));
     });
   });
+  describe('validateUserSkill', () => {
+    it('should pass validation with valid user skill data', () => {
+      // Setup
+      req.body = {
+        userId: 'user-1',
+        skillId: '123e4567-e89b-12d3-a456-426614174000', // Valid UUID format
+        level: 3
+      };
+      
+      // Call the validator
+      validateUserSkill(req, res, next);
+      
+      // Assert
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+    
+    it('should fail validation when userId is missing', () => {
+      // Setup
+      req.body = {
+        skillId: '123e4567-e89b-12d3-a456-426614174000',
+        level: 3
+      };
+      
+      // Call the validator
+      validateUserSkill(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        error: expect.stringContaining('userId')
+      }));
+    });
+    
+    it('should fail validation when skillId is not a valid UUID', () => {
+      // Setup
+      req.body = {
+        userId: 'user-1',
+        skillId: 'not-a-uuid',
+        level: 3
+      };
+      
+      // Call the validator
+      validateUserSkill(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        error: expect.stringContaining('skillId')
+      }));
+    });
+    
+    it('should fail validation when level is out of range', () => {
+      // Setup - level too high
+      req.body = {
+        userId: 'user-1',
+        skillId: '123e4567-e89b-12d3-a456-426614174000',
+        level: 6 // Greater than max of 5
+      };
+      
+      // Call the validator
+      validateUserSkill(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        error: expect.stringContaining('level')
+      }));
+      
+      // Reset mocks
+      jest.clearAllMocks();
+      
+      // Setup - level too low
+      req.body = {
+        userId: 'user-1',
+        skillId: '123e4567-e89b-12d3-a456-426614174000',
+        level: 0 // Less than min of 1
+      };
+      
+      // Call the validator
+      validateUserSkill(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        error: expect.stringContaining('level')
+      }));
+    });
+  });
 });
