@@ -199,7 +199,6 @@ const useRoadmap = () => {
       }
     } catch (error) {
       console.error('Exception updating topic status:', error);
-      alert('An error occurred while updating the topic status. Please try again.');
     }
   };
 
