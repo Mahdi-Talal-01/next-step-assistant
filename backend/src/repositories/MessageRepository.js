@@ -77,6 +77,26 @@ class MessageRepository {
       throw error;
     }
   }
+  /**
+   * Delete all messages for a user
+   * @param {string} userId - The user ID
+   * @returns {Promise<Object>} - Result with count of deleted messages
+   */
+  async deleteAllUserMessages(userId) {
+    try {
+      const result = await prisma.message.deleteMany({
+        where: { userId },
+      });
+
+      return {
+        success: true,
+        deletedCount: result.count,
+      };
+    } catch (error) {
+      console.error("Error deleting user messages:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new MessageRepository();
