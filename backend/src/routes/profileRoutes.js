@@ -24,4 +24,7 @@ router.get("/cv", auth, ProfileController.getCV);
 // Delete CV
 router.delete("/cv", auth, ProfileController.deleteCV);
 
+// Get all user data (profile, roadmap, skills, applications)
+router.get("/all-data", auth, ProfileController.getAllUserData);
+
 module.exports = router;
