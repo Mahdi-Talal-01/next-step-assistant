@@ -134,5 +134,142 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+  describe("createJob", () => {
+    it("should create a new job successfully", async () => {
+      // Setup
+      req.body = {
+        company: "Acme Inc",
+        position: "Software Engineer",
+        status: "Applied",
+        skills: [
+          { name: "JavaScript", required: true },
+          { name: "React", required: false },
+        ],
+      };
+
+      const createdSkills = [
+        { id: "skill-1", name: "JavaScript" },
+        { id: "skill-2", name: "React" },
+      ];
+
+      const createdJob = {
+        id: "new-job-id",
+        company: "Acme Inc",
+        position: "Software Engineer",
+        status: "Applied",
+        skills: [
+          { skillId: "skill-1", required: true },
+          { skillId: "skill-2", required: false },
+        ],
+      };
+
+      // Mock skill creation
+      skillRepository.createSkill.mockImplementation(async (skillData) => {
+        return skillData.name === "JavaScript"
+          ? createdSkills[0]
+          : createdSkills[1];
+      });
+
+      // Mock job creation
+      JobRepository.createJob.mockResolvedValue(createdJob);
+
+      // Spy on console.log
+      jest.spyOn(console, "log").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.createJob(req, res);
+
+      // Assert
+      expect(skillRepository.createSkill).toHaveBeenCalledTimes(2);
+      expect(JobRepository.createJob).toHaveBeenCalledWith(
+        "test-user-id",
+        expect.objectContaining({
+          company: "Acme Inc",
+          position: "Software Engineer",
+          status: "Applied",
+          skills: expect.arrayContaining([
+            expect.objectContaining({ skillId: "skill-1", required: true }),
+            expect.objectContaining({ skillId: "skill-2", required: false }),
+          ]),
+        })
+      );
+
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job created successfully",
+        createdJob,
+        201
+      );
+    });
+
+    it("should return bad request when required fields are missing", async () => {
+      // Setup with missing required fields
+      req.body = {
+        company: "Acme Inc",
+        // Missing position
+        status: "Applied",
+      };
+
+      // Call the method
+      await JobController.createJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Company, position, and status are required"
+      );
+      expect(JobRepository.createJob).not.toHaveBeenCalled();
+    });
+
+    it("should return bad request when skills is not an array", async () => {
+      // Setup with invalid skills format
+      req.body = {
+        company: "Acme Inc",
+        position: "Software Engineer",
+        status: "Applied",
+        skills: "JavaScript, React", // Not an array
+      };
+
+      // Call the method
+      await JobController.createJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Skills must be an array of objects"
+      );
+      expect(JobRepository.createJob).not.toHaveBeenCalled();
+    });
+
+    it("should handle errors during job creation", async () => {
+      // Setup
+      req.body = {
+        company: "Acme Inc",
+        position: "Software Engineer",
+        status: "Applied",
+        skills: [{ name: "JavaScript", required: true }],
+      };
+
+      // Mock skill creation success but job creation failure
+      skillRepository.createSkill.mockResolvedValue({
+        id: "skill-1",
+        name: "JavaScript",
+      });
+
+      const error = new Error("Database error");
+      JobRepository.createJob.mockRejectedValue(error);
+
+      // Spy on console
+      jest.spyOn(console, "error").mockImplementation(() => {});
+      jest.spyOn(console, "log").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.createJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(res, "Database error");
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
 });
 
