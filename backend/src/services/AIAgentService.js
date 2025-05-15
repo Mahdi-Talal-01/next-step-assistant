@@ -93,7 +93,22 @@ class AIAgentService {
     }
   }
   
+  /**
+   * Get conversation history for a user
+   * @param {string} userId - The user ID
+   * @param {number} limit - Maximum number of conversation pairs
+   * @returns {Promise<Array>} - Conversation history
+   */
+  async getConversationHistory(userId, limit = 10) {
+    try {
+      return await MessageRepository.getConversationHistory(userId, limit);
+    } catch (error) {
+      console.error('Error getting conversation history:', error);
+      throw error;
+    }
+  }
 
+  
 }
 
 module.exports = new AIAgentService(); 
