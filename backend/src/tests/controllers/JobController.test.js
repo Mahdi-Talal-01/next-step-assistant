@@ -437,5 +437,51 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+  describe("getJobStats", () => {
+    it("should return job statistics for the user", async () => {
+      // Mock data
+      const stats = {
+        totalJobs: 5,
+        byStatus: {
+          Applied: 2,
+          Interview: 2,
+          Offer: 1,
+        },
+      };
+
+      // Setup mocks
+      JobRepository.getJobStats.mockResolvedValue(stats);
+
+      // Call the method
+      await JobController.getJobStats(req, res);
+
+      // Assert
+      expect(JobRepository.getJobStats).toHaveBeenCalledWith("test-user-id");
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job statistics fetched successfully",
+        stats
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup mock to throw error
+      const error = new Error("Database error");
+      JobRepository.getJobStats.mockRejectedValue(error);
+
+      // Spy on console.error
+      jest.spyOn(console, "error").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.getJobStats(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(
+        res,
+        "Failed to fetch job statistics"
+      );
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
 });
 
