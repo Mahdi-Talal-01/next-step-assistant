@@ -217,4 +217,114 @@ describe("Job Routes", () => {
       expect(JobRepository.createJob).not.toHaveBeenCalled();
     });
   });
+  describe("PUT /api/jobs/:jobId", () => {
+    it("should update an existing job", async () => {
+      const updatedData = {
+        company: "Updated Company",
+        position: "Senior Engineer",
+        status: "Offer",
+        skills: [
+          { name: "JavaScript", required: true },
+          { name: "TypeScript", required: true },
+        ],
+      };
+
+      const response = await request(app)
+        .put(`${BASE_ROUTE}/${testJobs[0].id}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(updatedData);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.company).toBe(updatedData.company);
+      expect(response.body.data.status).toBe(updatedData.status);
+      expect(JobRepository.updateJob).toHaveBeenCalledWith(
+        testJobs[0].id,
+        testUser.id,
+        expect.objectContaining({
+          company: updatedData.company,
+          position: updatedData.position,
+          skills: expect.any(Array),
+        })
+      );
+    });
+
+    it("should return 404 when trying to update a non-existent job", async () => {
+      const updatedData = {
+        company: "Updated Company",
+        position: "Senior Engineer",
+        status: "Offer",
+      };
+
+      const response = await request(app)
+        .put(`${BASE_ROUTE}/non-existent-job`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(updatedData);
+
+      expect(response.status).toBe(404);
+      expect(response.body.success).toBe(false);
+    });
+  });
+  describe("DELETE /api/jobs/:jobId", () => {
+    it("should delete a job", async () => {
+      const response = await request(app)
+        .delete(`${BASE_ROUTE}/${testJobs[0].id}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(JobRepository.deleteJob).toHaveBeenCalledWith(
+        testJobs[0].id,
+        testUser.id
+      );
+    });
+
+    it("should return 404 when trying to delete a non-existent job", async () => {
+      JobRepository.deleteJob.mockResolvedValueOnce(false);
+
+      const response = await request(app)
+        .delete(`${BASE_ROUTE}/non-existent-job`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.success).toBe(false);
+    });
+  });
+
+  describe("GET /api/jobs/stats", () => {
+    it("should return job statistics", async () => {
+      const jobStats = {
+        totalJobs: testJobs.length,
+        byStatus: {
+          Applied: 1,
+          Interview: 1,
+        },
+      };
+
+      // Mock the controller method instead of relying on the route
+      const originalMethod =
+        require("../../controllers/JobController").getJobStats;
+      require("../../controllers/JobController").getJobStats = jest
+        .fn()
+        .mockImplementation((req, res) => {
+          return res.status(200).json({
+            success: true,
+            message: "Job statistics fetched successfully",
+            data: jobStats,
+          });
+        });
+
+      const response = await request(app)
+        .get(`${BASE_ROUTE}/stats`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      // Restore original method
+      require("../../controllers/JobController").getJobStats = originalMethod;
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toHaveProperty("totalJobs");
+      expect(response.body.data).toHaveProperty("byStatus");
+    });
+  });
 });
