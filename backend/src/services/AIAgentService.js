@@ -1,5 +1,5 @@
-const axios = require('axios');
-const MessageRepository = require('../repositories/MessageRepository');
+const axios = require("axios");
+const MessageRepository = require("../repositories/MessageRepository");
 
 class AIAgentService {
   /**
@@ -13,39 +13,42 @@ class AIAgentService {
     try {
       // Get webhook URL from environment variables
       const webhookUrl = process.env.N8N_WEBHOOK_URL;
-      
+
       if (!webhookUrl) {
-        throw new Error('N8N_WEBHOOK_URL environment variable is not set');
+        throw new Error("N8N_WEBHOOK_URL environment variable is not set");
       }
-      
+
       // Save the user message to the database
-      await MessageRepository.saveMessage(userId, message, 'user');
-      
+      await MessageRepository.saveMessage(userId, message, "user");
+
       // Create simplified payload with just message and user data
       const payload = {
         userMessage: message,
-        userData: userData
+        userData: userData,
       };
-      
+
       // Send to n8n webhook
       const response = await axios.post(webhookUrl, payload);
-      
-      console.log('Data sent to n8n webhook successfully');
-      
+
+      console.log("Data sent to n8n webhook successfully");
+
       // Extract the assistant's response text
-      let assistantMessage = '';
-      
+      let assistantMessage = "";
+
       // Check response format and extract the actual text message
       if (response.data) {
-        if (typeof response.data === 'string') {
+        if (typeof response.data === "string") {
           // If response is already a string, use it directly
           assistantMessage = response.data;
-        } else if (typeof response.data === 'object') {
+        } else if (typeof response.data === "object") {
           // Try to extract text from common response formats
           if (response.data.output) {
             // Handle the case where output is a string with the message
             assistantMessage = response.data.output;
-          } else if (response.data.message && typeof response.data.message === 'string') {
+          } else if (
+            response.data.message &&
+            typeof response.data.message === "string"
+          ) {
             assistantMessage = response.data.message;
           } else if (response.data.text) {
             assistantMessage = response.data.text;
@@ -57,42 +60,42 @@ class AIAgentService {
             assistantMessage = response.data.content;
           } else {
             // Default case: stringify the object but mark it as fallback
-            assistantMessage = 'AI Assistant Response';
+            assistantMessage = "AI Assistant Response";
           }
-          
+
           // Special case handling for n8n output format
           if (Array.isArray(response.data) && response.data.length > 0) {
             const firstItem = response.data[0];
-            if (firstItem && typeof firstItem === 'object') {
-              if (firstItem.output && typeof firstItem.output === 'string') {
+            if (firstItem && typeof firstItem === "object") {
+              if (firstItem.output && typeof firstItem.output === "string") {
                 assistantMessage = firstItem.output;
               }
             }
           }
         }
       } else {
-        assistantMessage = 'Received empty response from AI assistant';
+        assistantMessage = "Received empty response from AI assistant";
       }
-      
+
       // Save the assistant's response to the database
       await MessageRepository.saveMessage(
-        userId, 
-        assistantMessage, 
-        'assistant', 
+        userId,
+        assistantMessage,
+        "assistant",
         { fullResponse: response.data }
       );
-      
+
       // Return the webhook response directly
       return {
         success: true,
-        data: response.data
+        data: response.data,
       };
     } catch (error) {
-      console.error('Error in AI agent service:', error);
+      console.error("Error in AI agent service:", error);
       throw error;
     }
   }
-  
+
   /**
    * Get conversation history for a user
    * @param {string} userId - The user ID
@@ -103,12 +106,24 @@ class AIAgentService {
     try {
       return await MessageRepository.getConversationHistory(userId, limit);
     } catch (error) {
-      console.error('Error getting conversation history:', error);
+      console.error("Error getting conversation history:", error);
       throw error;
     }
   }
 
-  
+  /**
+   * Clear all messages for a user
+   * @param {string} userId - The user ID
+   * @returns {Promise<Object>} - Result with success status and count of deleted messages
+   */
+  async clearUserMessages(userId) {
+    try {
+      return await MessageRepository.deleteAllUserMessages(userId);
+    } catch (error) {
+      console.error("Error clearing user messages:", error);
+      throw error;
+    }
+  }
 }
 
-module.exports = new AIAgentService(); 
+module.exports = new AIAgentService();
