@@ -57,6 +57,7 @@ describe("skillRepository", () => {
     // Clear all mocks before each test
     jest.clearAllMocks();
   });
+
   // Skill CRUD operations tests
   describe("createSkill", () => {
     it("should create a new skill", async () => {
@@ -185,6 +186,7 @@ describe("skillRepository", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+
   describe("getSkillById", () => {
     it("should return a skill by its ID", async () => {
       // Setup
@@ -221,6 +223,7 @@ describe("skillRepository", () => {
       expect(result).toBeNull();
     });
   });
+
   describe("getAllSkills", () => {
     it("should return all skills ordered by name", async () => {
       // Setup
@@ -243,6 +246,7 @@ describe("skillRepository", () => {
       expect(result.length).toBe(skills.length);
     });
   });
+
   describe("updateSkill", () => {
     it("should update a skill", async () => {
       // Setup
@@ -273,6 +277,7 @@ describe("skillRepository", () => {
       expect(result).toEqual(updatedSkill);
     });
   });
+
   describe("deleteSkill", () => {
     it("should delete a skill", async () => {
       // Setup
@@ -295,6 +300,7 @@ describe("skillRepository", () => {
       expect(result).toEqual(deletedSkill);
     });
   });
+
   // User Skill operations tests
   describe("addUserSkill", () => {
     it("should add a skill to a user", async () => {
@@ -328,6 +334,7 @@ describe("skillRepository", () => {
       expect(result).toEqual(userSkill);
     });
   });
+
   describe("getUserSkills", () => {
     it("should return all skills for a user", async () => {
       // Setup
@@ -362,6 +369,7 @@ describe("skillRepository", () => {
       expect(result.length).toBe(userSkills.length);
     });
   });
+
   // Job Skill operations tests
   describe("addJobSkill", () => {
     it("should add a skill to a job", async () => {
@@ -397,6 +405,41 @@ describe("skillRepository", () => {
       });
 
       expect(result).toEqual(jobSkill);
+    });
+  });
+
+  describe("getJobSkills", () => {
+    it("should return all skills for a job", async () => {
+      // Setup
+      const jobId = "job-1";
+      const jobSkills = [
+        {
+          jobId,
+          skillId: "skill-1",
+          required: true,
+          skill: { id: "skill-1", name: "JavaScript" },
+        },
+        {
+          jobId,
+          skillId: "skill-2",
+          required: false,
+          skill: { id: "skill-2", name: "Python" },
+        },
+      ];
+
+      prisma.jobSkill.findMany.mockResolvedValue(jobSkills);
+
+      // Call the repository method
+      const result = await skillRepository.getJobSkills(jobId);
+
+      // Assertions
+      expect(prisma.jobSkill.findMany).toHaveBeenCalledWith({
+        where: { jobId },
+        include: { skill: true },
+      });
+
+      expect(result).toEqual(jobSkills);
+      expect(result.length).toBe(jobSkills.length);
     });
   });
 });
