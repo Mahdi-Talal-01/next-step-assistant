@@ -1,6 +1,9 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+/**
+ * Repository for managing Message data
+ */
 class MessageRepository {
   /**
    * Save a new message
@@ -26,6 +29,7 @@ class MessageRepository {
       throw error;
     }
   }
+
   /**
    * Get messages for a user
    * @param {string} userId - The user ID
@@ -50,6 +54,7 @@ class MessageRepository {
       throw error;
     }
   }
+
   /**
    * Get conversation history (as pairs of user and assistant messages)
    * @param {string} userId - The user ID
@@ -77,6 +82,7 @@ class MessageRepository {
       throw error;
     }
   }
+
   /**
    * Delete all messages for a user
    * @param {string} userId - The user ID
