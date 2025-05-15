@@ -12,5 +12,66 @@ describe('RoadmapService', () => {
     jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
+  describe('createRoadmap', () => {
+    it('should create a new roadmap successfully', async () => {
+      // Setup
+      const userId = 'test-user-id';
+      const roadmapData = {
+        title: 'Test Roadmap',
+        description: 'Test Description',
+        icon: 'test-icon',
+        color: '#FFFFFF',
+        estimatedTime: '2 weeks',
+        difficulty: 'medium',
+        topics: [
+          {
+            name: 'Topic 1',
+            status: 'pending',
+            resources: [
+              { name: 'Resource 1', url: 'https://example.com' }
+            ]
+          }
+        ]
+      };
+      
+      const createdRoadmap = {
+        id: 'roadmap-1',
+        ...roadmapData,
+        userId,
+        isTemplate: false
+      };
+      
+      roadmapRepository.create.mockResolvedValue(createdRoadmap);
+      
+      // Call the service method
+      const result = await roadmapService.createRoadmap(userId, roadmapData);
+      
+      // Assert
+      expect(roadmapRepository.create).toHaveBeenCalledWith({
+        ...roadmapData,
+        userId,
+        isTemplate: false
+      });
+      expect(result).toEqual(createdRoadmap);
+    });
+    
+    it('should handle errors during roadmap creation', async () => {
+      // Setup
+      const userId = 'test-user-id';
+      const roadmapData = { title: 'Test Roadmap' };
+      const error = new Error('Database error');
+      
+      roadmapRepository.create.mockRejectedValue(error);
+      
+      // Call and assert
+      await expect(roadmapService.createRoadmap(userId, roadmapData))
+        .rejects.toThrow(error);
+      expect(roadmapRepository.create).toHaveBeenCalledWith({
+        ...roadmapData,
+        userId,
+        isTemplate: false
+      });
+    });
+  });
 
 });
