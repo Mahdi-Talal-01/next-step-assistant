@@ -127,4 +127,37 @@ describe("SkillController", () => {
       );
     });
   });
+  describe("getAllSkills", () => {
+    it("should return all skills", async () => {
+      // Setup
+      const skills = [
+        { id: "skill-1", name: "JavaScript" },
+        { id: "skill-2", name: "Python" },
+      ];
+      skillService.getAllSkills.mockResolvedValue(skills);
+
+      // Call the method
+      await SkillController.getAllSkills(req, res);
+
+      // Assert
+      expect(skillService.getAllSkills).toHaveBeenCalled();
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Skills retrieved successfully",
+        skills
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      const error = new Error("Database error");
+      skillService.getAllSkills.mockRejectedValue(error);
+
+      // Call the method
+      await SkillController.getAllSkills(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(res, "Database error");
+    });
+  });
 });
