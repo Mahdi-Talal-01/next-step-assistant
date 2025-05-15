@@ -221,5 +221,64 @@ describe('RoadmapService', () => {
       expect(roadmapRepository.update).not.toHaveBeenCalled();
     });
   });
+  describe('deleteRoadmap', () => {
+    it('should delete a roadmap successfully', async () => {
+      // Setup
+      const roadmapId = 'roadmap-1';
+      const userId = 'test-user-id';
+      
+      const existingRoadmap = {
+        id: roadmapId,
+        title: 'Test Roadmap',
+        userId
+      };
+      
+      roadmapRepository.findById.mockResolvedValue(existingRoadmap);
+      roadmapRepository.delete.mockResolvedValue({ count: 1 });
+      
+      // Call the service method
+      const result = await roadmapService.deleteRoadmap(roadmapId, userId);
+      
+      // Assert
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+      expect(roadmapRepository.delete).toHaveBeenCalledWith(roadmapId);
+      expect(result).toEqual({ count: 1 });
+    });
+    
+    it('should throw error when roadmap is not found', async () => {
+      // Setup
+      const roadmapId = 'non-existent-roadmap';
+      const userId = 'test-user-id';
+      
+      roadmapRepository.findById.mockResolvedValue(null);
+      
+      // Call and assert
+      await expect(roadmapService.deleteRoadmap(roadmapId, userId))
+        .rejects.toThrow('Roadmap not found');
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+      expect(roadmapRepository.delete).not.toHaveBeenCalled();
+    });
+    
+    it('should throw error when user is not authorized', async () => {
+      // Setup
+      const roadmapId = 'roadmap-1';
+      const userId = 'test-user-id';
+      const differentUserId = 'different-user-id';
+      
+      const existingRoadmap = {
+        id: roadmapId,
+        title: 'Test Roadmap',
+        userId: differentUserId // Different from the requesting user
+      };
+      
+      roadmapRepository.findById.mockResolvedValue(existingRoadmap);
+      
+      // Call and assert
+      await expect(roadmapService.deleteRoadmap(roadmapId, userId))
+        .rejects.toThrow('Unauthorized to delete this roadmap');
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+      expect(roadmapRepository.delete).not.toHaveBeenCalled();
+    });
+  });
 
 });
