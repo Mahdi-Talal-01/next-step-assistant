@@ -29,9 +29,145 @@ jest.mock("@prisma/client", () => {
 // Get the mocked prisma client
 const prisma = new PrismaClient();
 
-describe('JobRepository', () => {
+describe("JobRepository", () => {
   beforeEach(() => {
     // Clear all mocks before each test
     jest.clearAllMocks();
+  });
+  describe('createJob', () => {
+    it('should create a new job with skills', async () => {
+      // Setup test data
+      const userId = 'user-1';
+      const jobData = {
+        company: 'Acme Inc',
+        position: 'Software Engineer',
+        status: 'Applied',
+        skills: [
+          { skillId: 'skill-1', required: true },
+          { skillId: 'skill-2', required: false }
+        ]
+      };
+      
+      // Mock the response from prisma
+      const mockCreatedJob = {
+        id: 'job-1',
+        userId,
+        company: jobData.company,
+        position: jobData.position,
+        status: jobData.status,
+        appliedDate: new Date(),
+        lastUpdated: new Date(),
+        stages: null,
+        skills: [
+          { 
+            skillId: 'skill-1',
+            required: true,
+            skill: { id: 'skill-1', name: 'JavaScript' }
+          },
+          {
+            skillId: 'skill-2',
+            required: false,
+            skill: { id: 'skill-2', name: 'React' }
+          }
+        ]
+      };
+      
+      prisma.job.create.mockResolvedValue(mockCreatedJob);
+      
+      // Call the repository method
+      const result = await JobRepository.createJob(userId, jobData);
+      
+      // Assertions
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(prisma.job.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          company: jobData.company,
+          position: jobData.position,
+          status: jobData.status,
+          user: expect.objectContaining({
+            connect: { id: userId }
+          }),
+          skills: expect.objectContaining({
+            create: expect.arrayContaining([
+              expect.objectContaining({ skillId: 'skill-1', required: true }),
+              expect.objectContaining({ skillId: 'skill-2', required: false })
+            ])
+          })
+        }),
+        include: expect.any(Object)
+      });
+      
+      expect(result).toEqual(expect.objectContaining({
+        id: mockCreatedJob.id,
+        company: mockCreatedJob.company,
+        position: mockCreatedJob.position,
+        skills: expect.arrayContaining([
+          expect.objectContaining({ skillId: 'skill-1', required: true }),
+          expect.objectContaining({ skillId: 'skill-2', required: false })
+        ])
+      }));
+    });
+    
+    it('should create a job with stages if provided', async () => {
+      // Setup test data
+      const userId = 'user-1';
+      const stages = [
+        { name: 'Applied', date: '2023-01-01' },
+        { name: 'Phone Screen', date: '2023-01-15' }
+      ];
+      const jobData = {
+        company: 'Acme Inc',
+        position: 'Software Engineer',
+        status: 'Interview',
+        stages,
+        skills: []
+      };
+      
+      // Mock the response from prisma
+      const mockCreatedJob = {
+        id: 'job-1',
+        company: jobData.company,
+        position: jobData.position,
+        status: jobData.status,
+        stages: JSON.stringify(stages),
+        skills: []
+      };
+      
+      prisma.job.create.mockResolvedValue(mockCreatedJob);
+      
+      // Call the repository method
+      const result = await JobRepository.createJob(userId, jobData);
+      
+      // Assertions
+      expect(prisma.job.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            stages: JSON.stringify(stages)
+          })
+        })
+      );
+      
+      expect(result).toEqual(expect.objectContaining({
+        stages
+      }));
+    });
+    
+    it('should throw an error if job creation fails', async () => {
+      // Setup test data
+      const userId = 'user-1';
+      const jobData = {
+        company: 'Acme Inc',
+        position: 'Software Engineer',
+        status: 'Applied',
+        skills: []
+      };
+      
+      // Mock the prisma client to throw an error
+      const error = new Error('Database error');
+      prisma.job.create.mockRejectedValue(error);
+      
+      // Call the repository method and expect it to throw
+      await expect(JobRepository.createJob(userId, jobData)).rejects.toThrow(error);
+    });
   });
 });
