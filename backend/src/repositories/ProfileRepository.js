@@ -100,6 +100,18 @@ class ProfileRepository {
           skill: true
         }
       });
+      // Get user's job applications
+      const jobs = await prisma.job.findMany({
+        where: { userId },
+        orderBy: { lastUpdated: 'desc' },
+        include: {
+          skills: {
+            include: {
+              skill: true
+            }
+          }
+        }
+      });
 
     
 
