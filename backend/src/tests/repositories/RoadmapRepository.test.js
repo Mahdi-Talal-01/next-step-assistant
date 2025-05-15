@@ -37,6 +37,7 @@ describe("RoadmapRepository", () => {
     jest.spyOn(console, "log").mockImplementation(() => {});
     jest.spyOn(console, "error").mockImplementation(() => {});
   });
+
   describe("create", () => {
     it("should create a new roadmap with topics and resources", async () => {
       // Setup test data
@@ -130,6 +131,7 @@ describe("RoadmapRepository", () => {
       expect(prisma.roadmap.create).toHaveBeenCalledTimes(1);
     });
   });
+
   describe("findAll", () => {
     it("should return all roadmaps for a user and template roadmaps", async () => {
       // Setup test data
@@ -175,6 +177,7 @@ describe("RoadmapRepository", () => {
       expect(prisma.roadmap.findMany).toHaveBeenCalledTimes(1);
     });
   });
+
   describe("findById", () => {
     it("should return a roadmap by its ID", async () => {
       // Setup test data
@@ -252,6 +255,7 @@ describe("RoadmapRepository", () => {
       );
     });
   });
+
   describe("update", () => {
     it("should update a roadmap and its topics", async () => {
       // Setup test data
@@ -342,6 +346,7 @@ describe("RoadmapRepository", () => {
       expect(prisma.roadmap.update).not.toHaveBeenCalled();
     });
   });
+
   describe("delete", () => {
     it("should delete a roadmap", async () => {
       // Setup test data
@@ -373,6 +378,189 @@ describe("RoadmapRepository", () => {
       // Call and assert
       await expect(roadmapRepository.delete(roadmapId)).rejects.toThrow(error);
       expect(prisma.roadmap.delete).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("updateTopicStatus", () => {
+    it("should update a topic status", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const topicId = "topic-1";
+      const status = "completed";
+
+      const topic = {
+        id: topicId,
+        name: "Topic 1",
+        status: "pending",
+        roadmapId,
+      };
+
+      const updatedTopic = {
+        ...topic,
+        status,
+      };
+
+      prisma.topic.findFirst.mockResolvedValue(topic);
+      prisma.topic.update.mockResolvedValue(updatedTopic);
+
+      // Call the repository method
+      const result = await roadmapRepository.updateTopicStatus(
+        roadmapId,
+        topicId,
+        status
+      );
+
+      // Assert
+      expect(prisma.topic.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: topicId,
+          roadmapId,
+        },
+      });
+      expect(prisma.topic.update).toHaveBeenCalledWith({
+        where: { id: topicId },
+        data: { status },
+      });
+      expect(result).toEqual(updatedTopic);
+    });
+
+    it("should throw error when topic is not found", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const topicId = "non-existent-topic";
+      const status = "completed";
+
+      prisma.topic.findFirst.mockResolvedValue(null);
+
+      // Call and assert
+      await expect(
+        roadmapRepository.updateTopicStatus(roadmapId, topicId, status)
+      ).rejects.toThrow(
+        `Topic not found with ID: ${topicId} in roadmap: ${roadmapId}`
+      );
+      expect(prisma.topic.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.topic.update).not.toHaveBeenCalled();
+    });
+
+    it("should handle errors during topic status update", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const topicId = "topic-1";
+      const status = "completed";
+
+      const topic = {
+        id: topicId,
+        name: "Topic 1",
+        status: "pending",
+        roadmapId,
+      };
+
+      const error = new Error("Database error");
+
+      prisma.topic.findFirst.mockResolvedValue(topic);
+      prisma.topic.update.mockRejectedValue(error);
+
+      // Call and assert
+      await expect(
+        roadmapRepository.updateTopicStatus(roadmapId, topicId, status)
+      ).rejects.toThrow("Failed to update topic status: Database error");
+      expect(prisma.topic.findFirst).toHaveBeenCalledTimes(1);
+      expect(prisma.topic.update).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("calculateProgress", () => {
+    it("should calculate progress correctly", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const topics = [
+        { id: "topic-1", status: "completed" },
+        { id: "topic-2", status: "completed" },
+        { id: "topic-3", status: "pending" },
+        { id: "topic-4", status: "in-progress" },
+      ];
+
+      prisma.topic.findMany.mockResolvedValue(topics);
+
+      // Call the repository method
+      const progress = await roadmapRepository.calculateProgress(roadmapId);
+
+      // Assert
+      expect(prisma.topic.findMany).toHaveBeenCalledWith({
+        where: { roadmapId },
+      });
+      // 2 completed out of 4 topics = 50%
+      expect(progress).toBe(50);
+    });
+
+    it("should return 0 when there are no topics", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+
+      prisma.topic.findMany.mockResolvedValue([]);
+
+      // Call the repository method
+      const progress = await roadmapRepository.calculateProgress(roadmapId);
+
+      // Assert
+      expect(progress).toBe(0);
+    });
+
+    it("should handle errors when calculating progress", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const error = new Error("Database error");
+
+      prisma.topic.findMany.mockRejectedValue(error);
+
+      // Call and assert
+      await expect(
+        roadmapRepository.calculateProgress(roadmapId)
+      ).rejects.toThrow(error);
+    });
+  });
+
+  describe("updateProgress", () => {
+    it("should update roadmap progress", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const progress = 75;
+
+      const updatedRoadmap = {
+        id: roadmapId,
+        title: "Test Roadmap",
+        progress,
+      };
+
+      prisma.roadmap.update.mockResolvedValue(updatedRoadmap);
+
+      // Call the repository method
+      const result = await roadmapRepository.updateProgress(
+        roadmapId,
+        progress
+      );
+
+      // Assert
+      expect(prisma.roadmap.update).toHaveBeenCalledWith({
+        where: { id: roadmapId },
+        data: { progress },
+      });
+      expect(result).toEqual(updatedRoadmap);
+    });
+
+    it("should handle errors during progress update", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const progress = 75;
+      const error = new Error("Database error");
+
+      prisma.roadmap.update.mockRejectedValue(error);
+
+      // Call and assert
+      await expect(
+        roadmapRepository.updateProgress(roadmapId, progress)
+      ).rejects.toThrow("Failed to update roadmap progress: Database error");
+      expect(prisma.roadmap.update).toHaveBeenCalledTimes(1);
     });
   });
 });
