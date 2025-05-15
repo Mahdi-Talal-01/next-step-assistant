@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 class ProfileRepository {
@@ -6,7 +6,7 @@ class ProfileRepository {
     try {
       const profile = await prisma.profile.update({
         where: { userId },
-        data: profileData
+        data: profileData,
       });
       return profile;
     } catch (error) {
@@ -22,10 +22,10 @@ class ProfileRepository {
           user: {
             select: {
               name: true,
-              email: true
-            }
-          }
-        }
+              email: true,
+            },
+          },
+        },
       });
       return profile;
     } catch (error) {
@@ -39,8 +39,8 @@ class ProfileRepository {
         where: { userId },
         data: {
           resumeUrl,
-          resumeName
-        }
+          resumeName,
+        },
       });
       return profile;
     } catch (error) {
@@ -54,8 +54,8 @@ class ProfileRepository {
         where: { userId },
         select: {
           resumeUrl: true,
-          resumeName: true
-        }
+          resumeName: true,
+        },
       });
       return profile;
     } catch (error) {
@@ -63,6 +63,7 @@ class ProfileRepository {
     }
   }
 
+  // ------------------
   async getAllUserData(userId) {
     try {
       // Get user profile with basic user info
@@ -73,57 +74,69 @@ class ProfileRepository {
             select: {
               id: true,
               name: true,
-              email: true
-            }
-          }
-        }
+              email: true,
+            },
+          },
+        },
       });
+
       // Get user's roadmaps
       const roadmaps = await prisma.roadmap.findMany({
         where: { userId },
         include: {
           topics: {
             include: {
-              resources: true
-            }
-          }
-        }
+              resources: true,
+            },
+          },
+        },
       });
+
       // Get user's skills (from roadmaps)
       const roadmapSkills = await prisma.roadmapSkill.findMany({
         where: {
           roadmap: {
-            userId
-          }
+            userId,
+          },
         },
         include: {
-          skill: true
-        }
+          skill: true,
+        },
       });
+
       // Get user's job applications
       const jobs = await prisma.job.findMany({
         where: { userId },
-        orderBy: { lastUpdated: 'desc' },
+        orderBy: { lastUpdated: "desc" },
         include: {
           skills: {
             include: {
-              skill: true
-            }
-          }
-        }
+              skill: true,
+            },
+          },
+        },
       });
 
-    
+      // Format jobs to handle JSON fields
+      const formattedJobs = jobs.map((job) => ({
+        ...job,
+        stages: job.stages ? JSON.parse(job.stages) : null,
+        skills: job.skills.map((js) => ({
+          skillId: js.skillId,
+          required: js.required,
+          skill: js.skill,
+        })),
+      }));
 
       // Return consolidated user data
       return {
         profile,
         roadmaps,
-        skills: roadmapSkills.map(rs => ({
+        skills: roadmapSkills.map((rs) => ({
           ...rs.skill,
-          roadmapId: rs.roadmapId,
-          topicId: rs.topicId
-        }))
+          level: rs.level,
+        })),
+        jobs: formattedJobs,
       };
     } catch (error) {
       throw error;
@@ -131,4 +144,4 @@ class ProfileRepository {
   }
 }
 
-module.exports = new ProfileRepository(); 
+module.exports = new ProfileRepository();
