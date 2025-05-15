@@ -183,4 +183,40 @@ describe('skillRepository', () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+  describe('getSkillById', () => {
+    it('should return a skill by its ID', async () => {
+      // Setup
+      const skillId = 'skill-1';
+      const skill = {
+        id: skillId,
+        name: 'JavaScript',
+        category: 'Programming',
+        description: 'A programming language'
+      };
+      
+      prisma.skill.findUnique.mockResolvedValue(skill);
+      
+      // Call the repository method
+      const result = await skillRepository.getSkillById(skillId);
+      
+      // Assertions
+      expect(prisma.skill.findUnique).toHaveBeenCalledWith({
+        where: { id: skillId }
+      });
+      
+      expect(result).toEqual(skill);
+    });
+    
+    it('should return null if skill is not found', async () => {
+      // Setup
+      const skillId = 'non-existent-skill';
+      prisma.skill.findUnique.mockResolvedValue(null);
+      
+      // Call the repository method
+      const result = await skillRepository.getSkillById(skillId);
+      
+      // Assertions
+      expect(result).toBeNull();
+    });
+  });
 });
