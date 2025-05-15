@@ -58,4 +58,20 @@ jest.mock("../../traits/ResponseTrait", () => {
     notFound: jest.fn(),
     badRequest: jest.fn(),
   };
+  
 });
+
+jest.mock("../../repositories/ProfileRepository", () => ({
+  getProfile: jest.fn().mockResolvedValue({
+    id: "profile-test-id",
+    userId: "test-id",
+    bio: "Test bio",
+    user: {
+      name: "E2E Test User",
+      email: "test@example.com",
+    },
+  }),
+  updateProfile: jest.fn(),
+  getCV: jest.fn(),
+  updateResume: jest.fn(),
+}));
