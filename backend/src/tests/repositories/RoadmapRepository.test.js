@@ -37,61 +37,61 @@ describe("RoadmapRepository", () => {
     jest.spyOn(console, "log").mockImplementation(() => {});
     jest.spyOn(console, "error").mockImplementation(() => {});
   });
-  describe('create', () => {
-    it('should create a new roadmap with topics and resources', async () => {
+  describe("create", () => {
+    it("should create a new roadmap with topics and resources", async () => {
       // Setup test data
       const roadmapData = {
-        title: 'Test Roadmap',
-        description: 'Test Description',
-        icon: 'test-icon',
-        color: '#FFFFFF',
-        estimatedTime: '2 weeks',
-        difficulty: 'medium',
-        userId: 'test-user-id',
+        title: "Test Roadmap",
+        description: "Test Description",
+        icon: "test-icon",
+        color: "#FFFFFF",
+        estimatedTime: "2 weeks",
+        difficulty: "medium",
+        userId: "test-user-id",
         isTemplate: false,
         topics: [
           {
-            id: 'client-generated-id', // This should be removed in the create
-            name: 'Topic 1',
-            status: 'pending',
+            id: "client-generated-id", // This should be removed in the create
+            name: "Topic 1",
+            status: "pending",
             resources: [
-              { 
-                id: 'client-generated-resource-id', // This should be removed in the create
-                name: 'Resource 1', 
-                url: 'https://example.com' 
-              }
-            ]
-          }
-        ]
+              {
+                id: "client-generated-resource-id", // This should be removed in the create
+                name: "Resource 1",
+                url: "https://example.com",
+              },
+            ],
+          },
+        ],
       };
-      
+
       const createdRoadmap = {
-        id: 'roadmap-1',
+        id: "roadmap-1",
         ...roadmapData,
         topics: [
           {
-            id: 'db-generated-topic-id',
-            name: 'Topic 1',
-            status: 'pending',
-            roadmapId: 'roadmap-1',
+            id: "db-generated-topic-id",
+            name: "Topic 1",
+            status: "pending",
+            roadmapId: "roadmap-1",
             resources: [
               {
-                id: 'db-generated-resource-id',
-                name: 'Resource 1',
-                url: 'https://example.com',
-                topicId: 'db-generated-topic-id'
-              }
-            ]
-          }
-        ]
+                id: "db-generated-resource-id",
+                name: "Resource 1",
+                url: "https://example.com",
+                topicId: "db-generated-topic-id",
+              },
+            ],
+          },
+        ],
       };
-      
+
       // Mock Prisma responses
       prisma.roadmap.create.mockResolvedValue(createdRoadmap);
-      
+
       // Call the repository method
       const result = await roadmapRepository.create(roadmapData);
-      
+
       // Assert
       expect(prisma.roadmap.create).toHaveBeenCalledTimes(1);
       // Verify the client-generated IDs are removed
@@ -100,33 +100,79 @@ describe("RoadmapRepository", () => {
           data: expect.objectContaining({
             topics: expect.objectContaining({
               create: expect.arrayContaining([
-                expect.not.objectContaining({ id: 'client-generated-id' })
-              ])
-            })
+                expect.not.objectContaining({ id: "client-generated-id" }),
+              ]),
+            }),
           }),
-          include: expect.any(Object)
+          include: expect.any(Object),
         })
       );
       expect(result).toEqual(createdRoadmap);
     });
-    
-    it('should handle errors during roadmap creation', async () => {
+
+    it("should handle errors during roadmap creation", async () => {
       // Setup test data
       const roadmapData = {
-        title: 'Test Roadmap',
-        description: 'Test Description',
-        userId: 'test-user-id',
+        title: "Test Roadmap",
+        description: "Test Description",
+        userId: "test-user-id",
         isTemplate: false,
-        topics: []
+        topics: [],
       };
-      
-      const error = new Error('Database error');
+
+      const error = new Error("Database error");
       prisma.roadmap.create.mockRejectedValue(error);
-      
+
       // Call and assert
-      await expect(roadmapRepository.create(roadmapData))
-        .rejects.toThrow(error);
+      await expect(roadmapRepository.create(roadmapData)).rejects.toThrow(
+        error
+      );
       expect(prisma.roadmap.create).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe("findAll", () => {
+    it("should return all roadmaps for a user and template roadmaps", async () => {
+      // Setup test data
+      const userId = "test-user-id";
+      const roadmaps = [
+        {
+          id: "roadmap-1",
+          title: "User Roadmap 1",
+          userId,
+        },
+        {
+          id: "roadmap-2",
+          title: "Template Roadmap",
+          userId: "system",
+          isTemplate: true,
+        },
+      ];
+
+      prisma.roadmap.findMany.mockResolvedValue(roadmaps);
+
+      // Call the repository method
+      const result = await roadmapRepository.findAll(userId);
+
+      // Assert
+      expect(prisma.roadmap.findMany).toHaveBeenCalledWith({
+        where: {
+          OR: [{ userId }, { isTemplate: true }],
+        },
+        include: expect.any(Object),
+      });
+      expect(result).toEqual(roadmaps);
+    });
+
+    it("should handle errors when fetching roadmaps", async () => {
+      // Setup test data
+      const userId = "test-user-id";
+      const error = new Error("Database error");
+
+      prisma.roadmap.findMany.mockRejectedValue(error);
+
+      // Call and assert
+      await expect(roadmapRepository.findAll(userId)).rejects.toThrow(error);
+      expect(prisma.roadmap.findMany).toHaveBeenCalledTimes(1);
     });
   });
 });
