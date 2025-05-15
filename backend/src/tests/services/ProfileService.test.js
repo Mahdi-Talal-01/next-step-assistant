@@ -71,4 +71,55 @@ describe('ProfileService', () => {
       });
     });
   });
+  describe('updateResume', () => {
+    it('should update resume URL and name successfully', async () => {
+      // Setup
+      const userId = 'test-user-id';
+      const resumeUrl = 'http://example.com/storage/test-cv.pdf';
+      const resumeName = 'test-cv.pdf';
+      
+      const updatedProfile = {
+        id: 'profile-id',
+        userId,
+        resumeUrl,
+        resumeName
+      };
+      
+      ProfileRepository.updateResume = jest.fn().mockResolvedValue(updatedProfile);
+      
+      // Execute
+      const result = await ProfileService.updateResume(userId, resumeUrl, resumeName);
+      
+      // Assert
+      expect(ProfileRepository.updateResume).toHaveBeenCalledWith(userId, resumeUrl, resumeName);
+      expect(result).toEqual({
+        success: true,
+        data: updatedProfile
+      });
+    });
+
+    it('should remove resume when null values provided', async () => {
+      // Setup
+      const userId = 'test-user-id';
+      
+      const updatedProfile = {
+        id: 'profile-id',
+        userId,
+        resumeUrl: null,
+        resumeName: null
+      };
+      
+      ProfileRepository.updateResume = jest.fn().mockResolvedValue(updatedProfile);
+      
+      // Execute
+      const result = await ProfileService.updateResume(userId, null, null);
+      
+      // Assert
+      expect(ProfileRepository.updateResume).toHaveBeenCalledWith(userId, null, null);
+      expect(result).toEqual({
+        success: true,
+        data: updatedProfile
+      });
+    });
+  });
 });
