@@ -78,12 +78,24 @@ class ProfileRepository {
           }
         }
       });
+      // Get user's roadmaps
+      const roadmaps = await prisma.roadmap.findMany({
+        where: { userId },
+        include: {
+          topics: {
+            include: {
+              resources: true
+            }
+          }
+        }
+      });
 
     
 
       // Return consolidated user data
       return {
         profile,
+        roadmaps,
       };
     } catch (error) {
       throw error;
