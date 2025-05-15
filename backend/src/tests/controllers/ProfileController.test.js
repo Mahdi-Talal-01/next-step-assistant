@@ -106,4 +106,55 @@ describe("ProfileController", () => {
       expect(ProfileService.updateProfile).not.toHaveBeenCalled();
     });
   });
+  describe("uploadCV", () => {
+    it("should upload CV successfully", async () => {
+      // Setup
+      req.file = {
+        filename: "test-cv.pdf",
+        originalname: "original-cv.pdf",
+      };
+
+      const fileUrl = "http://example.com/storage/test-cv.pdf";
+      fileUploadService.getFileUrl = jest.fn().mockReturnValue(fileUrl);
+
+      ProfileService.updateResume = jest.fn().mockResolvedValue({
+        data: {
+          id: "profile-id",
+          userId: "test-user-id",
+          resumeUrl: fileUrl,
+          resumeName: "original-cv.pdf",
+        },
+      });
+
+      // Execute
+      await ProfileController.uploadCV(req, res);
+
+      // Assert
+      expect(fileUploadService.getFileUrl).toHaveBeenCalledWith("test-cv.pdf");
+      expect(ProfileService.updateResume).toHaveBeenCalledWith(
+        "test-user-id",
+        fileUrl,
+        "original-cv.pdf"
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({ resumeUrl: fileUrl }),
+        "CV uploaded successfully"
+      );
+    });
+
+    it("should return error when no file is uploaded", async () => {
+      // Setup - req.file is undefined
+
+      // Execute
+      await ProfileController.uploadCV(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(
+        res,
+        expect.stringContaining("No file uploaded")
+      );
+      expect(ProfileService.updateResume).not.toHaveBeenCalled();
+    });
+  });
 });
