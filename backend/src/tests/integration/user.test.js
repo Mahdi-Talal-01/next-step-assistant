@@ -17,3 +17,14 @@ jest.mock("../utils/db", () => ({
     $disconnect: jest.fn(),
   },
 }));
+// Mock user service
+jest.mock("../../services/UserService", () => ({
+  register: jest.fn().mockResolvedValue({
+    user: { id: "test-id", name: "Test User", email: "test@example.com" },
+    token: "mock-jwt-token",
+  }),
+  login: jest.fn().mockResolvedValue({
+    user: { id: "test-id", name: "Test User", email: "test@example.com" },
+    token: "mock-jwt-token",
+  }),
+}));
