@@ -342,4 +342,37 @@ describe("RoadmapRepository", () => {
       expect(prisma.roadmap.update).not.toHaveBeenCalled();
     });
   });
+  describe("delete", () => {
+    it("should delete a roadmap", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const deletedRoadmap = {
+        id: roadmapId,
+        title: "Deleted Roadmap",
+      };
+
+      prisma.roadmap.delete.mockResolvedValue(deletedRoadmap);
+
+      // Call the repository method
+      const result = await roadmapRepository.delete(roadmapId);
+
+      // Assert
+      expect(prisma.roadmap.delete).toHaveBeenCalledWith({
+        where: { id: roadmapId },
+      });
+      expect(result).toEqual(deletedRoadmap);
+    });
+
+    it("should handle errors during deletion", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const error = new Error("Database error");
+
+      prisma.roadmap.delete.mockRejectedValue(error);
+
+      // Call and assert
+      await expect(roadmapRepository.delete(roadmapId)).rejects.toThrow(error);
+      expect(prisma.roadmap.delete).toHaveBeenCalledTimes(1);
+    });
+  });
 });
