@@ -73,57 +73,100 @@ describe("Skill Routes", () => {
       skill: testSkills[1],
     },
   ];
-    // JWT token for authentication
-    let authToken;
+  // JWT token for authentication
+  let authToken;
 
-    beforeEach(() => {
-      // Reset all mocks
-      jest.clearAllMocks();
-  
-      // Create a valid JWT token for authentication
-      authToken = jwt.sign(
-        { user: { id: testUser.id, email: testUser.email } },
-        process.env.JWT_SECRET || "test-secret",
-        { expiresIn: "1h" }
-      );
-  
-      // Setup default mock responses for the skill repository
-      skillRepository.getAllSkills.mockResolvedValue(testSkills);
-      skillRepository.getSkillById.mockImplementation(async (id) => {
-        return testSkills.find(skill => skill.id === id) || null;
-      });
-      skillRepository.getSkillByName.mockImplementation(async (name) => {
-        return testSkills.find(skill => skill.name === name) || null;
-      });
-      skillRepository.createSkill.mockImplementation(async (data) => {
-        return { id: "new-skill-id", ...data };
-      });
-      skillRepository.updateSkill.mockImplementation(async (id, data) => {
-        const skill = testSkills.find(skill => skill.id === id);
-        if (!skill) return null;
-        return { ...skill, ...data };
-      });
-      skillRepository.deleteSkill.mockResolvedValue({ count: 1 });
-  
-      // User skill mocks
-      skillRepository.getUserSkills.mockResolvedValue(testUserSkills);
-      skillRepository.getUserSkill.mockImplementation(async (userId, skillId) => {
-        return testUserSkills.find(
-          userSkill => userSkill.userId === userId && userSkill.skillId === skillId
-        ) || null;
-      });
-      skillRepository.addUserSkill.mockImplementation(async (userId, skillId, level) => {
-        return { userId, skillId, level, skill: testSkills.find(skill => skill.id === skillId) };
-      });
-      skillRepository.updateUserSkillLevel.mockResolvedValue(testUserSkills[0]);
-      skillRepository.removeUserSkill.mockResolvedValue({ count: 1 });
-  
-      // Job skill mocks
-      skillRepository.getJobSkills.mockResolvedValue(testJobSkills);
-      skillRepository.addJobSkill.mockImplementation(async (jobId, skillId, required) => {
-        return { jobId, skillId, required, skill: testSkills.find(skill => skill.id === skillId) };
-      });
-      skillRepository.updateJobSkillRequirement.mockResolvedValue(testJobSkills[0]);
-      skillRepository.removeJobSkill.mockResolvedValue({ count: 1 });
+  beforeEach(() => {
+    // Reset all mocks
+    jest.clearAllMocks();
+
+    // Create a valid JWT token for authentication
+    authToken = jwt.sign(
+      { user: { id: testUser.id, email: testUser.email } },
+      process.env.JWT_SECRET || "test-secret",
+      { expiresIn: "1h" }
+    );
+
+    // Setup default mock responses for the skill repository
+    skillRepository.getAllSkills.mockResolvedValue(testSkills);
+    skillRepository.getSkillById.mockImplementation(async (id) => {
+      return testSkills.find((skill) => skill.id === id) || null;
     });
+    skillRepository.getSkillByName.mockImplementation(async (name) => {
+      return testSkills.find((skill) => skill.name === name) || null;
+    });
+    skillRepository.createSkill.mockImplementation(async (data) => {
+      return { id: "new-skill-id", ...data };
+    });
+    skillRepository.updateSkill.mockImplementation(async (id, data) => {
+      const skill = testSkills.find((skill) => skill.id === id);
+      if (!skill) return null;
+      return { ...skill, ...data };
+    });
+    skillRepository.deleteSkill.mockResolvedValue({ count: 1 });
+
+    // User skill mocks
+    skillRepository.getUserSkills.mockResolvedValue(testUserSkills);
+    skillRepository.getUserSkill.mockImplementation(async (userId, skillId) => {
+      return (
+        testUserSkills.find(
+          (userSkill) =>
+            userSkill.userId === userId && userSkill.skillId === skillId
+        ) || null
+      );
+    });
+    skillRepository.addUserSkill.mockImplementation(
+      async (userId, skillId, level) => {
+        return {
+          userId,
+          skillId,
+          level,
+          skill: testSkills.find((skill) => skill.id === skillId),
+        };
+      }
+    );
+    skillRepository.updateUserSkillLevel.mockResolvedValue(testUserSkills[0]);
+    skillRepository.removeUserSkill.mockResolvedValue({ count: 1 });
+
+    // Job skill mocks
+    skillRepository.getJobSkills.mockResolvedValue(testJobSkills);
+    skillRepository.addJobSkill.mockImplementation(
+      async (jobId, skillId, required) => {
+        return {
+          jobId,
+          skillId,
+          required,
+          skill: testSkills.find((skill) => skill.id === skillId),
+        };
+      }
+    );
+    skillRepository.updateJobSkillRequirement.mockResolvedValue(
+      testJobSkills[0]
+    );
+    skillRepository.removeJobSkill.mockResolvedValue({ count: 1 });
+  });
+  // Basic CRUD operations tests
+  describe("GET /api/skills", () => {
+    it("should return all skills", async () => {
+      const response = await request(app).get(BASE_ROUTE);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data.length).toBe(testSkills.length);
+      expect(skillRepository.getAllSkills).toHaveBeenCalled();
+    });
+
+    it("should handle errors when fetching skills", async () => {
+      // Setup mock to throw error
+      skillRepository.getAllSkills.mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const response = await request(app).get(BASE_ROUTE);
+
+      expect(response.status).toBe(500);
+      expect(response.body.success).toBe(false);
+    });
+  });
 });
