@@ -252,4 +252,94 @@ describe("RoadmapRepository", () => {
       );
     });
   });
+  describe("update", () => {
+    it("should update a roadmap and its topics", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const updateData = {
+        title: "Updated Roadmap",
+        description: "Updated Description",
+        topics: [
+          {
+            id: "client-topic-id", // Should be removed in update
+            name: "New Topic",
+            status: "pending",
+            resources: [
+              {
+                id: "client-resource-id", // Should be removed in update
+                name: "New Resource",
+                url: "https://example.com/new",
+              },
+            ],
+          },
+        ],
+      };
+
+      const updatedRoadmap = {
+        id: roadmapId,
+        ...updateData,
+        topics: [
+          {
+            id: "db-generated-topic-id",
+            name: "New Topic",
+            status: "pending",
+            resources: [
+              {
+                id: "db-generated-resource-id",
+                name: "New Resource",
+                url: "https://example.com/new",
+              },
+            ],
+          },
+        ],
+      };
+
+      // Mock Prisma responses
+      prisma.topic.deleteMany.mockResolvedValue({ count: 1 });
+      prisma.roadmap.update.mockResolvedValue(updatedRoadmap);
+
+      // Call the repository method
+      const result = await roadmapRepository.update(roadmapId, updateData);
+
+      // Assert
+      expect(prisma.topic.deleteMany).toHaveBeenCalledWith({
+        where: { roadmapId },
+      });
+      expect(prisma.roadmap.update).toHaveBeenCalledTimes(1);
+      // Verify client IDs are removed
+      expect(prisma.roadmap.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: roadmapId },
+          data: expect.objectContaining({
+            topics: expect.objectContaining({
+              create: expect.arrayContaining([
+                expect.not.objectContaining({ id: "client-topic-id" }),
+              ]),
+            }),
+          }),
+          include: expect.any(Object),
+        })
+      );
+      expect(result).toEqual(updatedRoadmap);
+    });
+
+    it("should handle errors during update", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const updateData = {
+        title: "Updated Roadmap",
+        topics: [],
+      };
+
+      const error = new Error("Database error");
+      prisma.topic.deleteMany.mockRejectedValue(error);
+
+      // Call and assert
+      await expect(
+        roadmapRepository.update(roadmapId, updateData)
+      ).rejects.toThrow(error);
+      expect(prisma.topic.deleteMany).toHaveBeenCalledTimes(1);
+      expect(prisma.roadmap.update).not.toHaveBeenCalled();
+    });
+  });
 });
