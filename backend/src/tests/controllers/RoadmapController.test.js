@@ -118,4 +118,46 @@ describe("RoadmapController", () => {
       expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
     });
   });
+  describe('getRoadmapById', () => {
+    it('should return a specific roadmap', async () => {
+      // Setup
+      const roadmapId = 'roadmap-1';
+      req.params.id = roadmapId;
+      
+      const roadmap = {
+        id: roadmapId,
+        title: 'Test Roadmap',
+        userId: req.user.id
+      };
+      
+      roadmapService.getRoadmapById.mockResolvedValue(roadmap);
+      
+      // Call the method
+      await RoadmapController.getRoadmapById(req, res);
+      
+      // Assert
+      expect(roadmapService.getRoadmapById).toHaveBeenCalledWith(roadmapId);
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Roadmap retrieved successfully",
+        roadmap
+      );
+    });
+    
+    it('should return not found when roadmap does not exist', async () => {
+      // Setup
+      req.params.id = 'non-existent-roadmap';
+      const error = new Error('Roadmap not found');
+      roadmapService.getRoadmapById.mockRejectedValue(error);
+      
+      // Call the method
+      await RoadmapController.getRoadmapById(req, res);
+      
+      // Assert
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(
+        res,
+        error.message
+      );
+    });
+  });
 });
