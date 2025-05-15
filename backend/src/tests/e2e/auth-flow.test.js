@@ -184,3 +184,57 @@ jest.mock("../../controllers/UserController", () => ({
     });
   }),
 }));
+describe("Authentication Flow", () => {
+  beforeEach(() => {
+    // Reset mocks before each test
+    jest.clearAllMocks();
+  });
+
+  let authToken;
+
+  it("should register a new user", async () => {
+    const response = await request(app).post("/api/users/register").send({
+      name: "E2E Test User",
+      email: "test@example.com",
+      password: "password123",
+    });
+
+    expect(response.status).toBe(201);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toHaveProperty("user");
+    expect(response.body.message).toHaveProperty("token");
+
+    authToken = response.body.message.token;
+  });
+
+  it("should login with the registered user", async () => {
+    const response = await request(app).post("/api/users/login").send({
+      email: "test@example.com",
+      password: "password123",
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toHaveProperty("user");
+    expect(response.body.message).toHaveProperty("token");
+
+    authToken = response.body.message.token;
+  });
+
+  it("should get user profile with valid token", async () => {
+    const response = await request(app)
+      .get("/api/profiles")
+      .set("Authorization", `Bearer ${authToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toHaveProperty("user");
+  });
+
+  it("should return 401 for unauthenticated profile access", async () => {
+    const response = await request(app).get("/api/profiles");
+
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+  });
+});
