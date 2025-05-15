@@ -73,5 +73,37 @@ describe('RoadmapService', () => {
       });
     });
   });
+  describe('getRoadmaps', () => {
+    it('should return all roadmaps for a user', async () => {
+      // Setup
+      const userId = 'test-user-id';
+      const roadmaps = [
+        { id: 'roadmap-1', title: 'Roadmap 1', userId },
+        { id: 'roadmap-2', title: 'Roadmap 2', userId }
+      ];
+      
+      roadmapRepository.findAll.mockResolvedValue(roadmaps);
+      
+      // Call the service method
+      const result = await roadmapService.getRoadmaps(userId);
+      
+      // Assert
+      expect(roadmapRepository.findAll).toHaveBeenCalledWith(userId);
+      expect(result).toEqual(roadmaps);
+    });
+    
+    it('should handle errors when fetching roadmaps', async () => {
+      // Setup
+      const userId = 'test-user-id';
+      const error = new Error('Database error');
+      
+      roadmapRepository.findAll.mockRejectedValue(error);
+      
+      // Call and assert
+      await expect(roadmapService.getRoadmaps(userId))
+        .rejects.toThrow(error);
+      expect(roadmapRepository.findAll).toHaveBeenCalledWith(userId);
+    });
+  });
 
 });
