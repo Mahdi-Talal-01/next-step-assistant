@@ -50,6 +50,21 @@ class ProfileService {
       throw error;
     }
   }
+
+  async getAllUserData(userId) {
+    try {
+      const userData = await ProfileRepository.getAllUserData(userId);
+      if (!userData.profile) {
+        throw new Error('User data not found');
+      }
+      return {
+        success: true,
+        data: userData
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 
