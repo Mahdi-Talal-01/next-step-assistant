@@ -143,4 +143,28 @@ describe("Job Routes", () => {
       expect(response.body.success).toBe(false);
     });
   });
+  describe("GET /api/jobs/:jobId", () => {
+    it("should return a specific job", async () => {
+      const response = await request(app)
+        .get(`${BASE_ROUTE}/${testJobs[0].id}`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.id).toBe(testJobs[0].id);
+      expect(JobRepository.getJobById).toHaveBeenCalledWith(
+        testJobs[0].id,
+        testUser.id
+      );
+    });
+
+    it("should return 404 when job is not found", async () => {
+      const response = await request(app)
+        .get(`${BASE_ROUTE}/non-existent-job`)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body.success).toBe(false);
+    });
+  });
 });
