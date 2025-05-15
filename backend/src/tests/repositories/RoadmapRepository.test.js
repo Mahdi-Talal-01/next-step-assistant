@@ -175,4 +175,81 @@ describe("RoadmapRepository", () => {
       expect(prisma.roadmap.findMany).toHaveBeenCalledTimes(1);
     });
   });
+  describe("findById", () => {
+    it("should return a roadmap by its ID", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const roadmap = {
+        id: roadmapId,
+        title: "Test Roadmap",
+        userId: "test-user-id",
+        topics: [
+          {
+            id: "topic-1",
+            name: "Topic 1",
+            resources: [],
+          },
+        ],
+      };
+
+      prisma.roadmap.findUnique.mockResolvedValue(roadmap);
+
+      // Call the repository method
+      const result = await roadmapRepository.findById(roadmapId);
+
+      // Assert
+      expect(prisma.roadmap.findUnique).toHaveBeenCalledWith({
+        where: { id: roadmapId },
+        include: expect.any(Object),
+      });
+      expect(result).toEqual(roadmap);
+    });
+
+    it("should handle numeric ID conversion to string", async () => {
+      // Setup test data
+      const numericId = 123;
+      const roadmap = {
+        id: "123",
+        title: "Test Roadmap",
+      };
+
+      prisma.roadmap.findUnique.mockResolvedValue(roadmap);
+
+      // Call the repository method
+      const result = await roadmapRepository.findById(numericId);
+
+      // Assert
+      expect(prisma.roadmap.findUnique).toHaveBeenCalledWith({
+        where: { id: "123" },
+        include: expect.any(Object),
+      });
+      expect(result).toEqual(roadmap);
+    });
+
+    it("should return null when roadmap is not found", async () => {
+      // Setup test data
+      const roadmapId = "non-existent-roadmap";
+
+      prisma.roadmap.findUnique.mockResolvedValue(null);
+
+      // Call the repository method
+      const result = await roadmapRepository.findById(roadmapId);
+
+      // Assert
+      expect(result).toBeNull();
+    });
+
+    it("should handle errors from the database", async () => {
+      // Setup test data
+      const roadmapId = "roadmap-1";
+      const error = new Error("Database error");
+
+      prisma.roadmap.findUnique.mockRejectedValue(error);
+
+      // Call and assert
+      await expect(roadmapRepository.findById(roadmapId)).rejects.toThrow(
+        error
+      );
+    });
+  });
 });
