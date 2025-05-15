@@ -150,5 +150,76 @@ describe('RoadmapService', () => {
       expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
     });
   });
+  describe('updateRoadmap', () => {
+    it('should update a roadmap successfully', async () => {
+      // Setup
+      const roadmapId = 'roadmap-1';
+      const userId = 'test-user-id';
+      const updateData = {
+        title: 'Updated Roadmap',
+        description: 'Updated Description'
+      };
+      
+      const existingRoadmap = {
+        id: roadmapId,
+        title: 'Test Roadmap',
+        description: 'Test Description',
+        userId
+      };
+      
+      const updatedRoadmap = {
+        ...existingRoadmap,
+        ...updateData
+      };
+      
+      roadmapRepository.findById.mockResolvedValue(existingRoadmap);
+      roadmapRepository.update.mockResolvedValue(updatedRoadmap);
+      
+      // Call the service method
+      const result = await roadmapService.updateRoadmap(roadmapId, userId, updateData);
+      
+      // Assert
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+      expect(roadmapRepository.update).toHaveBeenCalledWith(roadmapId, updateData);
+      expect(result).toEqual(updatedRoadmap);
+    });
+    
+    it('should throw error when roadmap is not found', async () => {
+      // Setup
+      const roadmapId = 'non-existent-roadmap';
+      const userId = 'test-user-id';
+      const updateData = { title: 'Updated Roadmap' };
+      
+      roadmapRepository.findById.mockResolvedValue(null);
+      
+      // Call and assert
+      await expect(roadmapService.updateRoadmap(roadmapId, userId, updateData))
+        .rejects.toThrow('Roadmap not found');
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+      expect(roadmapRepository.update).not.toHaveBeenCalled();
+    });
+    
+    it('should throw error when user is not authorized', async () => {
+      // Setup
+      const roadmapId = 'roadmap-1';
+      const userId = 'test-user-id';
+      const differentUserId = 'different-user-id';
+      const updateData = { title: 'Updated Roadmap' };
+      
+      const existingRoadmap = {
+        id: roadmapId,
+        title: 'Test Roadmap',
+        userId: differentUserId // Different from the requesting user
+      };
+      
+      roadmapRepository.findById.mockResolvedValue(existingRoadmap);
+      
+      // Call and assert
+      await expect(roadmapService.updateRoadmap(roadmapId, userId, updateData))
+        .rejects.toThrow('Unauthorized to update this roadmap');
+      expect(roadmapRepository.findById).toHaveBeenCalledWith(roadmapId);
+      expect(roadmapRepository.update).not.toHaveBeenCalled();
+    });
+  });
 
 });
