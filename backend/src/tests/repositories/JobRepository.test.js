@@ -318,4 +318,109 @@ describe("JobRepository", () => {
       );
     });
   });
+  describe('updateJob', () => {
+    it('should update a job with its skills', async () => {
+      // Setup test data
+      const jobId = 'job-1';
+      const userId = 'user-1';
+      const jobData = {
+        company: 'Updated Company',
+        position: 'Senior Engineer',
+        status: 'Interview',
+        skills: [
+          { skillId: 'skill-1', required: true },
+          { skillId: 'skill-3', required: true }
+        ]
+      };
+      
+      // Mock prisma responses
+      prisma.job.findUnique.mockResolvedValue({ id: jobId, userId });
+      
+      const mockUpdatedJob = {
+        id: jobId,
+        company: jobData.company,
+        position: jobData.position,
+        status: jobData.status,
+        userId,
+        lastUpdated: new Date(),
+        skills: [
+          { 
+            skillId: 'skill-1',
+            required: true,
+            skill: { id: 'skill-1', name: 'JavaScript' }
+          },
+          {
+            skillId: 'skill-3',
+            required: true,
+            skill: { id: 'skill-3', name: 'TypeScript' }
+          }
+        ]
+      };
+      
+      prisma.job.update.mockResolvedValue(mockUpdatedJob);
+      
+      // Call the repository method
+      const result = await JobRepository.updateJob(jobId, userId, jobData);
+      
+      // Assertions
+      expect(prisma.job.findUnique).toHaveBeenCalledWith({
+        where: { id: jobId }
+      });
+      
+      expect(prisma.jobSkill.deleteMany).toHaveBeenCalledWith({
+        where: { jobId }
+      });
+      
+      expect(prisma.job.update).toHaveBeenCalledWith({
+        where: { id: jobId },
+        data: expect.objectContaining({
+          company: jobData.company,
+          position: jobData.position,
+          status: jobData.status,
+          skills: expect.objectContaining({
+            create: expect.arrayContaining([
+              expect.objectContaining({ skillId: 'skill-1', required: true }),
+              expect.objectContaining({ skillId: 'skill-3', required: true })
+            ])
+          })
+        }),
+        include: expect.any(Object)
+      });
+      
+      expect(result).toEqual(expect.objectContaining({
+        id: jobId,
+        company: jobData.company,
+        position: jobData.position,
+        skills: expect.arrayContaining([
+          expect.objectContaining({ skillId: 'skill-1', required: true }),
+          expect.objectContaining({ skillId: 'skill-3', required: true })
+        ])
+      }));
+    });
+    
+    it('should throw an error if job does not exist', async () => {
+      // Setup
+      const jobId = 'non-existent-job';
+      const userId = 'user-1';
+      const jobData = { company: 'Updated Company' };
+      
+      prisma.job.findUnique.mockResolvedValue(null);
+      
+      // Call and assert
+      await expect(JobRepository.updateJob(jobId, userId, jobData)).rejects.toThrow('Job not found');
+    });
+    
+    it('should throw an error if job belongs to a different user', async () => {
+      // Setup
+      const jobId = 'job-1';
+      const userId = 'user-1';
+      const differentUserId = 'different-user';
+      const jobData = { company: 'Updated Company' };
+      
+      prisma.job.findUnique.mockResolvedValue({ id: jobId, userId: differentUserId });
+      
+      // Call and assert
+      await expect(JobRepository.updateJob(jobId, userId, jobData)).rejects.toThrow('Unauthorized');
+    });
+  });
 });
