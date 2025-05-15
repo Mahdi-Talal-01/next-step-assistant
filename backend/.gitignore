@@ -10,6 +10,8 @@ node_modules
 
 storage/cvs/*
 coverage
+.env.test
+.env.test
 
 
 
