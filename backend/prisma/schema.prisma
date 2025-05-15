@@ -25,6 +25,7 @@ model User {
   jobs          Job[]     // One-to-many relation with Job
   roadmaps      Roadmap[] // One-to-many relation with Roadmap
   skills        UserSkill[] // Many-to-many relation with Skill
+  messages      Message[] // One-to-many relation with Message
 }
 
 model Profile {
@@ -180,4 +181,15 @@ model TopicSkill {
   updatedAt   DateTime  @updatedAt
 
   @@unique([topicId, skillId])
+}
+
+// AI Assistant Messages
+model Message {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String    @db.Text
+  type        String    // "user" or "assistant"
+  timestamp   DateTime  @default(now())
+  metadata    String?   @db.Text // Optional JSON string for additional data
 } 

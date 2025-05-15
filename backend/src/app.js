@@ -9,6 +9,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const roadmapRoutes = require('./routes/roadmap');
 const skillRoutes = require('./routes/skillRoutes');
 const contentAssistantRoutes = require('./routes/contentAssistantRoutes');
+const aiAgentRoutes = require('./routes/aiAgentRoutes');
 // Import the environment setup script
 const { checkAndSetGoogleEnv } = require('../setup-env');
 
@@ -56,6 +57,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/roadmaps', roadmapRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/content-assistant', contentAssistantRoutes);
+app.use('/api/ai-agent', aiAgentRoutes);
 
 // Special case for OAuth routes that need to be at root level
 app.use('/', oauthRoutes);

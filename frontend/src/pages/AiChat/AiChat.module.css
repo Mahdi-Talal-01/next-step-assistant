@@ -440,3 +440,54 @@
 .confirmButton:hover {
   background-color: var(--primary-dark);
 }
+
+.unauthorizedContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--bg-color, #f8f9fa);
+}
+
+.unauthorizedMessage {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  text-align: center;
+  max-width: 400px;
+}
+
+.unauthorizedMessage h2 {
+  color: var(--primary-color, #1a73e8);
+  margin-bottom: 1rem;
+}
+
+.unauthorizedMessage p {
+  margin-bottom: 1.5rem;
+  color: var(--text-color, #333);
+}
+
+.loginButton {
+  background-color: var(--primary-color, #1a73e8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.loginButton:hover {
+  background-color: var(--primary-dark, #0d47a1);
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--text-color, #333);
+  font-size: 1.2rem;
+}

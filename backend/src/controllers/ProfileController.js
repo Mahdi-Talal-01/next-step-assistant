@@ -32,19 +32,21 @@ class ProfileController {
 
   async uploadCV(req, res) {
     try {
-      console.log("req.file., req.filef;ile", req.file);
-      if (!req.file) {
-        return ResponseTrait.error(res, 'No file uploaded. Make sure the field name is "cv" in your form-data.');
+      const userId = req.user.id;
+      const file = req.file;
+      
+      if (!file) {
+        return ResponseTrait.badRequest(res, 'No file was uploaded');
       }
 
-      const userId = req.user.id;
-      const fileUrl = fileUploadService.getFileUrl(req.file.filename);
-      const result = await ProfileService.updateResume(userId, fileUrl, req.file.originalname);
+      const result = await ProfileService.updateResume(
+        userId,
+        `/storage/${file.filename}`, 
+        file.originalname
+      );
+      
       return ResponseTrait.success(res, result.data, 'CV uploaded successfully');
     } catch (error) {
-      if (error.name === 'MulterError') {
-        return ResponseTrait.error(res, `File upload error: ${error.message}. Make sure the field name is "cv" in your form-data.`);
-      }
       return ResponseTrait.error(res, error.message);
     }
   }
@@ -58,19 +60,33 @@ class ProfileController {
       return ResponseTrait.error(res, error.message);
     }
   }
-
+  
   async deleteCV(req, res) {
     try {
       const userId = req.user.id;
-      const profile = await ProfileService.getProfile(userId);
+      const profile = await ProfileService.getCV(userId);
       
-      if (profile.data.resumeUrl) {
-        const filename = profile.data.resumeUrl.split('/').pop();
-        fileUploadService.deleteFile(filename);
+      if (!profile.data || !profile.data.resumeUrl) {
+        return ResponseTrait.error(res, 'No CV found');
       }
-
+      
+      // Delete the file from storage
+      await fileUploadService.deleteFile(profile.data.resumeUrl);
+      
+      // Update the profile to remove CV reference
       const result = await ProfileService.updateResume(userId, null, null);
-      return ResponseTrait.success(res, result.data, 'CV deleted successfully');
+      
+      return ResponseTrait.success(res, null, 'CV deleted successfully');
+    } catch (error) {
+      return ResponseTrait.error(res, error.message);
+    }
+  }
+
+  async getAllUserData(req, res) {
+    try {
+      const userId = req.user.id;
+      const result = await ProfileService.getAllUserData(userId);
+      return ResponseTrait.success(res, result.data, 'User data retrieved successfully');
     } catch (error) {
       return ResponseTrait.error(res, error.message);
     }

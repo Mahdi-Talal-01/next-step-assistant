@@ -6,10 +6,17 @@ import styles from '../../AiChat.module.css';
 /**
  * Component for the chat header with title and action buttons
  */
-const ChatHeader = ({ onClearChat, onOpenSettings }) => (
+const ChatHeader = ({ onClearChat, onOpenSettings, onRefresh }) => (
   <div className={styles.chatHeader}>
     <h2>AI Assistant</h2>
     <div className={styles.headerActions}>
+      <button 
+        className={styles.actionButton} 
+        title="Refresh Conversation"
+        onClick={onRefresh}
+      >
+        <Icon icon="mdi:refresh" />
+      </button>
       <button 
         className={styles.actionButton} 
         title="Clear Chat"
@@ -30,7 +37,12 @@ const ChatHeader = ({ onClearChat, onOpenSettings }) => (
 
 ChatHeader.propTypes = {
   onClearChat: PropTypes.func.isRequired,
-  onOpenSettings: PropTypes.func.isRequired
+  onOpenSettings: PropTypes.func.isRequired,
+  onRefresh: PropTypes.func
+};
+
+ChatHeader.defaultProps = {
+  onRefresh: () => {}
 };
 
 export default ChatHeader; 
