@@ -377,5 +377,65 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+  
+  describe("deleteJob", () => {
+    it("should delete a job successfully", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      JobRepository.deleteJob.mockResolvedValue(true);
+
+      // Spy on console.log
+      jest.spyOn(console, "log").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.deleteJob(req, res);
+
+      // Assert
+      expect(JobRepository.deleteJob).toHaveBeenCalledWith(
+        "job-1",
+        "test-user-id"
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job deleted successfully"
+      );
+    });
+
+    it("should return not found when job does not exist", async () => {
+      // Setup
+      req.params.jobId = "non-existent-job";
+      JobRepository.deleteJob.mockResolvedValue(false);
+
+      // Spy on console.log
+      jest.spyOn(console, "log").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.deleteJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(res, "Job not found");
+    });
+
+    it("should handle errors during job deletion", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      const error = new Error("Database error");
+      JobRepository.deleteJob.mockRejectedValue(error);
+
+      // Spy on console
+      jest.spyOn(console, "error").mockImplementation(() => {});
+      jest.spyOn(console, "log").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.deleteJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(
+        res,
+        "Failed to delete job"
+      );
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
 });
 
