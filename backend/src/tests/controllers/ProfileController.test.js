@@ -21,6 +21,7 @@ describe("ProfileController", () => {
     res = {};
     jest.clearAllMocks();
   });
+
   describe("getProfile", () => {
     it("should get user profile successfully", async () => {
       // Setup
@@ -57,6 +58,7 @@ describe("ProfileController", () => {
       expect(ResponseTrait.error).toHaveBeenCalledWith(res, errorMessage);
     });
   });
+
   describe("updateProfile", () => {
     it("should update profile successfully", async () => {
       // Setup
@@ -106,6 +108,7 @@ describe("ProfileController", () => {
       expect(ProfileService.updateProfile).not.toHaveBeenCalled();
     });
   });
+
   describe("uploadCV", () => {
     it("should upload CV successfully", async () => {
       // Setup
@@ -155,6 +158,77 @@ describe("ProfileController", () => {
         expect.stringContaining("No file uploaded")
       );
       expect(ProfileService.updateResume).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("deleteCV", () => {
+    it("should delete CV successfully", async () => {
+      // Setup
+      const resumeUrl = "http://example.com/storage/test-cv.pdf";
+      ProfileService.getProfile = jest.fn().mockResolvedValue({
+        data: {
+          id: "profile-id",
+          userId: "test-user-id",
+          resumeUrl,
+        },
+      });
+
+      ProfileService.updateResume = jest.fn().mockResolvedValue({
+        data: {
+          id: "profile-id",
+          userId: "test-user-id",
+          resumeUrl: null,
+          resumeName: null,
+        },
+      });
+
+      // Execute
+      await ProfileController.deleteCV(req, res);
+
+      // Assert
+      expect(fileUploadService.deleteFile).toHaveBeenCalledWith("test-cv.pdf");
+      expect(ProfileService.updateResume).toHaveBeenCalledWith(
+        "test-user-id",
+        null,
+        null
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({ resumeUrl: null }),
+        "CV deleted successfully"
+      );
+    });
+
+    it("should handle case when profile has no CV", async () => {
+      // Setup
+      ProfileService.getProfile = jest.fn().mockResolvedValue({
+        data: {
+          id: "profile-id",
+          userId: "test-user-id",
+          resumeUrl: null,
+        },
+      });
+
+      ProfileService.updateResume = jest.fn().mockResolvedValue({
+        data: {
+          id: "profile-id",
+          userId: "test-user-id",
+          resumeUrl: null,
+          resumeName: null,
+        },
+      });
+
+      // Execute
+      await ProfileController.deleteCV(req, res);
+
+      // Assert
+      expect(fileUploadService.deleteFile).not.toHaveBeenCalled();
+      expect(ProfileService.updateResume).toHaveBeenCalledWith(
+        "test-user-id",
+        null,
+        null
+      );
+      expect(ResponseTrait.success).toHaveBeenCalled();
     });
   });
 });
