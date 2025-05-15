@@ -9,6 +9,7 @@ jest.mock("../../traits/ResponseTrait");
 describe("RoadmapController", () => {
   // Setup common variables and reset mocks before each test
   let req, res;
+
   beforeEach(() => {
     // Reset all mocks
     jest.clearAllMocks();
@@ -35,6 +36,7 @@ describe("RoadmapController", () => {
     ResponseTrait.notFound = jest.fn();
     ResponseTrait.unauthorized = jest.fn();
   });
+
   describe("createRoadmap", () => {
     it("should create a new roadmap successfully", async () => {
       // Setup
@@ -84,6 +86,7 @@ describe("RoadmapController", () => {
       expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
     });
   });
+
   describe("getRoadmaps", () => {
     it("should return all roadmaps for a user", async () => {
       // Setup
@@ -118,6 +121,7 @@ describe("RoadmapController", () => {
       expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
     });
   });
+
   describe("getRoadmapById", () => {
     it("should return a specific roadmap", async () => {
       // Setup
@@ -157,6 +161,7 @@ describe("RoadmapController", () => {
       expect(ResponseTrait.notFound).toHaveBeenCalledWith(res, error.message);
     });
   });
+
   describe("updateRoadmap", () => {
     it("should update a roadmap successfully", async () => {
       // Setup
@@ -215,6 +220,145 @@ describe("RoadmapController", () => {
 
       // Call the method
       await RoadmapController.updateRoadmap(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
+    });
+  });
+
+  describe("deleteRoadmap", () => {
+    it("should delete a roadmap successfully", async () => {
+      // Setup
+      const roadmapId = "roadmap-1";
+      req.params.id = roadmapId;
+
+      roadmapService.deleteRoadmap.mockResolvedValue(true);
+
+      // Call the method
+      await RoadmapController.deleteRoadmap(req, res);
+
+      // Assert
+      expect(roadmapService.deleteRoadmap).toHaveBeenCalledWith(
+        roadmapId,
+        req.user.id
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Roadmap deleted successfully",
+        null,
+        204
+      );
+    });
+
+    it("should return unauthorized when trying to delete another user's roadmap", async () => {
+      // Setup
+      req.params.id = "roadmap-1";
+      const error = new Error("Unauthorized to delete this roadmap");
+      roadmapService.deleteRoadmap.mockRejectedValue(error);
+
+      // Call the method
+      await RoadmapController.deleteRoadmap(req, res);
+
+      // Assert
+      expect(ResponseTrait.unauthorized).toHaveBeenCalledWith(
+        res,
+        error.message
+      );
+    });
+
+    it("should handle other errors during deletion", async () => {
+      // Setup
+      req.params.id = "roadmap-1";
+      const error = new Error("Database error");
+      roadmapService.deleteRoadmap.mockRejectedValue(error);
+
+      // Call the method
+      await RoadmapController.deleteRoadmap(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
+    });
+  });
+
+  describe("updateTopicStatus", () => {
+    it("should update a topic status successfully", async () => {
+      // Setup
+      req.params.roadmapId = "roadmap-1";
+      req.params.topicId = "topic-1";
+      req.body.status = "completed";
+
+      const updatedTopic = {
+        id: "topic-1",
+        name: "Test Topic",
+        status: "completed",
+        roadmapId: "roadmap-1",
+      };
+
+      roadmapService.updateTopicStatus.mockResolvedValue(updatedTopic);
+
+      // Call the method
+      await RoadmapController.updateTopicStatus(req, res);
+
+      // Assert
+      expect(roadmapService.updateTopicStatus).toHaveBeenCalledWith(
+        req.params.roadmapId,
+        req.params.topicId,
+        req.user.id,
+        req.body.status
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Topic status updated successfully",
+        updatedTopic
+      );
+    });
+
+    it("should return not found when topic does not exist", async () => {
+      // Setup
+      req.params.roadmapId = "roadmap-1";
+      req.params.topicId = "non-existent-topic";
+      req.body.status = "completed";
+
+      const error = new Error("Topic not found");
+      roadmapService.updateTopicStatus.mockRejectedValue(error);
+
+      // Call the method
+      await RoadmapController.updateTopicStatus(req, res);
+
+      // Assert
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(res, error.message);
+    });
+
+    it("should return unauthorized when trying to update topic on another user's roadmap", async () => {
+      // Setup
+      req.params.roadmapId = "roadmap-1";
+      req.params.topicId = "topic-1";
+      req.body.status = "completed";
+
+      const error = new Error("Unauthorized to update this roadmap");
+      roadmapService.updateTopicStatus.mockRejectedValue(error);
+
+      // Call the method
+      await RoadmapController.updateTopicStatus(req, res);
+
+      // Assert
+      expect(ResponseTrait.unauthorized).toHaveBeenCalledWith(
+        res,
+        error.message
+      );
+    });
+
+    it("should handle other errors during topic status update", async () => {
+      // Setup
+      req.params.roadmapId = "roadmap-1";
+      req.params.topicId = "topic-1";
+      req.body.status = "completed";
+
+      const error = new Error("Database error");
+      roadmapService.updateTopicStatus.mockRejectedValue(error);
+
+      // Call the method
+      await RoadmapController.updateTopicStatus(req, res);
 
       // Assert
       expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
