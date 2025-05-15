@@ -57,4 +57,53 @@ describe("ProfileController", () => {
       expect(ResponseTrait.error).toHaveBeenCalledWith(res, errorMessage);
     });
   });
+  describe("updateProfile", () => {
+    it("should update profile successfully", async () => {
+      // Setup
+      const profileData = {
+        bio: "Updated bio",
+        location: "New location",
+      };
+      req.body = profileData;
+
+      ProfileRequest.validate = jest.fn().mockReturnValue({ isValid: true });
+      ProfileService.updateProfile = jest.fn().mockResolvedValue({
+        data: { ...profileData, id: "profile-id", userId: "test-user-id" },
+      });
+
+      // Execute
+      await ProfileController.updateProfile(req, res);
+
+      // Assert
+      expect(ProfileRequest.validate).toHaveBeenCalledWith(req);
+      expect(ProfileService.updateProfile).toHaveBeenCalledWith(
+        "test-user-id",
+        profileData
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining(profileData),
+        "Profile updated successfully"
+      );
+    });
+
+    it("should return validation error when invalid data provided", async () => {
+      // Setup
+      const validationErrors = { bio: "Bio is too long" };
+      ProfileRequest.validate = jest.fn().mockReturnValue({
+        isValid: false,
+        errors: validationErrors,
+      });
+
+      // Execute
+      await ProfileController.updateProfile(req, res);
+
+      // Assert
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        validationErrors
+      );
+      expect(ProfileService.updateProfile).not.toHaveBeenCalled();
+    });
+  });
 });
