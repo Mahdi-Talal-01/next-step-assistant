@@ -293,4 +293,37 @@ describe('skillRepository', () => {
       expect(result).toEqual(deletedSkill);
     });
   });
+    // User Skill operations tests
+    describe('addUserSkill', () => {
+      it('should add a skill to a user', async () => {
+        // Setup
+        const userId = 'user-1';
+        const skillId = 'skill-1';
+        const level = 3;
+        
+        const userSkill = {
+          userId,
+          skillId,
+          level,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        
+        prisma.userSkill.create.mockResolvedValue(userSkill);
+        
+        // Call the repository method
+        const result = await skillRepository.addUserSkill(userId, skillId, level);
+        
+        // Assertions
+        expect(prisma.userSkill.create).toHaveBeenCalledWith({
+          data: {
+            userId,
+            skillId,
+            level
+          }
+        });
+        
+        expect(result).toEqual(userSkill);
+      });
+    });
 });
