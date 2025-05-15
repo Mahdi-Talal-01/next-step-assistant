@@ -119,6 +119,59 @@ describe('RoadmapRequest', () => {
       );
     });
   });
-  
+  describe('validateUpdate', () => {
+    it('should call next() for valid update data', () => {
+      // Setup valid update data
+      req.body = {
+        title: 'Updated Roadmap',
+        description: 'Updated Description',
+        icon: 'updated-icon',
+        color: '#000000',
+        estimatedTime: '3 weeks',
+        difficulty: 'hard',
+        topics: [
+          {
+            name: 'Updated Topic',
+            status: 'in-progress',
+            resources: [
+              { name: 'Updated Resource', url: 'https://example.com/updated' }
+            ]
+          }
+        ]
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateUpdate(req, res, next);
+      
+      // Assert
+      expect(next).toHaveBeenCalled();
+      expect(ResponseTrait.validationError).not.toHaveBeenCalled();
+    });
+    
+    it('should validate required fields are present', () => {
+      // Setup invalid update data
+      req.body = {
+        // Missing all required fields
+      };
+      
+      // Call the validator
+      RoadmapRequest.validateUpdate(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(ResponseTrait.validationError).toHaveBeenCalledWith(
+        res,
+        expect.objectContaining({
+          title: expect.any(String),
+          description: expect.any(String),
+          icon: expect.any(String),
+          color: expect.any(String),
+          estimatedTime: expect.any(String),
+          difficulty: expect.any(String),
+          topics: expect.any(String)
+        })
+      );
+    });
+  });
 
 }); 
