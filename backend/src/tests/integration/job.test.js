@@ -1,3 +1,26 @@
+const request = require("supertest");
+const jwt = require("jsonwebtoken");
+
+// Mock the auth middleware first
+jest.mock("../../middleware/auth", () => {
+  return jest.fn((req, res, next) => {
+    req.user = { id: "test-user-id", email: "test@example.com" };
+    next();
+  });
+});
+
+// Mock the repositories
+jest.mock("../../repositories/JobRepository");
+jest.mock("../../repositories/skillRepository");
+
+// Import after mocking
+const app = require("../../app");
+const JobRepository = require("../../repositories/JobRepository");
+const skillRepository = require("../../repositories/skillRepository");
+
+// Define the base route prefix
+const BASE_ROUTE = "/api/jobs";
+
 describe("Job Routes", () => {
   // Test user to be used for authentication
   const testUser = {
