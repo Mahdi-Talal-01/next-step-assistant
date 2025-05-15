@@ -147,3 +147,11 @@ jest.mock("../../services/UserService", () => ({
   }),
   generateToken: jest.fn().mockReturnValue("mock-jwt-token"),
 }));
+
+// Add JWT mock to create proper token structure
+jest.mock("jsonwebtoken", () => ({
+  sign: jest.fn().mockReturnValue("mock-jwt-token"),
+  verify: jest
+    .fn()
+    .mockReturnValue({ userId: "test-id", email: "test@example.com" }),
+}));
