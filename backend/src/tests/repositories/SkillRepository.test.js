@@ -271,4 +271,26 @@ describe('skillRepository', () => {
       expect(result).toEqual(updatedSkill);
     });
   });
+  describe('deleteSkill', () => {
+    it('should delete a skill', async () => {
+      // Setup
+      const skillId = 'skill-1';
+      const deletedSkill = {
+        id: skillId,
+        name: 'JavaScript'
+      };
+      
+      prisma.skill.delete.mockResolvedValue(deletedSkill);
+      
+      // Call the repository method
+      const result = await skillRepository.deleteSkill(skillId);
+      
+      // Assertions
+      expect(prisma.skill.delete).toHaveBeenCalledWith({
+        where: { id: skillId }
+      });
+      
+      expect(result).toEqual(deletedSkill);
+    });
+  });
 });
