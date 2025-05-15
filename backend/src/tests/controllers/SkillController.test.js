@@ -250,4 +250,184 @@ describe("SkillController", () => {
       );
     });
   });
+  // User Skills operations tests
+  describe("addUserSkill", () => {
+    it("should add a skill to a user successfully", async () => {
+      // Setup
+      req.body = { userId: "user-1", skillId: "skill-1", level: 3 };
+      const userSkill = { id: "user-skill-1", ...req.body };
+      skillService.addUserSkill.mockResolvedValue(userSkill);
+
+      // Call the method
+      await SkillController.addUserSkill(req, res);
+
+      // Assert
+      expect(skillService.addUserSkill).toHaveBeenCalledWith(
+        "user-1",
+        "skill-1",
+        3
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "User skill added successfully",
+        userSkill,
+        201
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.body = { userId: "user-1", skillId: "non-existent-skill", level: 3 };
+      const error = new Error("Skill not found");
+      skillService.addUserSkill.mockRejectedValue(error);
+
+      // Call the method
+      await SkillController.addUserSkill(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Skill not found"
+      );
+    });
+  });
+  describe("getUserSkills", () => {
+    it("should return skills for a specific user", async () => {
+      // Setup
+      req.params.userId = "user-1";
+      const skills = [
+        {
+          skillId: "skill-1",
+          level: 3,
+          skill: { id: "skill-1", name: "JavaScript" },
+        },
+        {
+          skillId: "skill-2",
+          level: 2,
+          skill: { id: "skill-2", name: "Python" },
+        },
+      ];
+      skillService.getUserSkills.mockResolvedValue(skills);
+
+      // Call the method
+      await SkillController.getUserSkills(req, res);
+
+      // Assert
+      expect(skillService.getUserSkills).toHaveBeenCalledWith("user-1");
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "User skills retrieved successfully",
+        skills
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.params.userId = "user-1";
+      const error = new Error("Database error");
+      skillService.getUserSkills.mockRejectedValue(error);
+
+      // Call the method
+      await SkillController.getUserSkills(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Database error"
+      );
+    });
+  });
+
+  // Job Skills operations tests
+  describe("addJobSkill", () => {
+    it("should add a skill to a job successfully", async () => {
+      // Setup
+      req.body = { jobId: "job-1", skillId: "skill-1", required: true };
+      const jobSkill = { id: "job-skill-1", ...req.body };
+      skillService.addJobSkill.mockResolvedValue(jobSkill);
+
+      // Call the method
+      await SkillController.addJobSkill(req, res);
+
+      // Assert
+      expect(skillService.addJobSkill).toHaveBeenCalledWith(
+        "job-1",
+        "skill-1",
+        true
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job skill added successfully",
+        jobSkill,
+        201
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.body = {
+        jobId: "job-1",
+        skillId: "non-existent-skill",
+        required: true,
+      };
+      const error = new Error("Skill not found");
+      skillService.addJobSkill.mockRejectedValue(error);
+
+      // Call the method
+      await SkillController.addJobSkill(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Skill not found"
+      );
+    });
+  });
+
+  describe("getJobSkills", () => {
+    it("should return skills for a specific job", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      const skills = [
+        {
+          skillId: "skill-1",
+          required: true,
+          skill: { id: "skill-1", name: "JavaScript" },
+        },
+        {
+          skillId: "skill-2",
+          required: false,
+          skill: { id: "skill-2", name: "Python" },
+        },
+      ];
+      skillService.getJobSkills.mockResolvedValue(skills);
+
+      // Call the method
+      await SkillController.getJobSkills(req, res);
+
+      // Assert
+      expect(skillService.getJobSkills).toHaveBeenCalledWith("job-1");
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job skills retrieved successfully",
+        skills
+      );
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      const error = new Error("Database error");
+      skillService.getJobSkills.mockRejectedValue(error);
+
+      // Call the method
+      await SkillController.getJobSkills(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
+        res,
+        "Database error"
+      );
+    });
+  });
 });
