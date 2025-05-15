@@ -34,6 +34,7 @@ describe("JobController", () => {
     ResponseTrait.notFound = jest.fn();
     ResponseTrait.badRequest = jest.fn();
   });
+
   describe("getJobs", () => {
     it("should return all jobs for the authenticated user", async () => {
       // Mock data
@@ -78,6 +79,7 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+
   describe("getJob", () => {
     it("should return a specific job", async () => {
       // Mock data
@@ -134,6 +136,7 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+
   describe("createJob", () => {
     it("should create a new job successfully", async () => {
       // Setup
@@ -271,6 +274,7 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+
   describe("updateJob", () => {
     it("should update a job successfully", async () => {
       // Setup
@@ -377,7 +381,7 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
-  
+
   describe("deleteJob", () => {
     it("should delete a job successfully", async () => {
       // Setup
@@ -437,6 +441,7 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+
   describe("getJobStats", () => {
     it("should return job statistics for the user", async () => {
       // Mock data
@@ -483,5 +488,68 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
-});
 
+  describe("getJobSkills", () => {
+    it("should return skills for a specific job", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      const job = { id: "job-1", title: "Software Engineer" };
+      const skills = [
+        { id: "skill-1", name: "JavaScript", required: true },
+        { id: "skill-2", name: "React", required: false },
+      ];
+
+      // Setup mocks
+      JobRepository.getJobById.mockResolvedValue(job);
+      skillRepository.getJobSkills.mockResolvedValue(skills);
+
+      // Call the method
+      await JobController.getJobSkills(req, res);
+
+      // Assert
+      expect(JobRepository.getJobById).toHaveBeenCalledWith(
+        "job-1",
+        "test-user-id"
+      );
+      expect(skillRepository.getJobSkills).toHaveBeenCalledWith("job-1");
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job skills fetched successfully",
+        skills
+      );
+    });
+
+    it("should return not found when job does not exist", async () => {
+      // Setup
+      req.params.jobId = "non-existent-job";
+      JobRepository.getJobById.mockResolvedValue(null);
+
+      // Call the method
+      await JobController.getJobSkills(req, res);
+
+      // Assert
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(res, "Job not found");
+      expect(skillRepository.getJobSkills).not.toHaveBeenCalled();
+    });
+
+    it("should handle errors", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      const error = new Error("Database error");
+      JobRepository.getJobById.mockRejectedValue(error);
+
+      // Spy on console.error
+      jest.spyOn(console, "error").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.getJobSkills(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(
+        res,
+        "Failed to fetch job skills"
+      );
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
+});
