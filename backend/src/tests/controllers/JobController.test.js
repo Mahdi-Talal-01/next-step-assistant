@@ -271,5 +271,111 @@ describe("JobController", () => {
       expect(console.error).toHaveBeenCalled();
     });
   });
+  describe("updateJob", () => {
+    it("should update a job successfully", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      req.body = {
+        company: "Updated Company",
+        position: "Senior Engineer",
+        status: "Interview",
+        skills: [
+          { name: "JavaScript", required: true },
+          { name: "TypeScript", required: true },
+        ],
+      };
+
+      const updatedJob = {
+        id: "job-1",
+        company: "Updated Company",
+        position: "Senior Engineer",
+        status: "Interview",
+        skills: [
+          { skillId: "skill-1", required: true },
+          { skillId: "skill-3", required: true },
+        ],
+      };
+
+      // Mock skill creation
+      skillRepository.createSkill.mockImplementation(async (skillData) => {
+        return {
+          id: skillData.name === "JavaScript" ? "skill-1" : "skill-3",
+          name: skillData.name,
+        };
+      });
+
+      // Mock job update
+      JobRepository.updateJob.mockResolvedValue(updatedJob);
+
+      // Spy on console.log
+      jest.spyOn(console, "log").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.updateJob(req, res);
+
+      // Assert
+      expect(skillRepository.createSkill).toHaveBeenCalledTimes(2);
+      expect(JobRepository.updateJob).toHaveBeenCalledWith(
+        "job-1",
+        "test-user-id",
+        expect.objectContaining({
+          company: "Updated Company",
+          position: "Senior Engineer",
+          status: "Interview",
+          skills: expect.arrayContaining([
+            expect.objectContaining({ skillId: "skill-1", required: true }),
+            expect.objectContaining({ skillId: "skill-3", required: true }),
+          ]),
+        })
+      );
+
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Job updated successfully",
+        updatedJob
+      );
+    });
+
+    it("should return not found when job does not exist", async () => {
+      // Setup
+      req.params.jobId = "non-existent-job";
+      req.body = {
+        company: "Updated Company",
+        position: "Senior Engineer",
+        status: "Interview",
+      };
+
+      JobRepository.updateJob.mockResolvedValue(null);
+
+      // Call the method
+      await JobController.updateJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(res, "Job not found");
+    });
+
+    it("should handle errors during job update", async () => {
+      // Setup
+      req.params.jobId = "job-1";
+      req.body = {
+        company: "Updated Company",
+        position: "Senior Engineer",
+        status: "Interview",
+      };
+
+      const error = new Error("Database error");
+      JobRepository.updateJob.mockRejectedValue(error);
+
+      // Spy on console.error
+      jest.spyOn(console, "error").mockImplementation(() => {});
+
+      // Call the method
+      await JobController.updateJob(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(res, "Database error");
+      expect(console.error).toHaveBeenCalled();
+    });
+  });
 });
 
