@@ -202,4 +202,59 @@ describe("Skill Request Validators", () => {
       }));
     });
   });
+  describe('validateJobSkill', () => {
+    it('should pass validation with valid job skill data', () => {
+      // Setup
+      req.body = {
+        jobId: '123e4567-e89b-12d3-a456-426614174000',
+        skillId: '123e4567-e89b-12d3-a456-426614174000',
+        required: true
+      };
+      
+      // Call the validator
+      validateJobSkill(req, res, next);
+      
+      // Assert
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+    
+    it('should fail validation when jobId is missing', () => {
+      // Setup
+      req.body = {
+        skillId: '123e4567-e89b-12d3-a456-426614174000',
+        required: true
+      };
+      
+      // Call the validator
+      validateJobSkill(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        error: expect.stringContaining('jobId')
+      }));
+    });
+    
+    it('should fail validation when required is not a boolean', () => {
+      // Setup
+      req.body = {
+        jobId: '123e4567-e89b-12d3-a456-426614174000',
+        skillId: '123e4567-e89b-12d3-a456-426614174000',
+        required: 'yes' // Not a boolean
+      };
+      
+      // Call the validator
+      validateJobSkill(req, res, next);
+      
+      // Assert
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        error: expect.stringContaining('required')
+      }));
+    });
+  });
+  
 });
