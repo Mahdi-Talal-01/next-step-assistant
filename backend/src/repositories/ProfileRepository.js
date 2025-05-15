@@ -62,6 +62,33 @@ class ProfileRepository {
       throw error;
     }
   }
+
+  async getAllUserData(userId) {
+    try {
+      // Get user profile with basic user info
+      const profile = await prisma.profile.findUnique({
+        where: { userId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
+        }
+      });
+
+    
+
+      // Return consolidated user data
+      return {
+        profile,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new ProfileRepository(); 
