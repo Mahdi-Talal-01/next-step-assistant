@@ -116,4 +116,31 @@ describe("Job Routes", () => {
       return null;
     });
   });
+  describe("GET /api/jobs", () => {
+    it("should return all jobs for the authenticated user", async () => {
+      const response = await request(app)
+        .get(BASE_ROUTE)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body.data.length).toBe(testJobs.length);
+      expect(JobRepository.getJobsByUserId).toHaveBeenCalledWith(testUser.id);
+    });
+
+    it("should handle errors when fetching jobs", async () => {
+      // Setup mock to throw error
+      JobRepository.getJobsByUserId.mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const response = await request(app)
+        .get(BASE_ROUTE)
+        .set("Authorization", `Bearer ${authToken}`);
+
+      expect(response.status).toBe(500);
+      expect(response.body.success).toBe(false);
+    });
+  });
 });
