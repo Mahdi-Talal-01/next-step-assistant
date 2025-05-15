@@ -126,4 +126,18 @@ describe('ProfileRequest', () => {
       expect(Object.keys(result.errors).length).toBe(0);
     });
   });
+  describe('isValidPhone', () => {
+    it('should validate correct phone numbers', () => {
+      expect(ProfileRequest.isValidPhone('+1234567890')).toBe(true);
+      expect(ProfileRequest.isValidPhone('1234567890')).toBe(true);
+      expect(ProfileRequest.isValidPhone('+1 234 567 890')).toBe(true);
+      expect(ProfileRequest.isValidPhone('+1-234-567-890')).toBe(true);
+    });
+
+    it('should reject invalid phone numbers', () => {
+      expect(ProfileRequest.isValidPhone('123')).toBe(false); // too short
+      expect(ProfileRequest.isValidPhone('abcdefghij')).toBe(false); // not numeric
+      expect(ProfileRequest.isValidPhone('123@456#789')).toBe(false); // invalid chars
+    });
+  });
 });
