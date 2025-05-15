@@ -219,4 +219,26 @@ describe('skillRepository', () => {
       expect(result).toBeNull();
     });
   });
+  describe('getAllSkills', () => {
+    it('should return all skills ordered by name', async () => {
+      // Setup
+      const skills = [
+        { id: 'skill-1', name: 'JavaScript' },
+        { id: 'skill-2', name: 'Python' }
+      ];
+      
+      prisma.skill.findMany.mockResolvedValue(skills);
+      
+      // Call the repository method
+      const result = await skillRepository.getAllSkills();
+      
+      // Assertions
+      expect(prisma.skill.findMany).toHaveBeenCalledWith({
+        orderBy: { name: 'asc' }
+      });
+      
+      expect(result).toEqual(skills);
+      expect(result.length).toBe(skills.length);
+    });
+  });
 });
