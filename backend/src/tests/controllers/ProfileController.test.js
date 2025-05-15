@@ -21,4 +21,40 @@ describe("ProfileController", () => {
     res = {};
     jest.clearAllMocks();
   });
+  describe("getProfile", () => {
+    it("should get user profile successfully", async () => {
+      // Setup
+      const profileData = {
+        id: "profile-id",
+        userId: "test-user-id",
+        bio: "Test bio",
+        location: "Test location",
+      };
+
+      ProfileService.getProfile = jest.fn().mockResolvedValue({
+        data: profileData,
+      });
+
+      // Execute
+      await ProfileController.getProfile(req, res);
+
+      // Assert
+      expect(ProfileService.getProfile).toHaveBeenCalledWith("test-user-id");
+      expect(ResponseTrait.success).toHaveBeenCalledWith(res, profileData);
+    });
+
+    it("should handle errors when getting profile", async () => {
+      // Setup
+      const errorMessage = "Profile not found";
+      ProfileService.getProfile = jest
+        .fn()
+        .mockRejectedValue(new Error(errorMessage));
+
+      // Execute
+      await ProfileController.getProfile(req, res);
+
+      // Assert
+      expect(ResponseTrait.error).toHaveBeenCalledWith(res, errorMessage);
+    });
+  });
 });
