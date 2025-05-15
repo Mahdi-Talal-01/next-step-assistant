@@ -169,4 +169,27 @@ describe("Skill Routes", () => {
       expect(response.body.success).toBe(false);
     });
   });
+  describe("GET /api/skills/:id", () => {
+    it('should return a specific skill', async () => {
+      const response = await request(app)
+        .get(`${BASE_ROUTE}/${testSkills[0].id}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.id).toBe(testSkills[0].id);
+      expect(skillRepository.getSkillById).toHaveBeenCalledWith(testSkills[0].id);
+    });
+
+    it('should return error when skill is not found', async () => {
+      // We need to mock the behavior to throw an error like the service does
+      skillRepository.getSkillById.mockRejectedValueOnce(new Error('Skill not found'));
+
+      const response = await request(app)
+        .get(`${BASE_ROUTE}/non-existent-skill`);
+
+      expect(response.status).toBe(400);
+      // The response format might be error or message depending on how the controller handles it
+      expect(response.body.error || response.body.message).toBeTruthy();
+    });
+  });
 });
