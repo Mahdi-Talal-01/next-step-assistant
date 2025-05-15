@@ -118,23 +118,23 @@ describe("RoadmapController", () => {
       expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
     });
   });
-  describe('getRoadmapById', () => {
-    it('should return a specific roadmap', async () => {
+  describe("getRoadmapById", () => {
+    it("should return a specific roadmap", async () => {
       // Setup
-      const roadmapId = 'roadmap-1';
+      const roadmapId = "roadmap-1";
       req.params.id = roadmapId;
-      
+
       const roadmap = {
         id: roadmapId,
-        title: 'Test Roadmap',
-        userId: req.user.id
+        title: "Test Roadmap",
+        userId: req.user.id,
       };
-      
+
       roadmapService.getRoadmapById.mockResolvedValue(roadmap);
-      
+
       // Call the method
       await RoadmapController.getRoadmapById(req, res);
-      
+
       // Assert
       expect(roadmapService.getRoadmapById).toHaveBeenCalledWith(roadmapId);
       expect(ResponseTrait.success).toHaveBeenCalledWith(
@@ -143,21 +143,81 @@ describe("RoadmapController", () => {
         roadmap
       );
     });
-    
-    it('should return not found when roadmap does not exist', async () => {
+
+    it("should return not found when roadmap does not exist", async () => {
       // Setup
-      req.params.id = 'non-existent-roadmap';
-      const error = new Error('Roadmap not found');
+      req.params.id = "non-existent-roadmap";
+      const error = new Error("Roadmap not found");
       roadmapService.getRoadmapById.mockRejectedValue(error);
-      
+
       // Call the method
       await RoadmapController.getRoadmapById(req, res);
-      
+
       // Assert
-      expect(ResponseTrait.notFound).toHaveBeenCalledWith(
+      expect(ResponseTrait.notFound).toHaveBeenCalledWith(res, error.message);
+    });
+  });
+  describe("updateRoadmap", () => {
+    it("should update a roadmap successfully", async () => {
+      // Setup
+      const roadmapId = "roadmap-1";
+      req.params.id = roadmapId;
+      req.body = {
+        title: "Updated Roadmap",
+        description: "Updated Description",
+      };
+
+      const updatedRoadmap = {
+        id: roadmapId,
+        ...req.body,
+        userId: req.user.id,
+      };
+
+      roadmapService.updateRoadmap.mockResolvedValue(updatedRoadmap);
+
+      // Call the method
+      await RoadmapController.updateRoadmap(req, res);
+
+      // Assert
+      expect(roadmapService.updateRoadmap).toHaveBeenCalledWith(
+        roadmapId,
+        req.user.id,
+        req.body
+      );
+      expect(ResponseTrait.success).toHaveBeenCalledWith(
+        res,
+        "Roadmap updated successfully",
+        updatedRoadmap
+      );
+    });
+
+    it("should return unauthorized when trying to update another user's roadmap", async () => {
+      // Setup
+      req.params.id = "roadmap-1";
+      const error = new Error("Unauthorized to update this roadmap");
+      roadmapService.updateRoadmap.mockRejectedValue(error);
+
+      // Call the method
+      await RoadmapController.updateRoadmap(req, res);
+
+      // Assert
+      expect(ResponseTrait.unauthorized).toHaveBeenCalledWith(
         res,
         error.message
       );
+    });
+
+    it("should handle other errors during update", async () => {
+      // Setup
+      req.params.id = "roadmap-1";
+      const error = new Error("Database error");
+      roadmapService.updateRoadmap.mockRejectedValue(error);
+
+      // Call the method
+      await RoadmapController.updateRoadmap(req, res);
+
+      // Assert
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(res, error.message);
     });
   });
 });
