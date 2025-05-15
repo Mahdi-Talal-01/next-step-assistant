@@ -105,3 +105,33 @@ jest.mock("../../repositories/UserRepository", () => ({
     },
   }),
 }));
+jest.mock("../../repositories/UserRepository", () => ({
+  findById: jest.fn().mockResolvedValue({
+    id: "test-id",
+    name: "E2E Test User",
+    email: "test@example.com",
+    profile: {
+      id: "profile-test-id",
+      bio: "Test bio",
+    },
+  }),
+  findByEmail: jest.fn().mockResolvedValue({
+    id: "test-id",
+    name: "E2E Test User",
+    email: "test@example.com",
+    password: "hashed-password",
+    profile: {
+      id: "profile-test-id",
+      bio: "Test bio",
+    },
+  }),
+  createUser: jest.fn().mockResolvedValue({
+    id: "test-id",
+    name: "E2E Test User",
+    email: "test@example.com",
+    profile: {
+      id: "profile-test-id",
+      bio: "Test bio",
+    },
+  }),
+}));
