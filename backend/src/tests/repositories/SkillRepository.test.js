@@ -362,4 +362,41 @@ describe("skillRepository", () => {
       expect(result.length).toBe(userSkills.length);
     });
   });
+  // Job Skill operations tests
+  describe("addJobSkill", () => {
+    it("should add a skill to a job", async () => {
+      // Setup
+      const jobId = "job-1";
+      const skillId = "skill-1";
+      const required = true;
+
+      const jobSkill = {
+        jobId,
+        skillId,
+        required,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      prisma.jobSkill.create.mockResolvedValue(jobSkill);
+
+      // Call the repository method
+      const result = await skillRepository.addJobSkill(
+        jobId,
+        skillId,
+        required
+      );
+
+      // Assertions
+      expect(prisma.jobSkill.create).toHaveBeenCalledWith({
+        data: {
+          jobId,
+          skillId,
+          required,
+        },
+      });
+
+      expect(result).toEqual(jobSkill);
+    });
+  });
 });
