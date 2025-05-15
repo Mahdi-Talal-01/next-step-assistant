@@ -58,7 +58,6 @@ jest.mock("../../traits/ResponseTrait", () => {
     notFound: jest.fn(),
     badRequest: jest.fn(),
   };
-  
 });
 
 jest.mock("../../repositories/ProfileRepository", () => ({
@@ -74,4 +73,35 @@ jest.mock("../../repositories/ProfileRepository", () => ({
   updateProfile: jest.fn(),
   getCV: jest.fn(),
   updateResume: jest.fn(),
+}));
+// Mock UserRepository
+jest.mock("../../repositories/UserRepository", () => ({
+  findById: jest.fn().mockResolvedValue({
+    id: "test-id",
+    name: "E2E Test User",
+    email: "test@example.com",
+    profile: {
+      id: "profile-test-id",
+      bio: "Test bio",
+    },
+  }),
+  findByEmail: jest.fn().mockResolvedValue({
+    id: "test-id",
+    name: "E2E Test User",
+    email: "test@example.com",
+    password: "hashed-password",
+    profile: {
+      id: "profile-test-id",
+      bio: "Test bio",
+    },
+  }),
+  createUser: jest.fn().mockResolvedValue({
+    id: "test-id",
+    name: "E2E Test User",
+    email: "test@example.com",
+    profile: {
+      id: "profile-test-id",
+      bio: "Test bio",
+    },
+  }),
 }));
