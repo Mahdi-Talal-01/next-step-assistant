@@ -34,5 +34,33 @@ describe("FileUploadService", () => {
       expect(url).toBe('/storage/cvs/test-cv.pdf');
     });
   });
+  describe('deleteFile', () => {
+    it('should delete file if it exists', () => {
+      // Setup
+      const filename = 'test-cv.pdf';
+      fs.existsSync.mockReturnValueOnce(true);
+      
+      // Execute
+      fileUploadService.deleteFile(filename);
+      
+      // Assert
+      expect(path.join).toHaveBeenCalledWith(expect.any(String), '../../storage/cvs', filename);
+      expect(fs.existsSync).toHaveBeenCalled();
+      expect(fs.unlinkSync).toHaveBeenCalled();
+    });
+    
+    it('should not attempt to delete file if it does not exist', () => {
+      // Setup
+      const filename = 'nonexistent-cv.pdf';
+      fs.existsSync.mockReturnValueOnce(false);
+      
+      // Execute
+      fileUploadService.deleteFile(filename);
+      
+      // Assert
+      expect(fs.existsSync).toHaveBeenCalled();
+      expect(fs.unlinkSync).not.toHaveBeenCalled();
+    });
+  });
 
 });
