@@ -25,5 +25,14 @@ describe("FileUploadService", () => {
     fs.mkdirSync.mockImplementation(() => {});
     fs.unlinkSync.mockImplementation(() => {});
   });
-  
+  describe('getFileUrl', () => {
+    it('should return the correct URL for a given filename', () => {
+      // Execute
+      const url = fileUploadService.getFileUrl('test-cv.pdf');
+      
+      // Assert
+      expect(url).toBe('/storage/cvs/test-cv.pdf');
+    });
+  });
+
 });
