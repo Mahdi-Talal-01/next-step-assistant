@@ -125,6 +125,12 @@
     </td>
   </tr>
   <tr>
+    <td><strong>Containerization</strong></td>
+    <td>
+      <img src="https://img.shields.io/badge/-Docker-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker"/>
+    </td>
+  </tr>
+  <tr>
     <td><strong>Testing</strong></td>
     <td>
       <img src="https://img.shields.io/badge/-Jest-C21325?style=flat&logo=jest&logoColor=white" alt="Jest"/>
