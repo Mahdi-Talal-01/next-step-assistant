@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
+import ReactMarkdown from 'react-markdown';
 import styles from '../../AiChat.module.css';
 import { MessageType } from '../../hooks/useChat';
 
@@ -16,7 +17,13 @@ const Message = ({ message, type }) => (
         </div>
       )}
       <div className={styles.textContent}>
-        <p>{message.text}</p>
+        {type === MessageType.USER ? (
+          <p>{message.text}</p>
+        ) : (
+          <div className={styles.markdownContent}>
+            <ReactMarkdown>{message.text}</ReactMarkdown>
+          </div>
+        )}
         {message.timestamp && (
           <span className={styles.timestamp}>
             {new Date(message.timestamp).toLocaleTimeString()}

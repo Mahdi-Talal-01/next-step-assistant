@@ -14,12 +14,28 @@ class AIAgentService {
       // Get webhook URL from environment variables
       const webhookUrl = process.env.N8N_WEBHOOK_URL;
 
-      if (!webhookUrl) {
-        throw new Error("N8N_WEBHOOK_URL environment variable is not set");
-      }
-
       // Save the user message to the database
       await MessageRepository.saveMessage(userId, message, "user");
+
+      if (!webhookUrl) {
+        console.warn("N8N_WEBHOOK_URL environment variable is not set - using fallback response");
+        
+        // Provide a fallback response when webhook URL is not configured
+        const fallbackResponse = "I'm sorry, the AI assistant is not configured properly. The N8N_WEBHOOK_URL environment variable is missing. Please contact the administrator.";
+        
+        // Save the fallback response to the database
+        await MessageRepository.saveMessage(
+          userId,
+          fallbackResponse,
+          "assistant",
+          { error: "N8N_WEBHOOK_URL missing" }
+        );
+        
+        return {
+          success: true,
+          data: { output: fallbackResponse }
+        };
+      }
 
       // Create simplified payload with just message and user data
       const payload = {
@@ -92,6 +108,20 @@ class AIAgentService {
       };
     } catch (error) {
       console.error("Error in AI agent service:", error);
+      
+      try {
+        // Save the error message to the database
+        const errorMessage = "Sorry, there was an error processing your request. Please try again later.";
+        await MessageRepository.saveMessage(
+          userId,
+          errorMessage,
+          "assistant",
+          { error: error.message || "Unknown error" }
+        );
+      } catch (dbError) {
+        console.error("Failed to save error message to database:", dbError);
+      }
+      
       throw error;
     }
   }
