@@ -1,7 +1,7 @@
 .chatContainer {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 80px);
+  height: 100vh;
   width: 100%;
   background-color: var(--card-bg);
   position: relative;
@@ -490,4 +490,131 @@
   height: 100vh;
   color: var(--text-color, #333);
   font-size: 1.2rem;
+}
+
+/* Markdown Content Styling */
+.markdownContent {
+  width: 100%;
+  overflow-wrap: break-word;
+}
+
+.markdownContent h1, 
+.markdownContent h2, 
+.markdownContent h3, 
+.markdownContent h4 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.markdownContent h1 {
+  font-size: 1.5em;
+}
+
+.markdownContent h2 {
+  font-size: 1.3em;
+}
+
+.markdownContent h3 {
+  font-size: 1.1em;
+}
+
+.markdownContent p {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.markdownContent ul, 
+.markdownContent ol {
+  margin-left: 20px;
+  margin-bottom: 12px;
+}
+
+.markdownContent li {
+  margin-bottom: 4px;
+}
+
+.markdownContent strong {
+  font-weight: 600;
+}
+
+.markdownContent em {
+  font-style: italic;
+}
+
+.markdownContent pre {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.markdownContent code {
+  font-family: monospace;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.markdownContent blockquote {
+  border-left: 4px solid #ccc;
+  padding-left: 16px;
+  margin-left: 0;
+  margin-bottom: 12px;
+  color: #666;
+}
+
+.markdownContent a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.markdownContent img {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+}
+
+.markdownContent table {
+  border-collapse: collapse;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.markdownContent table th,
+.markdownContent table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.markdownContent table th {
+  background-color: rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+/* Make sure numbered lists have proper numbering */
+.markdownContent ol {
+  list-style-type: decimal;
+}
+
+/* Make sure bulleted lists have proper bullets */
+.markdownContent ul {
+  list-style-type: disc;
+}
+
+.markdownContent ul ul {
+  list-style-type: circle;
+}
+
+/* Add space between paragraphs */
+.markdownContent p + p {
+  margin-top: 12px;
+}
+
+/* Add specific styling for the AI assistant messages containing markdown */
+.aiMessage .markdownContent {
+  color: #333;
 }

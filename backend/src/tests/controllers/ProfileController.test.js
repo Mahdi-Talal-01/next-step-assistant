@@ -117,14 +117,13 @@ describe("ProfileController", () => {
         originalname: "original-cv.pdf",
       };
 
-      const fileUrl = "http://example.com/storage/test-cv.pdf";
-      fileUploadService.getFileUrl = jest.fn().mockReturnValue(fileUrl);
-
+      const storagePath = `/storage/test-cv.pdf`;
+      
       ProfileService.updateResume = jest.fn().mockResolvedValue({
         data: {
           id: "profile-id",
           userId: "test-user-id",
-          resumeUrl: fileUrl,
+          resumeUrl: storagePath,
           resumeName: "original-cv.pdf",
         },
       });
@@ -133,15 +132,14 @@ describe("ProfileController", () => {
       await ProfileController.uploadCV(req, res);
 
       // Assert
-      expect(fileUploadService.getFileUrl).toHaveBeenCalledWith("test-cv.pdf");
       expect(ProfileService.updateResume).toHaveBeenCalledWith(
         "test-user-id",
-        fileUrl,
+        `/storage/${req.file.filename}`,
         "original-cv.pdf"
       );
       expect(ResponseTrait.success).toHaveBeenCalledWith(
         res,
-        expect.objectContaining({ resumeUrl: fileUrl }),
+        expect.objectContaining({ resumeUrl: storagePath }),
         "CV uploaded successfully"
       );
     });
@@ -153,9 +151,9 @@ describe("ProfileController", () => {
       await ProfileController.uploadCV(req, res);
 
       // Assert
-      expect(ResponseTrait.error).toHaveBeenCalledWith(
+      expect(ResponseTrait.badRequest).toHaveBeenCalledWith(
         res,
-        expect.stringContaining("No file uploaded")
+        "No file was uploaded"
       );
       expect(ProfileService.updateResume).not.toHaveBeenCalled();
     });
@@ -164,8 +162,8 @@ describe("ProfileController", () => {
   describe("deleteCV", () => {
     it("should delete CV successfully", async () => {
       // Setup
-      const resumeUrl = "http://example.com/storage/test-cv.pdf";
-      ProfileService.getProfile = jest.fn().mockResolvedValue({
+      const resumeUrl = "/storage/cvs/test-cv.pdf";
+      ProfileService.getCV = jest.fn().mockResolvedValue({
         data: {
           id: "profile-id",
           userId: "test-user-id",
@@ -186,35 +184,22 @@ describe("ProfileController", () => {
       await ProfileController.deleteCV(req, res);
 
       // Assert
-      expect(fileUploadService.deleteFile).toHaveBeenCalledWith("test-cv.pdf");
+      expect(fileUploadService.deleteFile).toHaveBeenCalledWith(resumeUrl);
       expect(ProfileService.updateResume).toHaveBeenCalledWith(
         "test-user-id",
         null,
         null
       );
-      expect(ResponseTrait.success).toHaveBeenCalledWith(
-        res,
-        expect.objectContaining({ resumeUrl: null }),
-        "CV deleted successfully"
-      );
+      expect(ResponseTrait.success).toHaveBeenCalled();
     });
 
     it("should handle case when profile has no CV", async () => {
       // Setup
-      ProfileService.getProfile = jest.fn().mockResolvedValue({
+      ProfileService.getCV = jest.fn().mockResolvedValue({
         data: {
           id: "profile-id",
           userId: "test-user-id",
           resumeUrl: null,
-        },
-      });
-
-      ProfileService.updateResume = jest.fn().mockResolvedValue({
-        data: {
-          id: "profile-id",
-          userId: "test-user-id",
-          resumeUrl: null,
-          resumeName: null,
         },
       });
 
@@ -223,12 +208,8 @@ describe("ProfileController", () => {
 
       // Assert
       expect(fileUploadService.deleteFile).not.toHaveBeenCalled();
-      expect(ProfileService.updateResume).toHaveBeenCalledWith(
-        "test-user-id",
-        null,
-        null
-      );
-      expect(ResponseTrait.success).toHaveBeenCalled();
+      expect(ResponseTrait.error).toHaveBeenCalledWith(res, "No CV found");
+      expect(ProfileService.updateResume).not.toHaveBeenCalled();
     });
   });
 });

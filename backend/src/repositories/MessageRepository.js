@@ -1,5 +1,31 @@
 const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+
+// Create a new PrismaClient instance with more detailed logging
+const prisma = new PrismaClient({
+  log: [
+    {
+      emit: 'event',
+      level: 'query',
+    },
+    {
+      emit: 'stdout',
+      level: 'error',
+    },
+    {
+      emit: 'stdout',
+      level: 'info',
+    },
+    {
+      emit: 'stdout',
+      level: 'warn',
+    },
+  ],
+});
+
+// Log any connection/query errors
+prisma.$on('error', (e) => {
+  console.error('Prisma error:', e);
+});
 
 /**
  * Repository for managing Message data
@@ -15,6 +41,11 @@ class MessageRepository {
    */
   async saveMessage(userId, content, type, metadata = null) {
     try {
+      // Check if prisma is available
+      if (!prisma || !prisma.message) {
+        throw new Error("Prisma client or Message model is not available");
+      }
+
       const message = await prisma.message.create({
         data: {
           userId,
@@ -38,6 +69,11 @@ class MessageRepository {
    */
   async getMessagesByUserId(userId, limit = 50) {
     try {
+      // Check if prisma is available
+      if (!prisma || !prisma.message) {
+        throw new Error("Prisma client or Message model is not available");
+      }
+
       const messages = await prisma.message.findMany({
         where: { userId },
         orderBy: { timestamp: "desc" },
@@ -63,6 +99,11 @@ class MessageRepository {
    */
   async getConversationHistory(userId, limit = 10) {
     try {
+      // Check if prisma is available
+      if (!prisma || !prisma.message) {
+        throw new Error("Prisma client or Message model is not available");
+      }
+
       const messages = await prisma.message.findMany({
         where: { userId },
         orderBy: { timestamp: "desc" },
@@ -90,6 +131,11 @@ class MessageRepository {
    */
   async deleteAllUserMessages(userId) {
     try {
+      // Check if prisma is available
+      if (!prisma || !prisma.message) {
+        throw new Error("Prisma client or Message model is not available");
+      }
+
       const result = await prisma.message.deleteMany({
         where: { userId },
       });
