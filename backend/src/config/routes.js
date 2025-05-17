@@ -1,5 +1,3 @@
-
-
 // Import all route modules
 const userRoutes = require('../routes/userRoutes');
 const profileRoutes = require('../routes/profileRoutes');
