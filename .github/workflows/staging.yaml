@@ -88,6 +88,7 @@ jobs:
         run: |
           sed -i "s|MYSQL_ROOT_PASSWORD=.*|MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }}|g" docker-compose.yaml
           sed -i "s|MYSQL_DATABASE=.*|MYSQL_DATABASE=${{ secrets.DB_NAME }}|g" docker-compose.yaml
+              sed -i 's|# - JWT_SECRET=.*|- JWT_SECRET=${{ secrets.JWT_SECRET }}|g' docker-compose.yaml
       - name: Copy docker-compose to EC2
         uses: appleboy/scp-action@v1
         with:
