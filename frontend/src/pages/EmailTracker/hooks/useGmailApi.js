@@ -18,45 +18,43 @@ export const useGmailApi = () => {
       // First log complete response
       console.log("Complete response object:", JSON.stringify(response));
 
-      // Be very aggressive in detecting authorization - consider authorized by default
-      let authStatus = true; // Default to true unless explicitly false
+      // IMPORTANT: Default to NOT authorized until confirmed
+      let authStatus = false;
 
-      // Only set to false if we explicitly see isAuthorized: false in a reliable format
+      // Check for explicit authorization status - prioritize data over message
       if (
         response &&
-        typeof response.isAuthorized === "boolean" &&
-        response.isAuthorized === false
-      ) {
-        authStatus = false;
-      } else if (
-        response &&
         response.data &&
-        typeof response.data.isAuthorized === "boolean" &&
-        response.data.isAuthorized === false
+        typeof response.data.isAuthorized === "boolean"
       ) {
-        authStatus = false;
+        // Priority 1: response.data.isAuthorized
+        authStatus = response.data.isAuthorized;
+        console.log("Using authorization status from response.data:", authStatus);
       } else if (
         response &&
         response.success === true &&
         response.data &&
-        typeof response.data.isAuthorized === "boolean" &&
-        response.data.isAuthorized === false
+        typeof response.data.isAuthorized === "boolean"
       ) {
-        authStatus = false;
-      }
-
-      // If response contains any indication of success, force to true
-      if (typeof response === "object" && response !== null) {
-        const responseStr = JSON.stringify(response).toLowerCase();
-        if (
-          responseStr.includes('"success":true') ||
-          responseStr.includes('"status":"success"')
-        ) {
-          console.log(
-            "Response indicates success, forcing authorization to true"
-          );
-          authStatus = true;
-        }
+        // Priority 2: response.success + response.data.isAuthorized
+        authStatus = response.data.isAuthorized;
+        console.log("Using authorization status from response.data with success check:", authStatus);
+      } else if (
+        response &&
+        typeof response.isAuthorized === "boolean"
+      ) {
+        // Priority 3: response.isAuthorized
+        authStatus = response.isAuthorized;
+        console.log("Using authorization status from response root:", authStatus);
+      } else if (
+        response &&
+        response.success === true &&
+        response.message &&
+        typeof response.message.isAuthorized === "boolean"
+      ) {
+        // Priority 4 (lowest): response.message.isAuthorized
+        authStatus = response.message.isAuthorized;
+        console.log("Using authorization status from response.message:", authStatus);
       }
 
       console.log("Final parsed authorization status:", authStatus);
@@ -64,20 +62,19 @@ export const useGmailApi = () => {
       setIsAuthorized(authStatus);
       setAuthChecked(true);
 
-      // If authorized, fetch emails immediately
+      // Only fetch emails if explicitly authorized
       if (authStatus) {
-        fetchEmails();
+        fetchEmails({}, authStatus);
       }
     } catch (err) {
       console.error("Authorization check error:", err);
-      setError("Failed to check Gmail authorization status");
+      
+      // Always set to false when there's an error
+      setIsAuthorized(false);
       setAuthChecked(true);
-
-      // Even on error, default to authorized if we can't definitively determine status
-      console.log(
-        "Setting authorization to true despite error, to be fixed later if needed"
-      );
-      setIsAuthorized(true);
+      
+      // For other errors, set a user-friendly error message
+      setError("Unable to check Gmail connection status. Please connect your Gmail account.");
     } finally {
       setIsLoading(false);
     }
@@ -173,20 +170,20 @@ export const useGmailApi = () => {
     }
   }, []);
 
-  // Fetch emails
+  // Fetch emails - only when explicitly triggered
   const fetchEmails = useCallback(
-    async (options = {}) => {
+    async (options = {}, authStatus) => {
       try {
-        if (!isAuthorized) {
+        // Use passed authStatus if provided, otherwise fall back to state
+        const isUserAuthorized = typeof authStatus === 'boolean' ? authStatus : isAuthorized;
+        
+        if (!isUserAuthorized) {
           console.log("Not authorized to fetch emails");
           return [];
         }
 
         setIsLoading(true);
         setError(null);
-
-        // Clear emails before fetching new ones to show loading state
-        setEmails([]);
 
         // Build query string
         const queryParams = new URLSearchParams();
@@ -202,170 +199,171 @@ export const useGmailApi = () => {
 
         console.log("Fetching emails with endpoint:", endpoint);
 
-        try {
-          const response = await BaseApi.get(endpoint);
-          console.log("Fetch emails response:", response);
+        const response = await BaseApi.get(endpoint);
+        console.log("Fetch emails response:", response);
+        console.log("Full email response JSON:", JSON.stringify(response));
 
-          // Log complete response for debugging
-          console.log(
-            "Complete emails response:",
-            JSON.stringify(response).substring(0, 500) + "..."
-          );
+        // Handle different response structures
+        let emailsData = [];
 
-          // Handle different response structures
-          let emailsData = [];
-
-          // Log the response structure to help with debugging
-          console.log("Response structure:", {
-            isArray: Array.isArray(response),
-            hasData: response && response.data !== undefined,
-            dataIsArray:
-              response && response.data && Array.isArray(response.data),
-            hasSuccess: response && response.success !== undefined,
-            hasDataProperty: response && response.data !== undefined,
-            deepDataProperty:
-              response && response.data && response.data.data !== undefined,
-            deepDataIsArray:
-              response &&
-              response.data &&
-              response.data.data &&
-              Array.isArray(response.data.data),
-          });
-
-          // Try to extract email data from various response structures
-          if (Array.isArray(response)) {
-            emailsData = response;
-          } else if (response && Array.isArray(response.data)) {
-            emailsData = response.data;
-          } else if (
-            response &&
-            response.success &&
-            Array.isArray(response.data)
-          ) {
-            emailsData = response.data;
-          } else if (
-            response &&
-            response.data &&
-            response.data.success &&
-            Array.isArray(response.data.data)
-          ) {
-            emailsData = response.data.data;
-          } else if (
-            response &&
-            response.data &&
-            response.data.data &&
-            Array.isArray(response.data.data)
-          ) {
-            emailsData = response.data.data;
-          }
-          // Check if the response or any nested property is an array
-          else {
-            const findArrays = (obj, path = "") => {
-              if (!obj || typeof obj !== "object") return;
-
-              Object.keys(obj).forEach((key) => {
-                const currentPath = path ? `${path}.${key}` : key;
-                if (Array.isArray(obj[key])) {
-                  console.log(`Found array at path: ${currentPath}`, obj[key]);
-                  if (
-                    obj[key].length > 0 &&
-                    obj[key][0] &&
-                    (obj[key][0].id || obj[key][0].subject || obj[key][0].from)
-                  ) {
-                    emailsData = obj[key];
-                  }
-                } else if (obj[key] && typeof obj[key] === "object") {
-                  findArrays(obj[key], currentPath);
-                }
-              });
-            };
-
-            findArrays(response);
-          }
-
-          console.log(
-            "Emails data extracted:",
-            emailsData ? emailsData.length : 0,
-            "emails"
-          );
-
-          if (!Array.isArray(emailsData)) {
-            console.error("Invalid emails data format:", emailsData);
-            emailsData = [];
-          }
-
-          // Transform API response to match our app's email format
-          const transformedEmails = emailsData
-            .map((email) => {
-              try {
-                if (!email) return null;
-
-                // Log one email for debugging
-                if (emailsData.indexOf(email) === 0) {
-                  console.log("Sample email object:", JSON.stringify(email));
-                }
-
-                return {
-                  id:
-                    email.id ||
-                    `temp-${Math.random().toString(36).substring(7)}`,
-                  sender: email.from || "Unknown Sender",
-                  recipient: email.to || "Unknown Recipient",
-                  subject: email.subject || "No Subject",
-                  preview: email.snippet || "",
-                  body: email.body || "",
-                  timestamp: email.date
-                    ? new Date(email.date).getTime()
-                    : Date.now(),
-                  date: email.date || new Date().toISOString(),
-                  isRead: !email.isUnread,
-                  isStarred: Array.isArray(email.labels)
-                    ? email.labels.includes("STARRED")
-                    : false,
-                  labels: Array.isArray(email.labels) ? email.labels : [],
-                  category: getCategoryFromLabels(
-                    Array.isArray(email.labels) ? email.labels : []
-                  ),
-                  priority: getPriorityFromHeaders(email),
-                };
-              } catch (err) {
-                console.error("Error transforming email:", err, email);
-                return {
-                  id:
-                    email?.id ||
-                    `error-${Math.random().toString(36).substring(7)}`,
-                  sender: "Error Processing Email",
-                  recipient: "",
-                  subject: "Error Processing Email",
-                  preview: "There was an error processing this email.",
-                  body: "",
-                  timestamp: Date.now(),
-                  date: new Date().toISOString(),
-                  isRead: true,
-                  isStarred: false,
-                  labels: [],
-                  category: "primary",
-                  priority: "normal",
-                };
-              }
-            })
-            .filter(Boolean); // Filter out any null values
-
-          console.log("Transformed emails:", transformedEmails.length);
-
-          // If we got this far but have no emails, log a warning
-          if (transformedEmails.length === 0) {
-            console.warn("No emails were found or transformed successfully");
-          }
-
-          setEmails(transformedEmails);
-          return transformedEmails;
-        } catch (fetchErr) {
-          console.error("Inner fetch error:", fetchErr);
-          throw fetchErr;
+        // Try to extract email data from various response structures
+        if (Array.isArray(response)) {
+          emailsData = response;
+          console.log("Found emails in root array");
+        } else if (
+          response &&
+          response.data &&
+          Array.isArray(response.data)
+        ) {
+          // Priority 1: response.data is an array
+          emailsData = response.data;
+          console.log("Found emails in response.data array");
+        } else if (
+          response &&
+          response.data &&
+          response.data.data &&
+          Array.isArray(response.data.data)
+        ) {
+          // Priority 2: response.data.data is an array
+          emailsData = response.data.data;
+          console.log("Found emails in response.data.data array");
+        } else if (
+          response &&
+          response.success &&
+          response.data &&
+          Array.isArray(response.data)
+        ) {
+          // Priority 3: response.success + response.data is an array
+          emailsData = response.data;
+          console.log("Found emails in response.data array with success check");
+        } else if (
+          response &&
+          response.success &&
+          Array.isArray(response.message)
+        ) {
+          // Priority 4: response.message is an array
+          emailsData = response.message;
+          console.log("Found emails in response.message array:", emailsData.length);
+        } else if (
+          response &&
+          response.message &&
+          Array.isArray(response.message)
+        ) {
+          // Priority 5: response.message is an array (without success check)
+          emailsData = response.message;
+          console.log("Found emails in response.message array (no success check):", emailsData.length);
         }
+        
+        // Ensure that emailsData is always an array
+        if (!Array.isArray(emailsData)) {
+          console.error("Failed to extract email data from response, setting to empty array");
+          console.log("Response structure was:", JSON.stringify(response));
+          emailsData = [];
+        } else {
+          console.log("Successfully extracted emails from response:", emailsData.length);
+          
+          // Log a sample email to help debug the structure
+          if (emailsData.length > 0) {
+            console.log("Sample email object structure:", JSON.stringify(emailsData[0]));
+          }
+        }
+
+        console.log(
+          "Emails data extracted:",
+          emailsData ? emailsData.length : 0,
+          "emails"
+        );
+
+        if (!Array.isArray(emailsData)) {
+          console.error("Invalid emails data format:", emailsData);
+          emailsData = [];
+        }
+
+        // Transform API response to match our app's email format
+        const transformedEmails = emailsData
+          .map((email) => {
+            try {
+              if (!email) return null;
+
+              // Log one email for debugging
+              if (emailsData.indexOf(email) === 0) {
+                console.log("Processing first email:", JSON.stringify(email));
+              }
+
+              // Set default category to primary if not specified
+              let category = "primary";
+              if (Array.isArray(email.labels)) {
+                if (email.labels.includes("CATEGORY_SOCIAL")) category = "social";
+                else if (email.labels.includes("CATEGORY_PROMOTIONS")) category = "promotions";
+                else if (email.labels.includes("CATEGORY_UPDATES")) category = "updates";
+                else if (email.labels.includes("CATEGORY_FORUMS")) category = "forums";
+              }
+
+              // Determine priority based on subject
+              let priority = "normal";
+              const subject = (email.subject || "").toLowerCase();
+              if (subject.includes("urgent") || subject.includes("important")) {
+                priority = "high";
+              } else if (subject.includes("reminder") || subject.includes("follow up")) {
+                priority = "medium";
+              }
+
+              // Create a well-formatted email object
+              const formattedEmail = {
+                id: email.id || `temp-${Math.random().toString(36).substring(7)}`,
+                sender: email.from || "Unknown Sender",
+                recipient: email.to || "Unknown Recipient",
+                subject: email.subject || "No Subject",
+                preview: email.snippet || "",
+                body: email.body || "",
+                timestamp: email.date ? new Date(email.date).getTime() : Date.now(),
+                date: email.date || new Date().toISOString(),
+                // Properly handle isRead/isUnread - if isUnread is true, isRead should be false
+                isRead: email.isUnread === undefined ? true : !email.isUnread,
+                isStarred: Array.isArray(email.labels) ? email.labels.includes("STARRED") : false,
+                labels: Array.isArray(email.labels) ? email.labels : [],
+                category: category,
+                priority: priority
+              };
+              
+              // Log the first transformed email for debugging
+              if (emailsData.indexOf(email) === 0) {
+                console.log("First email raw data:", email);
+                console.log("First email transformed:", formattedEmail);
+              }
+              
+              return formattedEmail;
+            } catch (err) {
+              console.error("Error transforming email:", err, email);
+              // Return a placeholder for error cases
+              return null;
+            }
+          })
+          .filter(Boolean); // Remove any null entries
+
+        console.log("Transformed emails:", transformedEmails.length);
+
+        // If we got this far but have no emails, log a warning
+        if (transformedEmails.length === 0) {
+          console.warn("No emails were found or transformed successfully");
+          
+          // Log more details about what might have gone wrong
+          if (emailsData.length > 0) {
+            console.log("Raw email data was found but transformation failed. First raw email:", 
+              JSON.stringify(emailsData[0]));
+          }
+        } else {
+          console.log("Successfully transformed emails:", transformedEmails.length);
+          console.log("First transformed email:", JSON.stringify(transformedEmails[0]));
+        }
+
+        // Update emails state
+        setEmails(transformedEmails);
+        console.log("Emails state updated with", transformedEmails.length, "emails");
+        
+        return transformedEmails;
       } catch (err) {
-        console.error("Outer fetch emails error:", err);
+        console.error("Fetch emails error:", err);
 
         // Check for specific types of errors
         if (err.response?.status === 401) {
@@ -416,7 +414,7 @@ export const useGmailApi = () => {
     return "normal";
   };
 
-  // Check if there are any connection parameters in the URL
+  // Only check OAuth parameters from callback URL and check authorization status
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const connected = urlParams.get("connected");
@@ -429,6 +427,9 @@ export const useGmailApi = () => {
       setIsAuthorized(true);
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
+      
+      // Immediately fetch emails with direct authorization status
+      fetchEmails({}, true);
     } else if (errorParam === "true") {
       setError(
         "Failed to connect Gmail: " +
@@ -440,31 +441,10 @@ export const useGmailApi = () => {
 
     // First check the server-side authorization status
     checkAuthorization();
-
-    // Auto-enable authorization after a small delay if auth check doesn't respond properly
-    const autoAuthTimer = setTimeout(() => {
-      // Only attempt auto-auth if no authorization was detected by the checkAuthorization call
-      if (!isAuthorized && authChecked) {
-        console.log("Auto-enabling authorization as a fallback");
-        setIsAuthorized(true);
-        fetchEmails();
-      }
-    }, 2000); // Wait 2 seconds after the component mounts
-
-    return () => clearTimeout(autoAuthTimer);
+    
+    // No auto-enabling of authorization
+    // No auto-fetching of emails
   }, [checkAuthorization, fetchEmails]);
-
-  // Force set authorization (for debugging/emergency use)
-  const forceAuthorize = useCallback(
-    (force = true) => {
-      console.log(`Manually ${force ? "enabling" : "disabling"} authorization`);
-      setIsAuthorized(force);
-      if (force) {
-        fetchEmails();
-      }
-    },
-    [fetchEmails]
-  );
 
   return {
     emails,
@@ -474,7 +454,6 @@ export const useGmailApi = () => {
     authChecked,
     fetchEmails,
     authorizeGmail,
-    disconnectGmail,
-    forceAuthorize,
+    disconnectGmail
   };
 };
