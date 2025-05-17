@@ -1,0 +1,119 @@
+name: deploy to staging
+on:
+  push:
+    branches:
+      - MT-staging
+jobs:
+  Build-Backend-Image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - name: inject  variables
+        run: |
+          sed -i "s|DATABASE_URL=.*|DATABASE_URL=${{ secrets.DATABASE_URL }}|g" docker-compose.yaml
+          sed -i "s|PORT=.*|PORT=${{ secrets.PORT }}|g" docker-compose.yaml
+          sed -i "s|JWT_SECRET=.*|JWT_SECRET=${{ secrets.JWT_SECRET }}|g" docker-compose.yaml
+          sed -i "s|JWT_EXPIRES_IN=.*|JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}|g" docker-compose.yaml
+          sed -i "s|GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}|g" docker-compose.yaml
+          sed -i "s|GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}|g" docker-compose.yaml
+          sed -i "s|CORS_ORIGIN=.*|CORS_ORIGIN=${{ secrets.CORS_ORIGIN}}|g" docker-compose.yaml
+          sed -i "s|OPENAI_API_KEY=.*|OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY}}|g" docker-compose.yaml
+          sed -i "s|N8N_WEBHOOK_Test_URL=.*|N8N_WEBHOOK_Test_URL=${{ secrets.N8N_WEBHOOK_Test_URL}}|g" docker-compose.yaml
+          sed -i "s|N8N_WEBHOOK_URL=.*|N8N_WEBHOOK_URL=${{ secrets.N8N_WEBHOOK_URL}}|g" docker-compose.yaml
+
+
+      - name: Build Docker image
+        working-directory: backend
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/nextstep:latest .
+      - name: Push Docker image 
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/nextstep:latest
+  Build-Frontend-And-Deploy-On-S3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+      - name: Check Node.js version
+        run: node -v
+      - name: Check npm version
+        run: npm -v
+      - name: Inject GitHub Secrets into .env.example
+        working-directory: ./frontend
+        run: sed -i "s|VITE_API_URL=.*|VITE_API_URL=http://${{ secrets.EC2_HOST_STAGING }}:3000|g" .env.example
+                  
+      - name: Copy .env.example to .env
+        working-directory: ./frontend
+        run: cp .env.example .env
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm install
+      - name: Build React Project
+        working-directory: ./frontend
+        run: npm run build
+      - name: Copy build to EC2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST_STAGING }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "frontend/dist"
+          target: "/home/${{ secrets.EC2_USER }}/" 
+      - name: Deploy to S3
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST_STAGING }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            mkdir -p ~/.aws
+            echo "[default]" > ~/.aws/config
+            echo "region = ${{ secrets.AWS_DEFAULT_REGION }}" >> ~/.aws/config
+            aws s3 cp frontend/dist/ s3://fse-final-mahdi --recursive
+            rm -r frontend/
+  Copy-docker-compose-To-EC2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Inject GitHub Secrets into docker-compose.yaml
+        run: |
+          sed -i "s|MYSQL_ROOT_PASSWORD=.*|MYSQL_ROOT_PASSWORD=${{ secrets.DB_PASSWORD }}|g" docker-compose.yaml
+          sed -i "s|MYSQL_DATABASE=.*|MYSQL_DATABASE=${{ secrets.DB_NAME }}|g" docker-compose.yaml
+      - name: Copy docker-compose to EC2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST_STAGING }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: 'docker-compose.yaml'
+          target: '/home/${{ secrets.EC2_USER }}/'
+  Deploy-Node-Docker:
+    needs:
+      [
+        Build-Backend-Image,
+        Build-Frontend-And-Deploy-On-S3,
+        Copy-docker-compose-To-EC2,
+      ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST_STAGING }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            docker compose down
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/nextstep:latest
+            docker compose up -d
