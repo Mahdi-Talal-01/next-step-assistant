@@ -1,14 +1,15 @@
+
 require('dotenv').config();
 
 // Express setup
 const express = require('express');
 
-// Configuration modules 
+// Configuration modules - following Single Responsibility Principle
 const { validateEnvironment } = require('./middleware/environmentValidator');
 const configureExpress = require('./config/express');
 const registerRoutes = require('./config/routes');
 const registerErrorHandlers = require('./config/errorHandlers');
-const { checkAndSetGoogleEnv } = require('../setup-env');
+const { checkAndSetGoogleEnv } = require('./config/setup-env.js');
 
 
 function initializeApp() {
@@ -25,6 +26,7 @@ function initializeApp() {
     googleEnvConfigured ? 'Yes' : 'No'
   );
   
+  // Apply configurations in sequence following the Dependency Inversion Principle
   // Each module accepts and returns the app instance
   return registerErrorHandlers(
     registerRoutes(
