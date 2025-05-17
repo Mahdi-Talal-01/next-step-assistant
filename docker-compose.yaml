@@ -34,6 +34,8 @@ services:
     image: mahditalaldev/nextstep:latest
     ports:
       - "3000:3000"
+    environment:
+      - JWT_SECRET=your_secret_here
     depends_on:
       - db
     restart: always
@@ -45,7 +47,6 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=database
-      
     volumes:
       - mysql_data:/var/lib/mysql
     restart: always
