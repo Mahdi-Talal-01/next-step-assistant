@@ -12,6 +12,7 @@ storage/cvs/*
 coverage
 .env.test
 .env.test
+test.yaml
 
 
 
