@@ -31,15 +31,19 @@
 
 services:
   backend:
-    image: mahditalaldev/nextstep-backend:latest
+    image: mahditalaldev/nextstep:latest
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=mysql://root:root@db:3306/nextstep
-      - NODE_ENV=production
-      - JWT_SECRET=asdfghjkl
-      - GOOGLE_CLIENT_ID=asdfghjkl
-      - GOOGLE_CLIENT_SECRET=asdfghjkl
+      - JWT_SECRET=your_secret_here
+      - JWT_EXPIRES_IN=1h
+      - GOOGLE_CLIENT_ID=your_client_id_here
+      - GOOGLE_CLIENT_SECRET=your_client_secret_here
+      - CORS_ORIGIN=http://localhost:3000
+      - OPENAI_API_KEY=your_openai_api_key_here
+      - N8N_WEBHOOK_Test_URL=your_n8n_webhook_test_url_here
+      - N8N_WEBHOOK_URL=your_n8n_webhook_url_here
+      - DATABASE_URL=url
     depends_on:
       - db
     restart: always
@@ -49,13 +53,11 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=nextstep
-      
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=database
     volumes:
       - mysql_data:/var/lib/mysql
     restart: always
-    command: --default-authentication-plugin=mysql_native_password
 
 volumes:
   mysql_data: 
