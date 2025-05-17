@@ -1,56 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthHeader } from './components/AuthHeader';
-import { LoginForm } from './components/LoginForm';
-import { RegisterForm } from './components/RegisterForm';
-import { GoogleLoginButton } from './components/GoogleLoginButton';
-import { useAuth } from './hooks/useAuth';
-import styles from './Auth.module.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { AuthHeader } from "./components/AuthHeader";
+import { LoginForm } from "./components/LoginForm";
+import { RegisterForm } from "./components/RegisterForm";
+import { GoogleLoginButton } from "./components/GoogleLoginButton";
+import { useAuth } from "./hooks/useAuth";
+import styles from "./Auth.module.css";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { register, login, loading, error, user, isAuthenticated } = useAuth();
 
-  // Handle OAuth callback
+  // Handle OAuth callback and check authentication status
   useEffect(() => {
+    // Handle OAuth callback
     const params = new URLSearchParams(location.search);
-    const urlToken = params.get('token');
-    const urlUser = params.get('user');
+    const urlToken = params.get("token");
+    const urlUser = params.get("user");
+    const urlError = params.get("error");
+    
+    // Check if we were redirected from Gmail tracker
+    const fromEmailTracker = location.state?.fromEmailTracker || false;
+
     if (urlToken && urlUser) {
-      localStorage.setItem('access_token', urlToken);
-      localStorage.setItem('user', decodeURIComponent(urlUser));
-      window.history.replaceState({}, document.title, '/');
-      navigate('/app/dashboard', { replace: true });
+      localStorage.setItem("access_token", urlToken);
+      localStorage.setItem("user", decodeURIComponent(urlUser));
+      window.history.replaceState({}, document.title, "/");
+      
+      // If coming from email tracker, redirect back there with success parameter
+      if (fromEmailTracker) {
+        navigate("/app/gmail-tracker?googleAuth=success", { replace: true });
+      } else {
+        navigate("/app/dashboard", { replace: true });
+      }
       return;
     }
-    // If already authenticated, redirect to dashboard
-    const { authenticated } = isAuthenticated();
-    if (authenticated) {
-      navigate('/app/dashboard', { replace: true });
+
+    if (urlError) {
+      console.error("OAuth error:", urlError);
+      return;
     }
-  }, [location, navigate, isAuthenticated]);
+
+    // If already authenticated, redirect to dashboard or back to Email Tracker
+    const { authenticated } = isAuthenticated();
+    if (authenticated || user) {
+      if (fromEmailTracker) {
+        navigate("/app/gmail-tracker?googleAuth=success", { replace: true });
+      } else {
+        const from = location.state?.from?.pathname || "/app/dashboard";
+        navigate(from, { replace: true });
+      }
+    }
+  }, [location, navigate, isAuthenticated, user]);
+
+  // Handle form submissions
+  const handleSubmit = async (data) => {
+    try {
+      console.log("Form submit with data:", data);
+      
+      if (isLogin) {
+        console.log("Attempting login...");
+        const result = await login(data);
+        console.log("Login result:", result);
+      } else {
+        console.log("Attempting registration...");
+        const result = await register(data);
+        console.log("Registration result:", result);
+      }
+      
+      // Check authentication immediately after login/register
+      const authState = isAuthenticated();
+      console.log("Auth state after login/register:", authState);
+      
+      if (authState.authenticated) {
+        const from = location.state?.from?.pathname || "/app/dashboard";
+        console.log("Redirecting to:", from);
+        navigate(from, { replace: true });
+      } else {
+        console.error("Still not authenticated after successful login/register");
+      }
+    } catch (err) {
+      console.error("Authentication error:", err);
+    }
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.authBox}>
         <AuthHeader />
-        {isLogin ? <LoginForm /> : <RegisterForm />}
-        <div className={styles.divider}><span>or</span></div>
+
+        {isLogin ? (
+          <LoginForm onSubmit={handleSubmit} loading={loading} error={error} />
+        ) : (
+          <RegisterForm
+            onSubmit={handleSubmit}
+            loading={loading}
+            error={error}
+          />
+        )}
+
+        <div className={styles.divider}>
+          <span>or</span>
+        </div>
+
         <GoogleLoginButton />
-        <div className={styles.toggleText} style={{ marginTop: 16 }}>
+
+        <div className={styles.toggleText}>
           {isLogin ? (
             <span>
-              Don't have an account?{' '}
-              <button className={styles.toggleButton} onClick={() => setIsLogin(false)}>
+              Don't have an account?{" "}
+              <button
+                className={styles.toggleButton}
+                onClick={() => setIsLogin(false)}
+                disabled={loading}
+              >
                 Create one
               </button>
             </span>
           ) : (
             <span>
-              Already have an account?{' '}
-              <button className={styles.toggleButton} onClick={() => setIsLogin(true)}>
+              Already have an account?{" "}
+              <button
+                className={styles.toggleButton}
+                onClick={() => setIsLogin(true)}
+                disabled={loading}
+              >
                 Sign in
               </button>
             </span>
@@ -61,4 +137,4 @@ const Auth = () => {
   );
 };
 
-export default Auth; 
+export default Auth;
