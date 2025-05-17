@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import profileService from '../services/profileService';
-
+import profileService from '../services/ProfileService';
 export const useProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
