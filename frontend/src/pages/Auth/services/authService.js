@@ -5,11 +5,19 @@ class AuthService {
   async register(userData) {
     try {
       const response = await BaseApi.post('/users/register', userData);
-      if (response.success && response.data) {
-        this.setAuthData(response.data);
-        return response.data;
+      if (response.success) {
+        // Handle both data structures - if message contains user and token
+        if (response.message && typeof response.message === 'object' && response.message.user && response.message.token) {
+          this.setAuthData(response.message);
+          return response.message;
+        } 
+        // Fallback to the expected structure (data contains user and token)
+        else if (response.data) {
+          this.setAuthData(response.data);
+          return response.data;
+        }
       }
-      throw new Error(response.message || 'Registration failed');
+      throw new Error((response.message && typeof response.message === 'string') ? response.message : 'Registration failed');
     } catch (error) {
       this.clearAuthData();
       throw error;
@@ -18,13 +26,25 @@ class AuthService {
 
   async login(credentials) {
     try {
+      console.log('Login request:', credentials);
       const response = await BaseApi.post('/users/login', credentials);
-      if (response.success && response.data) {
-        this.setAuthData(response.data);
-        return response.data;
+      console.log('Login response:', response);
+      
+      if (response.success) {
+        // Handle both data structures - if message contains user and token
+        if (response.message && typeof response.message === 'object' && response.message.user && response.message.token) {
+          this.setAuthData(response.message);
+          return response.message;
+        } 
+        // Fallback to the expected structure (data contains user and token)
+        else if (response.data) {
+          this.setAuthData(response.data);
+          return response.data;
+        }
       }
-      throw new Error(response.message || 'Login failed');
+      throw new Error((response.message && typeof response.message === 'string') ? response.message : 'Login failed');
     } catch (error) {
+      console.error('Login error details:', error);
       this.clearAuthData();
       throw error;
     }

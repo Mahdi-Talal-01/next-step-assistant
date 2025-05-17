@@ -1,9 +1,9 @@
-const userService = require("../services/UserService");
-const ResponseTrait = require("../traits/ResponseTrait");
-const RegisterRequest = require("../requests/RegisterRequest");
-const LoginRequest = require("../requests/LoginRequest");
+const userService = require("../../services/UserService");
+const ResponseTrait = require("../../traits/ResponseTrait");
+const RegisterRequest = require("../../requests/AuthRequest/RegisterRequest");
+const LoginRequest = require("../../requests/AuthRequest/LoginRequest");
 
-class UserController {
+class UserAuthController {
   async register(req, res) {
     try {
       const validation = RegisterRequest.validate(req);
@@ -40,4 +40,4 @@ class UserController {
   }
 }
 
-module.exports = new UserController();
+module.exports = new UserAuthController();

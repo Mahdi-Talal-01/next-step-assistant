@@ -15,7 +15,7 @@ const MainLayout = () => {
       <div
         className={`main-container ${isSidebarOpen ? "sidebar-collapsed" : ""}`}
       >
-        <Navbar />
+        {/* <Navbar /> */}
 
         <main className="main-content">
           <Outlet />

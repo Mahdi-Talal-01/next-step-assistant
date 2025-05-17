@@ -1,13 +1,20 @@
 import React from 'react';
-import { useAuthForm } from '../hooks/useAuthForm';
 import { ErrorMessage } from './ErrorMessage';
 import styles from '../Auth.module.css';
 
-export const RegisterForm = () => {
-  const { error, loading, handleRegister } = useAuthForm();
+export const RegisterForm = ({ onSubmit, loading, error }) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    onSubmit({
+      name: formData.get('name'),
+      email: formData.get('email'),
+      password: formData.get('password')
+    });
+  };
 
   return (
-    <form onSubmit={handleRegister} className={styles.registerForm} autoComplete="off">
+    <form onSubmit={handleSubmit} className={styles.registerForm} autoComplete="off">
       <div className={styles.formGroup}>
         <label htmlFor="name">Name</label>
         <input
@@ -41,7 +48,7 @@ export const RegisterForm = () => {
       <button type="submit" className={styles.submitButton} disabled={loading}>
         {loading ? 'Creating account...' : 'Create Account'}
       </button>
-      <ErrorMessage error={error} />
+      {error && <ErrorMessage error={error} />}
     </form>
   );
 }; 
