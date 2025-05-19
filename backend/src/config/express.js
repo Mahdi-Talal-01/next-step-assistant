@@ -15,19 +15,7 @@ const ResponseTrait = require("../traits/ResponseTrait");
  */
 function configureExpress(app) {
   // CORS configuration
-  app.use(
-    cors({
-      origin: [
-        "http://15.236.226.177:5173",
-        "http://15.236.226.177:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-      ],
-      methods: ["GET", "POST", "PUT", "DELETE"],
-      credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"],
-    })
-  );
+  app.use(cors());
 
   // Body parser middleware
   app.use(express.json());
