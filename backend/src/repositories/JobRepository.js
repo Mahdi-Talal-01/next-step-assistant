@@ -136,19 +136,13 @@ class JobRepository {
    */
   async updateJob(jobId, userId, data) {
     try {
-      console.log('Debug - Update Job Input:', { jobId, userId });
-      
       // First, verify the job exists and belongs to the user
       const existingJob = await prisma.job.findUnique({
         where: { 
           id: jobId
         }
       });
-
-      console.log('Debug - Existing Job:', existingJob);
-
       if (!existingJob) {
-        console.log('Debug - Job not found with ID:', jobId);
         throw new Error('Job not found');
       }
 
@@ -162,21 +156,13 @@ class JobRepository {
 
       // Extract skills data from the update data
       const { skills, stages, ...jobData } = data;
-      console.log('Debug - Update Data:', { skills, stages, jobData });
-
       try {
         // Start a transaction
         return await prisma.$transaction(async (prisma) => {
-          console.log('Debug - Starting transaction for job update');
-          
           // First, delete all existing job skills
-          console.log('Debug - Deleting existing job skills for jobId:', jobId);
           await prisma.jobSkill.deleteMany({
             where: { jobId }
           });
-          
-          console.log('Debug - Deleted existing job skills, now updating job');
-          
           // Create skill objects ensuring no duplicates
           const uniqueSkills = [];
           const seenSkillIds = new Set();
@@ -190,9 +176,6 @@ class JobRepository {
               });
             }
           }
-          
-          console.log('Debug - Unique skills to create:', uniqueSkills);
-          
           // Update the job
           const updatedJob = await prisma.job.update({
             where: { 
@@ -214,9 +197,6 @@ class JobRepository {
               }
             }
           });
-
-          console.log('Debug - Successfully updated job:', updatedJob.id);
-
           // Parse stages back to object for the response
           return {
             ...updatedJob,
@@ -228,8 +208,6 @@ class JobRepository {
         
         // Handle the unique constraint violation specifically
         if (transactionError.code === 'P2002') {
-          console.log('Unique constraint violation detected, attempting fallback update...');
-          
           // Fallback approach - update job without skills first, then add skills individually
           const updatedJobBase = await prisma.job.update({
             where: { id: jobId },
@@ -301,8 +279,6 @@ class JobRepository {
    */
   async deleteJob(jobId, userId) {
     try {
-      console.log(`Debug - Starting job deletion for jobId: ${jobId}, userId: ${userId}`);
-      
       // First, check if the job exists and belongs to the user
       const existingJob = await prisma.job.findFirst({
         where: {
@@ -312,26 +288,21 @@ class JobRepository {
       });
       
       if (!existingJob) {
-        console.log(`Debug - Job not found or doesn't belong to user: ${jobId}`);
         return false;
       }
       
       // Use a transaction to ensure all related records are deleted
       await prisma.$transaction(async (prisma) => {
         // First delete all job skills to avoid foreign key constraint issues
-        console.log(`Debug - Deleting job skills for jobId: ${jobId}`);
         await prisma.jobSkill.deleteMany({
           where: { jobId }
         });
         
         // Then delete the job itself
-        console.log(`Debug - Deleting job: ${jobId}`);
         await prisma.job.delete({
           where: { id: jobId }
         });
       });
-      
-      console.log(`Debug - Job successfully deleted: ${jobId}`);
       return true;
     } catch (error) {
       console.error(`Error deleting job ${jobId}:`, error);
@@ -387,8 +358,6 @@ class JobRepository {
    */
   async jobExists(userId, company, position) {
     try {
-      console.log(`Checking if job exists: ${company} - ${position} for user ${userId}`);
-      
       // Normalize inputs for case-insensitive comparison
       const normalizedCompany = company.toLowerCase().trim();
       const normalizedPosition = position.toLowerCase().trim();
@@ -409,8 +378,6 @@ class JobRepository {
         job.company.toLowerCase().trim() === normalizedCompany && 
         job.position.toLowerCase().trim() === normalizedPosition
       );
-      
-      console.log(`Job exists check result: ${exists}`);
       return exists;
     } catch (error) {
       console.error(`Error checking if job exists:`, error);

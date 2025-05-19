@@ -93,8 +93,6 @@ class JobController {
       });
 
       // Log the created job for debugging
-      console.log('DEBUG: Created job:', JSON.stringify(job, null, 2));
-
       return ResponseTrait.success(res, "Job created successfully", job, 201);
     } catch (error) {
       console.error("Error creating job:", error);
@@ -141,8 +139,6 @@ class JobController {
       });
 
       // Log the updated job for debugging
-      console.log('DEBUG: Updated job:', JSON.stringify(job, null, 2));
-
       if (!job) {
         return ResponseTrait.notFound(res, "Job not found");
       }
@@ -163,19 +159,11 @@ class JobController {
     try {
       const { jobId } = req.params;
       const userId = req.user.id;
-
-      console.log(`Backend: Delete job request received - Job ID: ${jobId}, User ID: ${userId}`);
-      console.log('Request body:', req.body);
-      console.log('Request headers:', req.headers);
-
       const deleted = await JobRepository.deleteJob(jobId, userId);
 
       if (!deleted) {
-        console.log(`Backend: Job not found or not deleted - Job ID: ${jobId}`);
         return ResponseTrait.notFound(res, "Job not found");
       }
-
-      console.log(`Backend: Job successfully deleted - Job ID: ${jobId}`);
       return ResponseTrait.success(res, "Job deleted successfully");
     } catch (error) {
       console.error("Error deleting job:", error);

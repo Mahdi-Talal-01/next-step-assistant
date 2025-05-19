@@ -18,8 +18,8 @@ function configureExpress(app) {
   app.use(
     cors({
       origin: [
-        "http://localhost:5173",
-        "http://localhost:3000",
+        "http://15.236.226.177:5173",
+        "http://15.236.226.177:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
       ],
@@ -35,10 +35,6 @@ function configureExpress(app) {
   // Debug middleware for request bodies
   app.use((req, res, next) => {
     if (req.method === "DELETE") {
-      console.log("DEBUG - DELETE request received:");
-      console.log("  Path:", req.path);
-      console.log("  Headers:", JSON.stringify(req.headers));
-      console.log("  Raw body:", req.body);
     }
     next();
   });

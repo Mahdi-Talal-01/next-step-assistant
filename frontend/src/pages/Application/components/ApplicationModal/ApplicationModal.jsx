@@ -144,9 +144,6 @@ const ApplicationModal = ({
   const handleSubmit = () => {
     // Make a deep copy to ensure we don't lose the skills
     const submissionData = JSON.parse(JSON.stringify(formData));
-    
-    console.log("DEBUG - Pre-submission skills check:", submissionData.skills);
-    
     // Ensure skills are properly formatted
     if (!submissionData.skills || !Array.isArray(submissionData.skills) || submissionData.skills.length === 0) {
       console.error("ERROR: Missing or empty skills array before submission");
@@ -172,9 +169,6 @@ const ApplicationModal = ({
       // Fallback
       return { name: "General", required: true };
     });
-    
-    console.log("DEBUG - Final skills object before submission:", JSON.stringify(submissionData.skills));
-    
     // Make the update call
     onUpdate(submissionData);
   };

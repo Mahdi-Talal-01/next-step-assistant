@@ -53,9 +53,6 @@ describe("Roadmap Routes - Simple Test", () => {
         console.log(
           `Test case (${testCase.description}) with ID: ${testCase.id}`
         );
-        console.log(`Response status: ${response.status}`);
-        console.log(`Response body: ${JSON.stringify(response.body)}`);
-
         // We'll log instead of asserting to see what's happening
       }
     });

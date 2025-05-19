@@ -16,17 +16,13 @@ const ProtectedRoute = ({ children }) => {
 
   // Wait for auth to initialize before making any decisions
   if (loading) {
-    console.log('ProtectedRoute - Loading auth state');
     return null; // or a loading spinner
   }
 
   if (!authenticated) {
-    console.log('ProtectedRoute - Not authenticated, redirecting to auth');
     // Redirect to auth page but save the attempted url
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
-
-  console.log("ProtectedRoute - Authenticated, rendering children");
   return children;
 };
 

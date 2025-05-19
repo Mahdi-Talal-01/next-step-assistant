@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Use the correct API URL for the backend server
-const API_URL = "http://localhost:3000/api/content-assistant";
+const API_URL = "http://15.236.226.177:3000/api/content-assistant";
 
 // Dictionary of experience level text descriptions
 const experienceTexts = {

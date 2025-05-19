@@ -5,14 +5,7 @@ const { checkAndSetGoogleEnv } = require('./setup-env');
 
 // Make sure we have the needed environment variables
 checkAndSetGoogleEnv();
-
-console.log('Testing Gmail API connectivity...');
-console.log('----------------------------------------');
-
 // Print out the critical environment variables (partial)
-console.log('CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.substring(0, 20) + '...' : 'MISSING');
-console.log('REDIRECT_URL:', process.env.GOOGLE_REDIRECT_URL);
-
 // Initialize OAuth2 client
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -33,17 +26,6 @@ const authUrl = oauth2Client.generateAuthUrl({
   scope: scopes,
   prompt: 'consent'
 });
-
-console.log('----------------------------------------');
-console.log('Auth URL Generated:');
-console.log(authUrl);
-console.log('----------------------------------------');
-console.log('Instructions:');
-console.log('1. Copy the URL above and open it in a browser');
-console.log('2. Complete the authorization process');
-console.log('3. You should be redirected to your callback URL');
-console.log('----------------------------------------');
-
 // Check if OAuth callback URL is correctly formatted
 const callbackUrl = process.env.GOOGLE_REDIRECT_URL;
 if (callbackUrl) {
@@ -53,17 +35,10 @@ if (callbackUrl) {
   if (callbackUrl.endsWith('/')) {
     console.warn('WARNING: Callback URL should not end with a trailing slash');
   }
-  
-  console.log('Callback validation:');
   try {
     const url = new URL(callbackUrl);
-    console.log('  Protocol:', url.protocol);
-    console.log('  Host:', url.host);
-    console.log('  Path:', url.pathname);
-    
     // Check if the URL path seems correctly formatted
     if (url.pathname.includes('/gmail/callback')) {
-      console.log('  Path format appears correct');
     } else {
       console.warn('  WARNING: Path does not contain /gmail/callback');
     }

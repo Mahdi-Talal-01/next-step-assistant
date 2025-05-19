@@ -31,12 +31,8 @@ const useRoadmap = () => {
   }, [searchTerm, filterDifficulty, sortBy, sortOrder, allRoadmaps]);
 
   const transformRoadmapData = (data) => {
-    console.log('Transforming roadmap data:', data);
-    
     // Ensure topics exists and is an array
     const topics = Array.isArray(data.topics) ? data.topics : [];
-    console.log(`Roadmap ${data.id} has ${topics.length} topics`);
-    
     return {
       id: ensureStringId(data.id),
       title: data.title || 'Untitled Roadmap',
@@ -69,16 +65,11 @@ const useRoadmap = () => {
     try {
       // Fetch all roadmaps without filters
       const response = await roadmapService.getAllRoadmaps();
-      console.log('Fetched roadmaps response:', response);
-      
       if (response.success) {
         // Log raw data before transformation
-        console.log('Raw roadmap data before transformation:', response.data);
-        
         const transformedRoadmaps = response.data.map(roadmap => {
           const transformed = transformRoadmapData(roadmap);
           // Log each roadmap's topics after transformation
-          console.log(`Roadmap ${roadmap.id} has ${roadmap.topics?.length || 0} topics, transformed has ${transformed.topics?.length || 0} topics`);
           return transformed;
         });
         
@@ -149,8 +140,6 @@ const useRoadmap = () => {
 
   const handleTopicStatusChange = async (roadmapId, topicId, newStatus) => {
     try {
-      console.log(`Updating topic status: Roadmap=${roadmapId}, Topic=${topicId}, New Status=${newStatus}`);
-      
       const response = await roadmapService.updateTopicStatus(
         ensureStringId(roadmapId), 
         ensureStringId(topicId), 
@@ -158,8 +147,6 @@ const useRoadmap = () => {
       );
       
       if (response.success) {
-        console.log('Topic status updated successfully', response.data);
-        
         // Update both states: allRoadmaps and roadmaps
         const updateRoadmapsState = (prevRoadmaps) => {
           return prevRoadmaps.map(roadmap => {
@@ -205,16 +192,9 @@ const useRoadmap = () => {
 
   const handleCreateRoadmap = async (newRoadmapData) => {
     try {
-      console.log('Creating new roadmap with data:', newRoadmapData);
-      
       const response = await roadmapService.createRoadmap(newRoadmapData);
-      console.log('Create roadmap API response:', response);
-      
       if (response.success) {
-        console.log('Roadmap created successfully, transforming data...');
         const transformedRoadmap = transformRoadmapData(response.data);
-        console.log('Transformed roadmap:', transformedRoadmap);
-        
         setAllRoadmaps(prev => [...prev, transformedRoadmap]);
         // The new roadmap will be filtered in through the useEffect
         setShowCreateModal(false);
@@ -255,14 +235,9 @@ const useRoadmap = () => {
     try {
       // Ensure we're working with a string ID
       const stringId = ensureStringId(id);
-      console.log(`Attempting to delete roadmap with ID: ${stringId}`);
-      
       const response = await roadmapService.deleteRoadmap(stringId);
-      console.log('Delete API response:', response);
-      
       // Check if the response indicates success
       if (response && response.success) {
-        console.log('Roadmap deleted successfully on the server');
         return true;
       } else {
         // Handle error from response
@@ -283,7 +258,6 @@ const useRoadmap = () => {
   };
 
   const handleRoadmapClick = (roadmap) => {
-    console.log('Opening roadmap details:', roadmap);
     // Use the roadmap data we already have instead of making another API call
     setSelectedRoadmap(roadmap);
   };

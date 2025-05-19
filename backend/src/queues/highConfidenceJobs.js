@@ -18,11 +18,6 @@ const openai = new OpenAI({
 // Listen for 'job' events
 jobEmitter.on("job", async (data) => {
   const { emails, userId } = data;
-
-  console.log('\n=== Processing Job Event ===');
-  console.log('User ID:', userId);
-  console.log('Number of emails:', Array.isArray(emails) ? emails.length : 1);
-
   try {
     // Ensure we have valid email objects with required structure
     // The parsed emails from GmailService have a different structure 
@@ -33,20 +28,11 @@ jobEmitter.on("job", async (data) => {
     const jobApplications = [];
     
     for (const email of Array.isArray(emails) ? emails : [emails]) {
-      console.log('\n=== Processing Email for Job Application ===');
-      console.log('Email ID:', email.id);
-      console.log('Subject:', email.subject);
-      
       try {
         // Check if this email has job application data from NLP analysis
         if (email.isJobApplication) {
-          console.log('Is Job Application:', email.isJobApplication);
-          console.log('Confidence Score:', email.jobConfidenceScore);
-          
           // For high confidence applications (score >= 75) directly from NLP analysis
           if (email.jobConfidenceScore >= 75 && email.jobDetails) {
-            console.log('✅ High confidence job application found (>= 75)');
-            
             jobApplications.push({
               emailId: email.id,
               company: email.jobDetails?.company,
@@ -57,26 +43,15 @@ jobEmitter.on("job", async (data) => {
               userId
             });
           } else {
-            console.log('❌ Skipping low confidence job application (< 75)');
           }
         } else {
-          console.log('❌ Not a job application email');
         }
       } catch (emailError) {
         console.error('Error processing email for job application:', emailError);
       }
     }
-
-    console.log('\n=== Job Applications Found ===');
-    console.log('Total applications:', jobApplications.length);
-    console.log(JSON.stringify(jobApplications, null, 2));
-
     // High confidence jobs are those directly from the emails that were already analyzed
     const highConfidenceJobs = jobApplications;
-    
-    console.log('\n=== High Confidence Jobs ===');
-    console.log('Found jobs:', highConfidenceJobs.length);
-
     // Process each high confidence job with OpenAI
     for (const jobEmail of highConfidenceJobs) {
       try {
@@ -84,9 +59,6 @@ jobEmitter.on("job", async (data) => {
         const jobData = jobEmail.jobDetails || await analyzeJobEmailWithOpenAI(jobEmail);
 
         // Log the structured job data
-        console.log("\n=== Structured Job Data ===");
-        console.log(JSON.stringify(jobData, null, 2));
-
         // Only proceed if we have valid job data with required fields
         if (jobData && jobData.company && jobData.position) {
           try {
@@ -107,16 +79,11 @@ jobEmitter.on("job", async (data) => {
 
             // Format the job data for repository
             const formattedJob = formatJobForRepository(jobData, jobEmail.userId);
-            console.log("\n=== Formatted Job for Repository ===");
-            console.log(JSON.stringify(formattedJob, null, 2));
-
             // Create the job in the database
             const createdJob = await JobRepository.createJob(
               jobEmail.userId,
               formattedJob
             );
-            console.log("\n=== Job Created Successfully ===");
-            console.log("Job ID:", createdJob.id);
           } catch (dbError) {
             console.error("\n=== Database Error ===");
             console.error("Error saving job to database:", dbError.message);
@@ -211,8 +178,6 @@ Remember:
     const responseText = response.choices[0].message.content;
     
     // Log the raw response for debugging
-    console.log("Raw OpenAI response:", responseText);
-    
     // Parse the text as JSON
     let parsedData;
     try {
@@ -358,13 +323,7 @@ function formatJobForRepository(jobData, userId) {
 // Add job method for compatibility with the existing code
 const add = (emails, options = {}) => {
   // Get userId from options if it exists
-  console.log('\n=== Job Handler Called ===');
-  console.log('Options received:', options);
-  
   const userId = options.userId || "unknown-user";
-  console.log('User ID extracted:', userId);
-  console.log('Number of emails:', Array.isArray(emails) ? emails.length : 1);
-
   // Emit the job event with both emails and userId
   jobEmitter.emit("job", { emails, userId });
 

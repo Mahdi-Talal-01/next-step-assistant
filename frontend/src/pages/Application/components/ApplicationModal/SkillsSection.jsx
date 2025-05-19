@@ -10,7 +10,6 @@ const SkillsSection = ({ formData, setFormData, availableSkills, isEditing }) =>
   // Helper function to validate and ensure skills array
   const ensureSkillsArray = (data) => {
     if (!data.skills || !Array.isArray(data.skills)) {
-      console.log("DEBUG - SkillsSection - Creating empty skills array");
       return [];
     }
     return data.skills;
@@ -50,8 +49,6 @@ const SkillsSection = ({ formData, setFormData, availableSkills, isEditing }) =>
       
       return { name: 'Unnamed Skill', required: true };
     });
-    
-    console.log("DEBUG - SkillsSection - Processed skills:", JSON.stringify(processed));
     setProcessedSkills(processed);
   }, [formData.skills]);
 
@@ -63,9 +60,6 @@ const SkillsSection = ({ formData, setFormData, availableSkills, isEditing }) =>
         required: true
       };
     });
-    
-    console.log("DEBUG - SkillsSection - Setting skills from dropdown:", JSON.stringify(selectedSkills));
-    
     setFormData(prev => {
       const updatedData = { ...prev, skills: selectedSkills };
       return updatedData;

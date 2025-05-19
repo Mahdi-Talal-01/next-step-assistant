@@ -18,8 +18,6 @@ class GmailController {
       });
 
       const authUrl = GmailService.generateAuthUrl(state);
-      console.log("Generated Gmail auth URL:", authUrl);
-
       // Return the auth URL in both ways to ensure it's accessible
       return res.status(200).json({
         success: true,
@@ -69,11 +67,11 @@ class GmailController {
         scope: tokens.scope,
       });
 
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      const frontendUrl = process.env.FRONTEND_URL || "http://fse-final-mahdi.s3-website.eu-west-3.amazonaws.com/auth";
       res.redirect(`${frontendUrl}/app/gmail-tracker?connected=true`);
     } catch (error) {
       console.error("Gmail callback error:", error);
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      const frontendUrl = process.env.FRONTEND_URL || "http://fse-final-mahdi.s3-website.eu-west-3.amazonaws.com/auth";
       res.redirect(
         `${frontendUrl}/app/gmail-tracker?error=true&message=${encodeURIComponent(
           "Failed to connect Gmail"
@@ -139,17 +137,9 @@ class GmailController {
       
       // Log the structure of the first email for debugging
       if (emails && emails.length > 0) {
-        console.log('\n=== First Email Structure ===');
-        console.log('Keys:', Object.keys(emails[0]));
-        console.log('Has isJobApplication:', 'isJobApplication' in emails[0]);
-        console.log('Has jobConfidenceScore:', 'jobConfidenceScore' in emails[0]);
       }
       
       // emit job with userId
-      console.log('\n=== Sending emails to job handler ===');
-      console.log('Number of emails:', emails.length);
-      console.log('User ID:', req.user.id);
-      
       jobHandler(emails, { userId: req.user.id });
 
       // 2) Send the HTTP response immediately

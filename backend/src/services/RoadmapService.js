@@ -56,8 +56,6 @@ class RoadmapService {
 
   async updateTopicStatus(roadmapId, topicId, userId, status) {
     try {
-      console.log(`Service: Updating topic status. Roadmap=${roadmapId}, Topic=${topicId}, Status=${status}`);
-      
       const roadmap = await roadmapRepository.findById(roadmapId);
       if (!roadmap) {
         throw new Error("Roadmap not found");
@@ -75,8 +73,6 @@ class RoadmapService {
 
       // Calculate the new progress
       const progress = await roadmapRepository.calculateProgress(roadmapId);
-      console.log(`Calculated new progress: ${progress}%`);
-
       // Use the dedicated method to update just the progress field
       await roadmapRepository.updateProgress(roadmapId, progress);
 

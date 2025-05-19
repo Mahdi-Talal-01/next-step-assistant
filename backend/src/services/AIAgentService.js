@@ -45,9 +45,6 @@ class AIAgentService {
 
       // Send to n8n webhook
       const response = await axios.post(webhookUrl, payload);
-
-      console.log("Data sent to n8n webhook successfully");
-
       // Extract the assistant's response text
       let assistantMessage = "";
 

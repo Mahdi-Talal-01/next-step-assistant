@@ -26,10 +26,7 @@ class AuthService {
 
   async login(credentials) {
     try {
-      console.log('Login request:', credentials);
       const response = await BaseApi.post('/users/login', credentials);
-      console.log('Login response:', response);
-      
       if (response.success) {
         // Handle both data structures - if message contains user and token
         if (response.message && typeof response.message === 'object' && response.message.user && response.message.token) {
@@ -60,11 +57,9 @@ class AuthService {
     try {
       if (data.token) {
         localStorage.setItem('access_token', data.token);
-        console.log('Token saved in setAuthData:', data.token);
       }
       if (data.user) {
         localStorage.setItem('user', JSON.stringify(data.user));
-        console.log('User data saved in setAuthData:', data.user);
       }
     } catch (error) {
       console.error('Error saving auth data:', error);
@@ -77,7 +72,6 @@ class AuthService {
     try {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
-      console.log('Auth data cleared');
     } catch (error) {
       console.error('Error clearing auth data:', error);
     }
@@ -88,9 +82,6 @@ class AuthService {
       const token = localStorage.getItem('access_token');
       const userStr = localStorage.getItem('user');
       const user = userStr ? JSON.parse(userStr) : null;
-      
-      console.log('Getting auth data:', { token: !!token, user: !!user });
-      
       return {
         token,
         user,
@@ -109,7 +100,6 @@ class AuthService {
 
   isAuthenticated() {
     const { isAuthenticated } = this.getAuthData();
-    console.log('Checking authentication:', isAuthenticated);
     return isAuthenticated;
   }
 }

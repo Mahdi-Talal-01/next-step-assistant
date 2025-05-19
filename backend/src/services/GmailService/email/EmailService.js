@@ -27,10 +27,6 @@ class EmailService extends IEmailService {
    */
   async listEmails(userId, options = {}, convertToMarkdown = true) {
     try {
-      console.log('\n=== EmailService.listEmails called ===');
-      console.log('User ID:', userId);
-      console.log('Options:', JSON.stringify(options));
-      
       // Get OAuth2 client
       const auth = await this.authService.getOAuth2Client(userId);
       
@@ -39,8 +35,6 @@ class EmailService extends IEmailService {
 
       // Build query
       const query = this.buildQuery(options);
-      console.log('Query:', query);
-
       // Get messages
       const response = await gmail.users.messages.list({
         userId: 'me',
@@ -48,9 +42,6 @@ class EmailService extends IEmailService {
         q: query,
         labelIds: options.labelIds || ['INBOX']
       });
-      
-      console.log(`Found ${response.data.messages?.length || 0} messages`);
-
       // Get full message details
       const messages = await Promise.all(
         response.data.messages.map(async (message) => {
@@ -62,9 +53,6 @@ class EmailService extends IEmailService {
           return fullMessage.data;
         })
       );
-
-      console.log(`Retrieved ${messages.length} full messages`);
-
       // Parse messages
       const parsedMessages = await Promise.all(
         messages.map(async (message) => {
@@ -76,8 +64,6 @@ class EmailService extends IEmailService {
           return parsed;
         })
       );
-
-      console.log(`Parsed ${parsedMessages.length} messages`);
       return parsedMessages;
     } catch (error) {
       console.error('Error listing emails:', error);

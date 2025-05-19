@@ -63,13 +63,9 @@ const EmailTracker = () => {
 
   // Update emails in filtering hook when emails change
   useEffect(() => {
-    console.log("EmailTracker: emails from useGmailApi:", emails);
-    console.log("EmailTracker: emails length:", emails?.length || 0);
     setFilteredEmails(emails || []);
     
     setTimeout(() => {
-      console.log("EmailTracker: filteredEmails after update:", filteredEmails);
-      console.log("EmailTracker: filteredEmails length:", filteredEmails?.length || 0);
     }, 0);
   }, [emails, setFilteredEmails, filteredEmails]);
 

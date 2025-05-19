@@ -93,7 +93,6 @@ export function useChat(fallbackService) {
       // Try fallback if API fails and fallback is provided
       if (fallbackService) {
         try {
-          console.log('Trying fallback service...');
           const fallbackResponse = await fallbackService(text);
           setMessages(prev => [...prev, fallbackResponse]);
         } catch (fallbackError) {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'http://15.236.226.177:3000/api',
   timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
@@ -36,13 +36,11 @@ instance.interceptors.response.use(
       // Don't automatically log out for Gmail API failures
       // This prevents auto-logout when Gmail authorization fails
       if (!url.includes('/gmail/') && !url.includes('/oauth/')) {
-        console.log('Auth failure detected. Logging out user...');
         // Handle unauthorized access
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         window.location.href = '/auth';
       } else {
-        console.log('Auth failure for Gmail API - not logging out user');
       }
     }
     return Promise.reject(error);
@@ -75,8 +73,6 @@ const request = async (method, url, data = null, config = {}) => {
     const response = await instance(requestConfig);
     
     // Log detailed response for all request types
-    console.log(`[RESPONSE ${method.toUpperCase()} ${url}] Status: ${response.status}`, response.data);
-    
     // Extract the data from the response to handle our API format
     if (response && response.data) {
       // Handle our backend ResponseTrait format

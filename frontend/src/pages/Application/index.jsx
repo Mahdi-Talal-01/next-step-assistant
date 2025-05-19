@@ -89,8 +89,6 @@ const Applications = () => {
   };
 
   const handleUpdateApplication = async (updatedApplication) => {
-    console.log("DEBUG - index.jsx - Received application:", JSON.stringify(updatedApplication));
-    
     // Create a deep copy
     const applicationCopy = JSON.parse(JSON.stringify(updatedApplication));
     
@@ -116,9 +114,6 @@ const Applications = () => {
       // Fallback
       return { name: "General", required: true };
     });
-    
-    console.log("DEBUG - index.jsx - Final application with skills:", JSON.stringify(applicationCopy.skills));
-    
     let success;
     if (isNew) {
       success = await addApplication(applicationCopy);
@@ -133,11 +128,9 @@ const Applications = () => {
   };
 
   const handleStatusUpdate = async (id, newStatus) => {
-    console.log(`Application component: Status update requested for job ID ${id} to status '${newStatus}'`);
     try {
       const result = await updateApplicationStatus(id, newStatus);
       if (result) {
-        console.log(`Status update successful for job ID ${id}`);
       } else {
         console.error(`Status update failed for job ID ${id}`);
       }

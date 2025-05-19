@@ -8,7 +8,6 @@ const prisma = new PrismaClient();
 // Connect to test database before tests
 // Jest will automatically pick up these hooks
 global.beforeAll(async () => {
-  console.log("Test database connected:", process.env.DATABASE_URL);
 });
 
 // Disconnect after all tests are done

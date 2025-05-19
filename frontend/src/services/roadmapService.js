@@ -34,8 +34,6 @@ class RoadmapService {
         };
       }),
     };
-
-    console.log("Creating roadmap with processed data:", processedData);
     return request.post("/roadmaps", processedData);
   }
 
@@ -58,8 +56,6 @@ class RoadmapService {
         };
       }),
     };
-
-    console.log("Updating roadmap with processed data:", processedData);
     return request.put(`/roadmaps/${ensureStringId(id)}`, processedData);
   }
 
@@ -70,8 +66,6 @@ class RoadmapService {
     );
     try {
       const response = await request.delete(`/roadmaps/${stringId}`);
-      console.log(`Delete roadmap response:`, response);
-
       // Make sure we return a properly structured response even if the backend doesn't
       if (!response || typeof response !== "object") {
         return {

@@ -5,7 +5,7 @@ dotenv.config();
 
 const REDIRECT_URL =
   process.env.GOOGLE_AUTH_REDIRECT_URL ||
-  "http://localhost:3000/api/auth/google/callback";
+  "http://15.236.226.177:3000/api/auth/google/callback";
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -30,9 +30,6 @@ class OAuthService {
       process.env.JWT_SECRET || "secret-fallback",
       { expiresIn: "1h" }
     );
-
-    console.log("Generating OAuth URL with redirect:", REDIRECT_URL);
-
     return oauth2Client.generateAuthUrl({
       access_type: "offline",
       scope: scopes,
@@ -44,7 +41,6 @@ class OAuthService {
 
   async getToken(code) {
     try {
-      console.log("Getting token with code and redirect URL:", REDIRECT_URL);
       const { tokens } = await oauth2Client.getToken({
         code: code,
         redirect_uri: REDIRECT_URL, // Explicitly pass redirect_uri here too

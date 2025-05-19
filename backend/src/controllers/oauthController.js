@@ -7,8 +7,6 @@ const prisma = new PrismaClient();
 class OAuthController {
   async handleGoogleAuth(req, res) {
     try {
-      console.log("Initiating Google authentication...");
-
       // Check if required environment variables are set
       if (!process.env.GOOGLE_CLIENT_ID) {
         console.error("Missing GOOGLE_CLIENT_ID environment variable");
@@ -27,12 +25,10 @@ class OAuthController {
       console.log(
         "Using redirect URL:",
         process.env.GOOGLE_REDIRECT_URL ||
-          "http://localhost:3000/api/auth/google/callback"
+          "http://15.236.226.177:3000/api/auth/google/callback"
       );
 
       const url = oauthService.generateAuthUrl();
-      console.log("Auth URL generated successfully");
-
       return res.json({ url });
     } catch (error) {
       console.error("Google auth error:", error);

@@ -134,9 +134,6 @@ export const useApplications = () => {
             })
           : []
       };
-      
-      console.log('DEBUG - addApplication - Formatted skills:', JSON.stringify(formattedApplication.skills));
-      
       if (formattedApplication.skills.length === 0) {
         console.error('Cannot add application with empty skills array');
         setError('Skills information is required');
@@ -201,9 +198,6 @@ export const useApplications = () => {
             })
           : []
       };
-      
-      console.log('DEBUG - updateApplication - Formatted skills:', JSON.stringify(formattedData.skills));
-      
       if (formattedData.skills.length === 0) {
         console.error('Cannot update application with empty skills array');
         setError('Skills information is required');
@@ -250,13 +244,8 @@ export const useApplications = () => {
     try {
       const app = applications.find((a) => a.id === id);
       if (!app) return false;
-      
-      console.log(`Updating application ${id} status to ${newStatus}`);
-      
       // Use the dedicated status update method instead of the general update method
       const response = await jobService.updateJobStatus(id, newStatus, app.notes);
-      console.log('Status update response:', response);
-      
       if (response) {
         // If we got a response with updated job data, use it to update our local state
         if (response.data && typeof response.data === 'object') {

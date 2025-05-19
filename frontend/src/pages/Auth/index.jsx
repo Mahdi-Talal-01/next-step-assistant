@@ -58,25 +58,16 @@ const Auth = () => {
   // Handle form submissions
   const handleSubmit = async (data) => {
     try {
-      console.log("Form submit with data:", data);
-      
       if (isLogin) {
-        console.log("Attempting login...");
         const result = await login(data);
-        console.log("Login result:", result);
       } else {
-        console.log("Attempting registration...");
         const result = await register(data);
-        console.log("Registration result:", result);
       }
       
       // Check authentication immediately after login/register
       const authState = isAuthenticated();
-      console.log("Auth state after login/register:", authState);
-      
       if (authState.authenticated) {
         const from = location.state?.from?.pathname || "/app/dashboard";
-        console.log("Redirecting to:", from);
         navigate(from, { replace: true });
       } else {
         console.error("Still not authenticated after successful login/register");

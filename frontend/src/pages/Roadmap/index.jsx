@@ -45,15 +45,12 @@ const Roadmap = () => {
 
   const handleDeleteClick = (roadmap, e) => {
     e.stopPropagation();
-    console.log('Delete button clicked for roadmap:', roadmap.id, roadmap.title);
     setRoadmapToDelete(roadmap);
     setShowDeleteDialog(true);
   };
 
   const handleConfirmDelete = async () => {
     if (!roadmapToDelete) return;
-    
-    console.log('Confirming deletion of roadmap:', roadmapToDelete.id, roadmapToDelete.title);
     setIsDeleting(true);
     
     try {
@@ -61,7 +58,6 @@ const Roadmap = () => {
       const success = await handleDeleteRoadmap(roadmapToDelete.id);
       
       if (success) {
-        console.log('Roadmap successfully deleted, refreshing roadmap list');
       } else {
         console.error('Failed to delete roadmap - server returned an error');
         // You could show a notification error here
@@ -69,7 +65,6 @@ const Roadmap = () => {
       
       // Regardless of success or failure with the deletion, refresh the roadmap list
       // This ensures our UI is in sync with the server state
-      console.log('Refreshing roadmap list');
       await fetchRoadmaps();
       
     } catch (error) {
@@ -84,7 +79,6 @@ const Roadmap = () => {
   };
 
   const handleCancelDelete = () => {
-    console.log('Deletion cancelled');
     setShowDeleteDialog(false);
     setRoadmapToDelete(null);
   };

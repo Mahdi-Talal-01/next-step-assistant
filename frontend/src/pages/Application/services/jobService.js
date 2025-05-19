@@ -57,20 +57,14 @@ class JobService {
       // Check for empty skills array before doing anything else
       if (!jobData.skills || !Array.isArray(jobData.skills) || jobData.skills.length === 0) {
         console.error('ERROR: Cannot create job with empty skills array');
-        console.log('Original job data:', JSON.stringify(jobData));
         throw new Error('Skills are required');
       }
       
       // Make a deep copy of the data to avoid modifying the original
       // Using JSON.parse/stringify to ensure deep copying of nested objects
       const formattedData = JSON.parse(JSON.stringify(jobData));
-      
-      console.log('DEBUG Raw jobData:', JSON.stringify(jobData));
-
       // Format skills data
       if (formattedData.skills) {
-        console.log('DEBUG Original skills:', JSON.stringify(formattedData.skills));
-        
         // Check for valid skills
         const validSkills = formattedData.skills.filter(skill => 
           typeof skill === 'object' && skill !== null && (skill.name || skill.skillId)
@@ -84,7 +78,6 @@ class JobService {
         if (Array.isArray(formattedData.skills)) {
           // If skills array is empty, initialize with at least one placeholder skill
           if (formattedData.skills.length === 0) {
-            console.log('Skills array is empty, adding default required skills');
             // We'll add a blank skill with just required property to trigger proper validation
             formattedData.skills = [{ name: 'General', required: true }];
           } else {
@@ -94,7 +87,6 @@ class JobService {
             );
             
             if (hasValidSkills) {
-              console.log('Skills are already properly formatted');
               // Make sure we keep the existing format but create a new array
               formattedData.skills = formattedData.skills.map(skill => ({
                 name: skill.name,
@@ -107,7 +99,6 @@ class JobService {
                   // Keep skills that have a name or skillId or id
                   const isValid = skill.name || skill.skillId || skill.id || (typeof skill === 'string' && skill.trim());
                   if (!isValid) {
-                    console.log('Removing invalid skill:', JSON.stringify(skill));
                   }
                   return isValid;
                 })
@@ -163,9 +154,6 @@ class JobService {
         console.error('ERROR: Skills property is missing or invalid');
         throw new Error('Skills are required');
       }
-      
-      console.log('DEBUG Final skills:', JSON.stringify(formattedData.skills));
-
       // Final check before submitting
       if (!formattedData.skills || formattedData.skills.length === 0) {
         console.error('ERROR: Skills array is empty after processing');
@@ -180,11 +168,8 @@ class JobService {
       }
 
       // Log the exact data being sent to the API
-      console.log('Submitting job data to API:', JSON.stringify(formattedData));
-      
       try {
         const response = await BaseApi.post("/jobs", formattedData);
-        console.log('API response:', response);
         return response.data || null;
       } catch (apiError) {
         console.error("API Error:", apiError);
@@ -207,20 +192,14 @@ class JobService {
       // Check for empty skills array before doing anything else
       if (!jobData.skills || !Array.isArray(jobData.skills) || jobData.skills.length === 0) {
         console.error('ERROR: Cannot update job with empty skills array');
-        console.log('Original update job data:', JSON.stringify(jobData));
         throw new Error('Skills are required');
       }
       
       // Make a deep copy of the data to avoid modifying the original
       // Using JSON.parse/stringify to ensure deep copying of nested objects
       const formattedData = JSON.parse(JSON.stringify(jobData));
-      
-      console.log('DEBUG Raw updateJob data:', JSON.stringify(jobData));
-
       // Format skills data
       if (formattedData.skills) {
-        console.log('DEBUG Original update skills:', JSON.stringify(formattedData.skills));
-        
         // Check for valid skills
         const validSkills = formattedData.skills.filter(skill => 
           typeof skill === 'object' && skill !== null && (skill.name || skill.skillId)
@@ -234,7 +213,6 @@ class JobService {
         if (Array.isArray(formattedData.skills)) {
           // If skills array is empty, initialize with at least one placeholder skill
           if (formattedData.skills.length === 0) {
-            console.log('Skills array is empty, adding default required skills');
             // We'll add a blank skill with just required property to trigger proper validation
             formattedData.skills = [{ name: 'General', required: true }];
           } else {
@@ -244,7 +222,6 @@ class JobService {
             );
             
             if (hasValidSkills) {
-              console.log('Skills are already properly formatted');
               // Make sure we keep the existing format but create a new array
               formattedData.skills = formattedData.skills.map(skill => ({
                 name: skill.name,
@@ -257,7 +234,6 @@ class JobService {
                   // Keep skills that have a name or skillId or id
                   const isValid = skill.name || skill.skillId || skill.id || (typeof skill === 'string' && skill.trim());
                   if (!isValid) {
-                    console.log('Removing invalid skill in update:', JSON.stringify(skill));
                   }
                   return isValid;
                 })
@@ -313,9 +289,6 @@ class JobService {
         console.error('ERROR: Skills property is missing or invalid in update');
         throw new Error('Skills are required');
       }
-      
-      console.log('DEBUG Final update skills:', JSON.stringify(formattedData.skills));
-      
       // Final check before submitting
       if (!formattedData.skills || formattedData.skills.length === 0) {
         console.error('ERROR: Skills array is empty after processing in update');
@@ -335,11 +308,8 @@ class JobService {
       delete formattedData.userId;
       delete formattedData.createdAt;
       delete formattedData.updatedAt;
-
-      console.log('Submitting updated job data:', JSON.stringify(formattedData));
       try {
         const response = await BaseApi.put(`/jobs/${jobId}`, formattedData);
-        console.log('API update response:', response);
         return response.data || null;
       } catch (apiError) {
         console.error("API Update Error:", apiError);
@@ -358,18 +328,13 @@ class JobService {
    */
   async deleteJob(jobId) {
     try {
-      console.log(`DEBUG: Attempting to delete job with ID: ${jobId}`);
-      
       // Log the request config that will be sent
       const config = {
         method: 'DELETE',
         url: `/jobs/${jobId}`,
         headers: { 'Content-Type': 'application/json' }
       };
-      console.log('DELETE Request config:', config);
-      
       const response = await BaseApi.delete(`/jobs/${jobId}`);
-      console.log('DELETE Response:', response);
       return true;
     } catch (error) {
       console.error(`Error deleting job ${jobId}:`, error);

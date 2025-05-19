@@ -20,24 +20,19 @@ export const useProfile = () => {
         if (response.data) {
           // Standard structure: { data: {...} }
           profileData = response.data;
-          console.log('Using response.data as profile data');
         } else if (response.success && response.message && typeof response.message === 'object') {
           // API response with profile in message property
           profileData = response.message;
-          console.log('Using response.message as profile data');
         } else if (response.success && response.data) {
           // API response with success flag: { success: true, data: {...} }
           profileData = response.data;
-          console.log('Using response.data from success response');
         } else if (response.user || response.bio || response.id) {
           // Response is directly the profile object
           profileData = response;
-          console.log('Using direct response as profile data');
         }
       }
       
       if (profileData) {
-        console.log('Setting profile data:', profileData);
         setProfile(profileData);
       } else {
         console.error('Could not extract profile data from response:', response);
@@ -73,12 +68,8 @@ export const useProfile = () => {
         } else if (response.success) {
           // If we got a success response but no usable profile data,
           // fetch the latest profile data instead of using the response
-          console.log('Update successful but no profile data returned. Fetching latest profile...');
-          
           // Fetch the latest profile data
           const profileResponse = await profileService.getProfile();
-          console.log('Fetched latest profile after update:', profileResponse);
-          
           if (profileResponse && typeof profileResponse === 'object') {
             if (profileResponse.data && typeof profileResponse.data === 'object') {
               updatedProfileData = profileResponse.data;
@@ -90,7 +81,6 @@ export const useProfile = () => {
       }
       
       if (updatedProfileData && typeof updatedProfileData === 'object') {
-        console.log('Setting updated profile:', updatedProfileData);
         setProfile(updatedProfileData);
         return response;
       } else {
@@ -132,12 +122,8 @@ export const useProfile = () => {
         } else if (response.success) {
           // If we got a success response but no usable CV data,
           // fetch the latest profile data instead of using the response
-          console.log('CV upload successful but no CV data returned. Fetching latest profile...');
-          
           // Fetch the latest profile data
           const profileResponse = await profileService.getProfile();
-          console.log('Fetched latest profile after CV upload:', profileResponse);
-          
           let profileData = null;
           if (profileResponse && typeof profileResponse === 'object') {
             if (profileResponse.data && typeof profileResponse.data === 'object') {

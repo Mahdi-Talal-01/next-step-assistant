@@ -26,8 +26,6 @@ class OAuthController {
       }
 
       const url = oauthService.generateAuthUrl();
-      console.log("Auth URL generated successfully");
-
       return res.json({ url });
     } catch (error) {
       console.error("Google auth error:", error);

@@ -22,18 +22,12 @@ class NLPMessageParser extends BaseMessageParser {
    */
   async processJobApplication(userId, analysis) {
     try {
-      console.log('\n=== Starting Job Processing ===');
-      console.log('User ID:', userId);
-      console.log('Analysis:', JSON.stringify(analysis, null, 2));
-
       if (!analysis.isJobApplication || !analysis.jobDetails) {
-        console.log('❌ Not a job application or missing job details');
         return null;
       }
       
       // Ensure we only process high confidence job applications (score >= 75)
       if (analysis.jobConfidenceScore < 75) {
-        console.log(`❌ Skipping low confidence job application: ${analysis.jobConfidenceScore}`);
         return null;
       }
 
@@ -55,51 +49,29 @@ class NLPMessageParser extends BaseMessageParser {
         // Always include an empty skills array by default
         skills: []
       };
-
-      console.log('\n=== Prepared Job Data ===');
-      console.log(JSON.stringify(jobData, null, 2));
-
       // If skills are provided, override the default empty array
       if (skills && Array.isArray(skills) && skills.length > 0) {
         jobData.skills = skills;
-        console.log('\n=== Skills Data ===');
-        console.log(JSON.stringify(skills, null, 2));
       }
-
-      console.log('\n=== Checking Existing Jobs ===');
       // Get existing jobs for the user
       const existingJobs = await JobRepository.getJobsByUserId(userId);
-      console.log('Found existing jobs:', existingJobs.length);
-      
       // Find if a job with the same company and position exists
       const existingJob = existingJobs.find(job => 
         job.company.toLowerCase() === company.toLowerCase() && 
         job.position.toLowerCase() === position.toLowerCase()
       );
-
-      console.log('\n=== Job Match Result ===');
-      console.log('Existing job found:', !!existingJob);
       if (existingJob) {
-        console.log('Existing job ID:', existingJob.id);
       }
 
       let result;
       try {
         if (existingJob) {
-          console.log('\n=== Updating Existing Job ===');
-          console.log('Job ID:', existingJob.id);
           // Update existing job
           result = await JobRepository.updateJob(existingJob.id, userId, jobData);
-          console.log('Update successful:', !!result);
         } else {
-          console.log('\n=== Creating New Job ===');
           // Create new job
           result = await JobRepository.createJob(userId, jobData);
-          console.log('Creation successful:', !!result);
         }
-
-        console.log('\n=== Final Result ===');
-        console.log(JSON.stringify(result, null, 2));
         return result;
       } catch (dbError) {
         console.error('\n=== Database Operation Error ===');
@@ -125,29 +97,13 @@ class NLPMessageParser extends BaseMessageParser {
    */
   async parseMessage(message, userId) {
     try {
-      console.log('\n=== Starting Message Parse ===');
-      console.log('User ID:', userId);
-      
       const basicData = this.extractBasicEmailData(message);
-      console.log('\n=== Basic Email Data ===');
-      console.log(JSON.stringify(basicData, null, 2));
-      
       // Add NLP analysis
       const nlpData = await this.analyzeWithNLP(basicData);
-      console.log('\n=== NLP Analysis Result ===');
-      console.log(JSON.stringify(nlpData, null, 2));
-      
       // Process job application if it is one with confidence >= 75
       if (nlpData.isJobApplication && nlpData.jobConfidenceScore >= 75 && userId) {
-        console.log('\n=== Processing High Confidence Job Application ===');
-        console.log('Confidence Score:', nlpData.jobConfidenceScore);
         await this.processJobApplication(userId, nlpData);
       } else {
-        console.log('\n=== Skipping Job Processing ===');
-        console.log('Is Job Application:', nlpData.isJobApplication);
-        console.log('Confidence Score:', nlpData.jobConfidenceScore);
-        console.log('Has User ID:', !!userId);
-        console.log('Meets threshold of 75:', nlpData.jobConfidenceScore >= 75);
       }
       
       return {
@@ -173,9 +129,6 @@ class NLPMessageParser extends BaseMessageParser {
       if (!content) {
         throw new Error('Empty response from OpenAI');
       }
-
-      console.log('Cleaning JSON response:', content);
-
       // Find the first occurrence of '{' and the last occurrence of '}'
       const startIndex = content.indexOf('{');
       const endIndex = content.lastIndexOf('}') + 1;
@@ -186,8 +139,6 @@ class NLPMessageParser extends BaseMessageParser {
 
       // Extract the JSON string
       const jsonStr = content.slice(startIndex, endIndex);
-      console.log('Extracted JSON string:', jsonStr);
-      
       // Parse the JSON
       const parsed = JSON.parse(jsonStr);
       
@@ -218,13 +169,6 @@ class NLPMessageParser extends BaseMessageParser {
   async analyzeWithNLP(emailData) {
     try {
       // Debug input data
-      console.log('\n=== NLP Parser Input ===');
-      console.log('Email Subject:', emailData.subject);
-      console.log('Email Body Length:', emailData.body?.length || 0);
-      console.log('Email Body Preview:', emailData.body?.substring(0, 200) + '...');
-      console.log('Full Email Data:', JSON.stringify(emailData, null, 2));
-      console.log('========================\n');
-
       const prompt = `You are a specialized job application email analyzer. Your task is to analyze the following email and extract job application details in a structured format.
 
 Subject: ${emailData.subject}
@@ -270,13 +214,6 @@ Important guidelines:
 Do not include any other text or formatting outside of this JSON object.`;
 
       // Debug OpenAI request
-      console.log('\n=== OpenAI Request ===');
-      console.log('Model:', 'gpt-4');
-      console.log('Temperature:', 0.1);
-      console.log('Prompt:', prompt);
-      console.log('========================\n');
-
-      console.log('Sending request to OpenAI...');
       const response = await this.openai.chat.completions.create({
         model: "gpt-4",
         messages: [
@@ -293,22 +230,9 @@ Do not include any other text or formatting outside of this JSON object.`;
       });
 
       // Debug OpenAI response
-      console.log('\n=== OpenAI Response ===');
-      console.log('Raw Response:', response.choices[0].message.content);
-      console.log('Response Length:', response.choices[0].message.content.length);
-      console.log('Full Response Object:', JSON.stringify(response, null, 2));
-      console.log('========================\n');
-      
       const analysis = this.cleanAndParseJSON(response.choices[0].message.content);
       
       // Debug parsed analysis
-      console.log('\n=== Parsed Analysis ===');
-      console.log('Is Job Application:', analysis.isJobApplication);
-      console.log('Confidence Score:', analysis.confidenceScore);
-      console.log('Job Details:', JSON.stringify(analysis.jobDetails, null, 2));
-      console.log('Full Analysis:', JSON.stringify(analysis, null, 2));
-      console.log('========================\n');
-      
       return {
         isJobApplication: analysis.isJobApplication || false,
         jobConfidenceScore: analysis.confidenceScore || 0,
@@ -339,10 +263,6 @@ Do not include any other text or formatting outside of this JSON object.`;
    */
   async extractJobApplicationData(parsedEmails, userId) {
     try {
-      console.log('\n=== Extracting Job Applications ===');
-      console.log('User ID:', userId);
-      console.log('Number of emails:', parsedEmails.length);
-
       const jobApplications = [];
       
       for (const email of parsedEmails) {
@@ -351,10 +271,6 @@ Do not include any other text or formatting outside of this JSON object.`;
           const parsedData = await this.parseMessage(email, userId);
           
           if (parsedData.isJobApplication && parsedData.jobConfidenceScore >= 75) {
-            console.log('\n=== Found High Confidence Job ===');
-            console.log('Email ID:', email.id);
-            console.log('Confidence Score:', parsedData.jobConfidenceScore);
-            
             jobApplications.push({
               emailId: email.id,
               company: parsedData.jobDetails?.company,
@@ -369,11 +285,6 @@ Do not include any other text or formatting outside of this JSON object.`;
           continue;
         }
       }
-
-      console.log('\n=== Job Applications Found ===');
-      console.log('Total applications:', jobApplications.length);
-      console.log(JSON.stringify(jobApplications, null, 2));
-
       return jobApplications;
     } catch (error) {
       console.error('Error extracting job applications:', error);

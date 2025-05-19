@@ -15,7 +15,6 @@ const Profile = () => {
 
   // Log the actual profile data for debugging
   useEffect(() => {
-    console.log('Profile component received profile data:', profile);
   }, [profile]);
 
   const handleProfileUpdate = async (profileData) => {
@@ -91,8 +90,6 @@ const Profile = () => {
   } : defaultProfile;
 
   // Log the safe profile for debugging
-  console.log('Safe profile to be rendered:', safeProfile);
-
   return (
     <div className={styles.profileContainer}>
       {/* Profile Header with Avatar and Name */}

@@ -96,7 +96,6 @@ class ContentAssistantService {
         for await (const chunk of stream) {
           // Check if client disconnected
           if (res.writableEnded) {
-            console.log("Client disconnected, stopping stream");
             break;
           }
 

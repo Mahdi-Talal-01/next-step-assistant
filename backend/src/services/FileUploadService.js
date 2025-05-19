@@ -39,7 +39,6 @@ class FileUploadService {
   }
 
   getUploadMiddleware() {
-    console.log("getUploadMiddleware");
     return this.upload.single('cv');
   }
 

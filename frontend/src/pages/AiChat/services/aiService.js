@@ -10,19 +10,12 @@ export const sendMessageToAI = async (text) => {
   try {
     // Ensure we send the correct message format
     const payload = { message: text };
-    console.log('Sending message to AI:', payload);
-    
     const response = await request.post('/ai-agent/message', payload);
-    console.log('Received AI response:', response);
-    
     // Extract the response data - request.js already handles the standard format extraction
     const responseData = response.data;
     
     // Extract the AI's message text based on the sample response format
     let aiMessageText = '';
-    
-    console.log('Processing response data:', responseData);
-    
     // Handle array format from backend: data: [{ output: "..." }]
     if (Array.isArray(responseData) && responseData.length > 0) {
       const firstItem = responseData[0];
