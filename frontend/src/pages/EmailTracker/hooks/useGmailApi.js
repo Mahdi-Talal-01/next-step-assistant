@@ -13,7 +13,11 @@ export const useGmailApi = () => {
     try {
       setIsLoading(true);
       const response = await BaseApi.get("/gmail/status");
+      console.log("Auth status response:", response);
+
       // First log complete response
+      console.log("Complete response object:", JSON.stringify(response));
+
       // IMPORTANT: Default to NOT authorized until confirmed
       let authStatus = false;
 
@@ -25,6 +29,7 @@ export const useGmailApi = () => {
       ) {
         // Priority 1: response.data.isAuthorized
         authStatus = response.data.isAuthorized;
+        console.log("Using authorization status from response.data:", authStatus);
       } else if (
         response &&
         response.success === true &&
@@ -33,12 +38,14 @@ export const useGmailApi = () => {
       ) {
         // Priority 2: response.success + response.data.isAuthorized
         authStatus = response.data.isAuthorized;
+        console.log("Using authorization status from response.data with success check:", authStatus);
       } else if (
         response &&
         typeof response.isAuthorized === "boolean"
       ) {
         // Priority 3: response.isAuthorized
         authStatus = response.isAuthorized;
+        console.log("Using authorization status from response root:", authStatus);
       } else if (
         response &&
         response.success === true &&
@@ -47,7 +54,11 @@ export const useGmailApi = () => {
       ) {
         // Priority 4 (lowest): response.message.isAuthorized
         authStatus = response.message.isAuthorized;
+        console.log("Using authorization status from response.message:", authStatus);
       }
+
+      console.log("Final parsed authorization status:", authStatus);
+
       setIsAuthorized(authStatus);
       setAuthChecked(true);
 
@@ -74,6 +85,8 @@ export const useGmailApi = () => {
     try {
       setIsLoading(true);
       const response = await BaseApi.get("/gmail/auth");
+      console.log("Auth URL response:", response);
+
       // Check different possibilities for how the URL might be nested
       if (response && response.authUrl) {
         return response.authUrl;
@@ -83,6 +96,7 @@ export const useGmailApi = () => {
         return response;
       } else if (response && typeof response === "object") {
         // Log the full response to help debug
+        console.log("Auth URL response structure:", JSON.stringify(response));
         // Try to find anything that looks like a URL
         for (const key in response) {
           if (
@@ -164,6 +178,7 @@ export const useGmailApi = () => {
         const isUserAuthorized = typeof authStatus === 'boolean' ? authStatus : isAuthorized;
         
         if (!isUserAuthorized) {
+          console.log("Not authorized to fetch emails");
           return [];
         }
 
@@ -181,13 +196,20 @@ export const useGmailApi = () => {
         const endpoint = queryString
           ? `/gmail/emails?${queryString}`
           : "/gmail/emails";
+
+        console.log("Fetching emails with endpoint:", endpoint);
+
         const response = await BaseApi.get(endpoint);
+        console.log("Fetch emails response:", response);
+        console.log("Full email response JSON:", JSON.stringify(response));
+
         // Handle different response structures
         let emailsData = [];
 
         // Try to extract email data from various response structures
         if (Array.isArray(response)) {
           emailsData = response;
+          console.log("Found emails in root array");
         } else if (
           response &&
           response.data &&
@@ -195,6 +217,7 @@ export const useGmailApi = () => {
         ) {
           // Priority 1: response.data is an array
           emailsData = response.data;
+          console.log("Found emails in response.data array");
         } else if (
           response &&
           response.data &&
@@ -203,6 +226,7 @@ export const useGmailApi = () => {
         ) {
           // Priority 2: response.data.data is an array
           emailsData = response.data.data;
+          console.log("Found emails in response.data.data array");
         } else if (
           response &&
           response.success &&
@@ -211,6 +235,7 @@ export const useGmailApi = () => {
         ) {
           // Priority 3: response.success + response.data is an array
           emailsData = response.data;
+          console.log("Found emails in response.data array with success check");
         } else if (
           response &&
           response.success &&
@@ -218,6 +243,7 @@ export const useGmailApi = () => {
         ) {
           // Priority 4: response.message is an array
           emailsData = response.message;
+          console.log("Found emails in response.message array:", emailsData.length);
         } else if (
           response &&
           response.message &&
@@ -225,15 +251,20 @@ export const useGmailApi = () => {
         ) {
           // Priority 5: response.message is an array (without success check)
           emailsData = response.message;
+          console.log("Found emails in response.message array (no success check):", emailsData.length);
         }
         
         // Ensure that emailsData is always an array
         if (!Array.isArray(emailsData)) {
           console.error("Failed to extract email data from response, setting to empty array");
+          console.log("Response structure was:", JSON.stringify(response));
           emailsData = [];
         } else {
+          console.log("Successfully extracted emails from response:", emailsData.length);
+          
           // Log a sample email to help debug the structure
           if (emailsData.length > 0) {
+            console.log("Sample email object structure:", JSON.stringify(emailsData[0]));
           }
         }
 
@@ -256,6 +287,7 @@ export const useGmailApi = () => {
 
               // Log one email for debugging
               if (emailsData.indexOf(email) === 0) {
+                console.log("Processing first email:", JSON.stringify(email));
               }
 
               // Set default category to primary if not specified
@@ -296,6 +328,8 @@ export const useGmailApi = () => {
               
               // Log the first transformed email for debugging
               if (emailsData.indexOf(email) === 0) {
+                console.log("First email raw data:", email);
+                console.log("First email transformed:", formattedEmail);
               }
               
               return formattedEmail;
@@ -306,6 +340,9 @@ export const useGmailApi = () => {
             }
           })
           .filter(Boolean); // Remove any null entries
+
+        console.log("Transformed emails:", transformedEmails.length);
+
         // If we got this far but have no emails, log a warning
         if (transformedEmails.length === 0) {
           console.warn("No emails were found or transformed successfully");
@@ -316,10 +353,14 @@ export const useGmailApi = () => {
               JSON.stringify(emailsData[0]));
           }
         } else {
+          console.log("Successfully transformed emails:", transformedEmails.length);
+          console.log("First transformed email:", JSON.stringify(transformedEmails[0]));
         }
 
         // Update emails state
         setEmails(transformedEmails);
+        console.log("Emails state updated with", transformedEmails.length, "emails");
+        
         return transformedEmails;
       } catch (err) {
         console.error("Fetch emails error:", err);

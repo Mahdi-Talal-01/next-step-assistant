@@ -14,8 +14,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const initializeAuth = async () => {
+    console.log("Initializing auth state...");
     const storedToken = localStorage.getItem("access_token");
     const storedUser = localStorage.getItem("user");
+    console.log("Token from localStorage:", storedToken);
+
     if (storedToken) {
       try {
         // If user data is in localStorage (from OAuth), use it
@@ -25,10 +28,12 @@ export const AuthProvider = ({ children }) => {
         } else {
           // Otherwise, fetch from backend
           const authData = await authService.getAuthData();
+          console.log("Stored auth data:", authData);
           if (authData.user) {
             setUser(authData.user);
             setToken(storedToken);
           } else {
+            console.log("No authenticated user found");
             clearAuth();
           }
         }
@@ -37,6 +42,7 @@ export const AuthProvider = ({ children }) => {
         clearAuth();
       }
     } else {
+      console.log("No token found");
       clearAuth();
     }
     setLoading(false);
@@ -45,11 +51,15 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     setLoading(true);
     setError(null);
+    console.log("Logging in user...");
     try {
       const response = await authService.login(userData);
+      console.log("Login response in useAuth:", response);
       if (response.token) {
         setUser(response.user);
         setToken(response.token);
+        console.log("Setting user in state:", response.user);
+        console.log("Setting token in state:", response.token);
         localStorage.setItem("access_token", response.token);
         localStorage.setItem("user", JSON.stringify(response.user));
       } else {
@@ -68,6 +78,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true);
     setError(null);
+    console.log("Registering user...");
     try {
       const response = await authService.register(userData);
       if (response.token) {

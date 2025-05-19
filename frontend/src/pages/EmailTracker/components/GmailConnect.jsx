@@ -78,5 +78,3 @@ const GmailConnect = ({
 };
 
 export default GmailConnect;
-
- 
