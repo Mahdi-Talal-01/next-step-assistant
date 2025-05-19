@@ -204,9 +204,3 @@ Our deployment pipeline leverages GitHub Actions for CI/CD, Docker for container
 
 This architecture ensures automated, reliable, and scalable deployments for both backend and frontend services.
 ### API Documentation
-
-|            Authentication API            |            Job Tracking API             |            AI Services API             |
-| :--------------------------------------: | :-------------------------------------: | :------------------------------------: |
-| ![Auth API](./readme/demo/1440x1024.png) | ![Job API](./readme/demo/1440x1024.png) | ![AI API](./readme/demo/1440x1024.png) |
-
-<br><br>
