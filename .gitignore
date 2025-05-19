@@ -1,1 +1,4 @@
 frontend/src/pages/Application/README.md
+node_modules
+/node_modules
+test.js

@@ -194,6 +194,7 @@ export const useGmailApi = () => {
           queryParams.append("maxResults", options.maxResults);
         if (options?.labelIds) queryParams.append("labelIds", options.labelIds);
         if (options?.q) queryParams.append("q", options.q);
+        if (options?.refresh) queryParams.append("refresh", options.refresh);
 
         const queryString = queryParams.toString();
         const endpoint = queryString

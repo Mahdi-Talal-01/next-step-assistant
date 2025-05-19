@@ -35,10 +35,10 @@ const GmailConnect = ({
             <Icon icon="mdi:gmail" width="48" height="48" />
           </div>
           <div className="connect-content">
-            <h3>Connect Your Gmail Account</h3>
+            <h3>Gmail Connection Required</h3>
             <p>
-              Connect your Gmail account to track and analyze your emails.
-              We only request read access to your emails and won't modify or delete any data.
+              Please connect your Google account to unlock the Email Tracker feature.
+              This will allow you to track and analyze your job application emails.
             </p>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <button 
@@ -58,49 +58,11 @@ const GmailConnect = ({
                   </>
                 )}
               </button>
-              
-              {authChecked && (
-                <button 
-                  style={{ 
-                    background: 'none', 
-                    border: '1px solid #ccc', 
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => setShowDebug(!showDebug)}
-                >
-                  <Icon icon="mdi:information-outline" style={{ marginRight: '5px' }} />
-                  {showDebug ? 'Hide Details' : 'Show Details'}
-                </button>
-              )}
-              
-              {/* Debug buttons */}
-              {authChecked && showDebug && (
-                <div style={{ display: 'flex', gap: '10px', marginTop: '10px', width: '100%' }}>
-                  {/* Test API button */}
-                  <button 
-                    style={debugButtonStyle}
-                    onClick={onTestApi}
-                  >
-                    <Icon icon="mdi:bug" style={{ marginRight: '5px' }} />
-                    Test API Directly
-                  </button>
-                  
-                  {/* Force auth button */}
-                  <button 
-                    style={{
-                      ...debugButtonStyle,
-                      backgroundColor: '#fff8e1',
-                      borderColor: '#ffd54f'
-                    }}
-                    onClick={() => onForceAuth && onForceAuth(true)}
-                  >
-                    <Icon icon="mdi:key" style={{ marginRight: '5px' }} />
-                    Force Authorization
-                  </button>
-                </div>
-              )}
+            )}
+            
+            <div className="lock-message">
+              <Icon icon="mdi:lock" className="lock-icon" />
+              <span>This feature requires Gmail access to display your emails</span>
             </div>
             
             {showDebug && (

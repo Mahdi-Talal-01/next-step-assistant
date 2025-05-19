@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Icon } from "@iconify/react";
 import "./EmailTracker.css";
-import BaseApi from '../../commons/request';
 
+// Components
 import EmailHeader from "./components/EmailHeader";
 import SearchBox from "./components/SearchBox";
 import FilterGroup from "./components/FilterGroup";
@@ -9,90 +11,39 @@ import EmailList from "./components/EmailList";
 import GmailConnect from "./components/GmailConnect";
 import { EmailLoading, EmailEmpty } from "./components/EmailStates";
 import EmailViewer from "./components/EmailViewer";
+import AuthenticationGuard from "./components/AuthenticationGuard";
 
+// Hooks
 import { useEmailFiltering } from "./hooks/useEmailFiltering";
 import { useGmailApi } from "./hooks/useGmailApi";
+import { useAuth } from "../Auth/hooks/useAuth";
 
+/**
+ * EmailTracker is the main component for the email tracking feature.
+ * It handles the overall layout and coordination between child components.
+ */
 const EmailTracker = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  
+  // Gmail API integration
   const {
     emails,
     isLoading,
     error,
-    isAuthorized: apiIsAuthorized,
+    isAuthorized,
     authChecked,
     fetchEmails,
     authorizeGmail,
-    disconnectGmail,
-    forceAuthorize
+    disconnectGmail
   } = useGmailApi();
-  
-  // Default to authorized (matching our aggressive authorization approach)
-  const [overrideAuthorized, setOverrideAuthorized] = useState(true);
-  
-  // Combine the API's auth state with our override
-  const isAuthorized = overrideAuthorized || apiIsAuthorized;
-  
-  const [debugInfo, setDebugInfo] = useState(null);
 
-  // Add debugging for authorization status
-  useEffect(() => {
-    console.log('Email Tracker - Auth Status:', {
-      isAuthorized,
-      apiIsAuthorized,
-      overrideAuthorized,
-      authChecked,
-      hasEmails: emails && emails.length > 0,
-      emailCount: emails ? emails.length : 0,
-      hasError: !!error
-    });
-  }, [isAuthorized, apiIsAuthorized, overrideAuthorized, authChecked, emails, error]);
-  
-  // Fetch emails when component mounts, regardless of authorization state
-  useEffect(() => {
-    // Always try to fetch emails on component mount
-    const timer = setTimeout(() => {
-      fetchEmails();
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }, [fetchEmails]);
-  
-  // Manual debug function to test API directly
-  const testApiDirectly = async () => {
-    try {
-      const statusResponse = await BaseApi.get('/gmail/status');
-      console.log('Direct status check:', statusResponse);
-      
-      const emailsResponse = await BaseApi.get('/gmail/emails');
-      console.log('Direct emails check:', emailsResponse);
-      
-      setDebugInfo({
-        statusResponse,
-        emailsResponse: emailsResponse ? 'Response received' : 'No response',
-        timestamp: new Date().toLocaleTimeString()
-      });
-      
-      // If emails were received directly but isAuthorized is false, force true
-      if (emailsResponse) {
-        console.log('Emails received. Forcing authorization...');
-        setOverrideAuthorized(true);
-        forceAuthorize(true);
-      } else {
-        // Regular refresh
-        fetchEmails();
-      }
-    } catch (err) {
-      console.error('Direct API test failed:', err);
-      setDebugInfo({
-        error: err.message || 'Unknown error',
-        timestamp: new Date().toLocaleTimeString()
-      });
-    }
-  };
-
+  // UI State
   const [searchOptions, setSearchOptions] = useState({});
   const [selectedEmail, setSelectedEmail] = useState(null);
 
+  // Email filtering
   const {
     filteredEmails,
     filters,
@@ -106,19 +57,35 @@ const EmailTracker = () => {
 
   // Update emails in filtering hook when emails change
   useEffect(() => {
-    // Always set the current emails, even if empty
-    // This ensures we're always showing the most current state
-    setFilteredEmails(emails || []);
+    if (emails && Array.isArray(emails)) {
+      setFilteredEmails(emails);
+    }
   }, [emails, setFilteredEmails]);
 
-  // Fetch emails when authorized
+  // Check URL parameters for Google auth redirection
   useEffect(() => {
-    if (isAuthorized) {
-      fetchEmails(searchOptions);
+    const params = new URLSearchParams(location.search);
+    if (params.get('googleAuth') === 'success') {
+      window.history.replaceState({}, document.title, location.pathname);
+      // Wait a moment to ensure state is updated
+      setTimeout(() => {
+        if (isAuthorized) {
+          fetchEmails({refresh: Date.now()});
+        }
+      }, 500);
     }
-  }, [isAuthorized, fetchEmails, searchOptions]);
+  }, [location, isAuthorized, fetchEmails]);
+  
+  // Fetch emails when auth state changes and user is authenticated
+  useEffect(() => {
+    const { authenticated } = isAuthenticated();
+    
+    if (!authLoading && authenticated && isAuthorized) {
+      fetchEmails({...searchOptions, refresh: Date.now()});
+    }
+  }, [authLoading, isAuthorized, isAuthenticated, fetchEmails, searchOptions]);
 
-  // Handle search submission
+  // Event handlers
   const handleSearch = (term) => {
     setSearchTerm(term);
     if (isAuthorized) {
@@ -126,67 +93,73 @@ const EmailTracker = () => {
     }
   };
 
-  // Handle refresh button click
   const handleRefresh = () => {
     if (isAuthorized && !isLoading) {
-      fetchEmails(searchOptions);
+      fetchEmails({ ...searchOptions, refresh: Date.now() });
     }
   };
 
-  // Handle filter change with API refresh if needed
   const handleApiFilterChange = (filterType, value) => {
     handleFilterChange(filterType, value);
-    
-    // For certain filters, update the API query
     if (filterType === 'category' && isAuthorized) {
       let labelIds = ['INBOX'];
-      
       if (value === 'social') labelIds = ['CATEGORY_SOCIAL'];
       if (value === 'promotions') labelIds = ['CATEGORY_PROMOTIONS'];
       if (value === 'updates') labelIds = ['CATEGORY_UPDATES'];
       if (value === 'forums') labelIds = ['CATEGORY_FORUMS'];
-      
       setSearchOptions(prev => ({ ...prev, labelIds: labelIds.join(',') }));
     }
   };
 
-  // Handle email selection for viewing
   const handleViewEmail = (email) => {
-    // Mark as read when opening
     if (!email.isRead) {
       toggleReadStatus(email.id);
     }
     setSelectedEmail(email);
   };
 
-  // Handle closing the email viewer
   const handleCloseEmailViewer = () => {
     setSelectedEmail(null);
   };
 
-  const renderEmailContent = () => {
-    if (isLoading) {
-      return <EmailLoading />;
-    }
-    
-    if (!isAuthorized) {
-      return <EmailEmpty isAuthorized={false} />;
-    }
-    
-    if (filteredEmails && filteredEmails.length > 0) {
-      return (
-        <EmailList
-          emails={filteredEmails}
-          onToggleRead={toggleReadStatus}
-          onToggleStarred={toggleStarred}
-          onViewEmail={handleViewEmail}
-        />
-      );
-    }
-    
-    return <EmailEmpty isAuthorized={true} />;
+  const handleConnect = () => {
+    authorizeGmail();
   };
 
+  const handleDisconnect = () => {
+    disconnectGmail();
+  };
+
+  // Wait for auth state to finish loading before rendering anything
+  if (authLoading) {
+    return <EmailLoading />;
+  }
+
+  // Check authentication
+  const { authenticated } = isAuthenticated();
+  if (!authenticated) {
+    return (
+      <AuthenticationGuard 
+        isLoading={isLoading}
+        error="You must be logged in to use this feature"
+        onConnect={() => navigate('/auth', { state: { fromEmailTracker: true } })}
+      />
+    );
+  }
+
+  // Check Gmail authorization
+  if (!isAuthorized) {
+    return (
+      <AuthenticationGuard 
+        isLoading={isLoading}
+        error={error}
+        onConnect={handleConnect}
+        isAuthorized={false}
+      />
+    );
+  }
+
+  // Main content when user is authorized
   return (
     <div className="page-container">
       <EmailHeader 
@@ -194,38 +167,6 @@ const EmailTracker = () => {
         isLoading={isLoading} 
         isAuthorized={isAuthorized}
       />
-
-      <GmailConnect
-        isAuthorized={isAuthorized}
-        onConnect={authorizeGmail}
-        onDisconnect={disconnectGmail}
-        isLoading={isLoading}
-        error={error}
-        authChecked={authChecked}
-        onTestApi={testApiDirectly}
-        onForceAuth={forceAuthorize}
-      />
-      
-      {debugInfo && (
-        <div style={{
-          margin: '10px 0',
-          padding: '10px',
-          backgroundColor: '#f0f8ff',
-          border: '1px solid #ccc',
-          borderRadius: '4px',
-          fontSize: '0.9em'
-        }}>
-          <div><strong>Debug Info (Last checked: {debugInfo.timestamp})</strong></div>
-          {debugInfo.error ? (
-            <div style={{color: 'red'}}>Error: {debugInfo.error}</div>
-          ) : (
-            <div>
-              <div>Status API: {JSON.stringify(debugInfo.statusResponse)}</div>
-              <div>Emails API: {debugInfo.emailsResponse}</div>
-            </div>
-          )}
-        </div>
-      )}
 
       <div className="gmail-filters">
         <SearchBox
@@ -240,7 +181,22 @@ const EmailTracker = () => {
         <FilterGroup filters={filters} onFilterChange={handleApiFilterChange} />
       </div>
 
-      {renderEmailContent()}
+      {/* Email content area */}
+      {isLoading ? (
+        // Always show loading state when fetching emails
+        <EmailLoading />
+      ) : filteredEmails && filteredEmails.length > 0 ? (
+        // Show email list when we have emails
+        <EmailList
+          emails={filteredEmails}
+          onToggleRead={toggleReadStatus}
+          onToggleStarred={toggleStarred}
+          onViewEmail={handleViewEmail}
+        />
+      ) : (
+        // Show empty state when not loading and no emails
+        <EmailEmpty isAuthorized={true} />
+      )}
 
       {selectedEmail && (
         <EmailViewer

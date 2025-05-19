@@ -19,16 +19,34 @@ const Auth = () => {
     const urlToken = params.get('token');
     const urlUser = params.get('user');
     if (urlToken && urlUser) {
-      localStorage.setItem('access_token', urlToken);
-      localStorage.setItem('user', decodeURIComponent(urlUser));
-      window.history.replaceState({}, document.title, '/');
-      navigate('/app/dashboard', { replace: true });
+      localStorage.setItem("access_token", urlToken);
+      localStorage.setItem("user", decodeURIComponent(urlUser));
+      window.history.replaceState({}, document.title, "/auth");
+      
+      // If coming from email tracker, redirect back there with success parameter
+      if (fromEmailTracker) {
+        navigate("/app/gmail-tracker?googleAuth=success", { replace: true });
+      } else {
+        navigate("/app/dashboard", { replace: true });
+      }
       return;
     }
-    // If already authenticated, redirect to dashboard
+
+    if (urlError) {
+      console.error("OAuth error:", urlError);
+      return;
+    }
+
+    // If already authenticated, redirect to dashboard or back to Email Tracker
+    // Only redirect if currently on /auth to avoid infinite loop
     const { authenticated } = isAuthenticated();
-    if (authenticated) {
-      navigate('/app/dashboard', { replace: true });
+    if (authenticated && location.pathname === "/auth") {
+      if (fromEmailTracker) {
+        navigate("/app/gmail-tracker?googleAuth=success", { replace: true });
+      } else {
+        const from = location.state?.from?.pathname || "/app/dashboard";
+        navigate(from, { replace: true });
+      }
     }
   }, [location, navigate, isAuthenticated]);
 

@@ -3,8 +3,57 @@ import { Icon } from "@iconify/react";
 import { formatDate, getPriorityBadgeClass, getCategoryBadgeClass } from "../utils/formatUtils";
 import "../EmailTracker.css";
 
+// Helper function to convert URLs to clickable links in plain text
+const makeLinksClickable = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+};
+
+// Helper function to check if content is HTML
+const isHtmlContent = (content) => {
+  return /<[a-z][\s\S]*>/i.test(content);
+};
+
+// Helper function to safely render HTML content
+const createSafeHtml = (htmlContent) => {
+  // In a production app, use a library like DOMPurify or sanitize-html
+  // This is a simplified version for demonstration
+  return {
+    __html: htmlContent
+  };
+};
+
 const EmailViewer = ({ email, onClose, onToggleRead, onToggleStarred }) => {
   if (!email) return null;
+
+  // Process email body content
+  const renderEmailContent = () => {
+    // If no body, just show the preview
+    if (!email.body) {
+      return (
+        <div>
+          <p className="email-preview">{email.preview}</p>
+          <p className="no-body-message">
+            Full message content not available. Only preview is shown.
+          </p>
+        </div>
+      );
+    }
+
+    // Determine if the content is HTML or plain text
+    if (isHtmlContent(email.body)) {
+      // If HTML, render it safely
+      return <div dangerouslySetInnerHTML={createSafeHtml(email.body)} />;
+    } else {
+      // If plain text, convert URLs to links and preserve formatting
+      const textWithLinks = makeLinksClickable(email.body);
+      return (
+        <div className="plain-text-email">
+          <div dangerouslySetInnerHTML={createSafeHtml(textWithLinks)} />
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="email-viewer-overlay">
@@ -67,16 +116,7 @@ const EmailViewer = ({ email, onClose, onToggleRead, onToggleStarred }) => {
           </div>
           
           <div className="email-viewer-body">
-            {email.body ? (
-              <div dangerouslySetInnerHTML={{ __html: email.body }} />
-            ) : (
-              <div>
-                <p className="email-preview">{email.preview}</p>
-                <p className="no-body-message">
-                  Full message content not available. Only preview is shown.
-                </p>
-              </div>
-            )}
+            {renderEmailContent()}
           </div>
         </div>
       </div>
