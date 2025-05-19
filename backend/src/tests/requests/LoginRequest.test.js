@@ -1,4 +1,4 @@
-const LoginRequest = require("../../requests/LoginRequest");
+const LoginRequest = require("../../requests/AuthRequest/LoginRequest");
 
 describe("LoginRequest", () => {
   it("should validate valid login data", () => {
