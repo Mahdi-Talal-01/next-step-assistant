@@ -1,0 +1,1206 @@
+{
+  "info": {
+    "name": "Next-Step-Assistant API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API endpoints for the Next-Step-Assistant application"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Authentication",
+          "item": [
+            {
+              "name": "Register",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/users/register",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"John Doe\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData && jsonData.token) {",
+                      "    pm.environment.set('token', jsonData.token);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/users/login",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "OAuth",
+          "item": [
+            {
+              "name": "Google Auth",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/auth/google",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Google Callback",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/auth/google/callback",
+                "query": [
+                  {
+                    "key": "code",
+                    "value": "{{code}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "OAuth Redirect",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/oauth",
+                "query": [
+                  {
+                    "key": "code",
+                    "value": "{{code}}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "User Profile",
+          "item": [
+            {
+              "name": "Get Profile",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/profiles",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Update Profile",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/profiles",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Name\",\n  \"title\": \"Software Developer\",\n  \"bio\": \"Experienced developer\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get All User Data",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/profiles/all-data",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CV Management",
+          "item": [
+            {
+              "name": "Upload CV",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/profiles/cv",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get CV",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/profiles/cv",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Delete CV",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/profiles/cv",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Job Management",
+      "item": [
+        {
+          "name": "Job CRUD",
+          "item": [
+            {
+              "name": "Get All Jobs",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/jobs",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Create Job",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/jobs",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Software Developer\",\n  \"company\": \"Tech Inc\",\n  \"description\": \"Building awesome software\",\n  \"location\": \"Remote\",\n  \"salary\": \"100000\",\n  \"applicationUrl\": \"https://example.com/apply\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Job by ID",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/jobs/{{jobId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Update Job",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/jobs/{{jobId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Senior Software Developer\",\n  \"company\": \"Tech Inc\",\n  \"description\": \"Updated description\",\n  \"location\": \"Remote\",\n  \"salary\": \"120000\",\n  \"applicationUrl\": \"https://example.com/apply\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Job",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/jobs/{{jobId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Job Statistics",
+          "item": [
+            {
+              "name": "Get Job Stats",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/jobs/stats",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Job Skills",
+          "item": [
+            {
+              "name": "Get Job Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/jobs/{{jobId}}/skills",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Add Job Skill",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/jobs/{{jobId}}/skills",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"skillId\": \"{{skillId}}\",\n  \"required\": true\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Job Skill",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/jobs/{{jobId}}/skills/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"required\": false\n}"
+                }
+              }
+            },
+            {
+              "name": "Remove Job Skill",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/jobs/{{jobId}}/skills/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Get Jobs By Skill",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/jobs/skills/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Skills System",
+      "item": [
+        {
+          "name": "Skills CRUD",
+          "item": [
+            {
+              "name": "Create Skill",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/skills",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"JavaScript\",\n  \"category\": \"Programming\",\n  \"description\": \"Web programming language\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get All Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Skill By ID",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/{{skillId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Update Skill",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/skills/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"JavaScript\",\n  \"category\": \"Programming\",\n  \"description\": \"Updated description\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Skill",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/skills/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Get Skills By Category",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/category/{{category}}",
+                "header": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "User Skills",
+          "item": [
+            {
+              "name": "Add User Skill",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/skills/user",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"skillId\": \"{{skillId}}\",\n  \"level\": 3\n}"
+                }
+              }
+            },
+            {
+              "name": "Get User Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/user/{{userId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Update User Skill Level",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/skills/user/{{userId}}/skill/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"level\": 4\n}"
+                }
+              }
+            },
+            {
+              "name": "Remove User Skill",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/skills/user/{{userId}}/skill/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Skill Analysis",
+          "item": [
+            {
+              "name": "Get Skill Gaps",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/gaps/user/{{userId}}/job/{{jobId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Get Recommended Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/recommendations/user/{{userId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Skill Analytics",
+          "item": [
+            {
+              "name": "Get Skills Trends",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/trends",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Skill Growth Trends",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/growth-trends/{{skillId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Average Salary Per Skill",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/average-salary",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Job Demand Per Skill",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/job-demand",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Skill Growth Rate",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/growth-rate/{{skillId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Skill Demand Trends",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/demand-trends/{{skillId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Skill Analytics",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/skill/{{skillId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Get All Skills Analytics",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/all",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Top Growing Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/top/growing",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Top Paying Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/top/paying",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Most Demanded Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/analytics/top/demanded",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Skills With User Count",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/stats/users",
+                "header": []
+              }
+            },
+            {
+              "name": "Get Skills With Job Count",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/stats/jobs",
+                "header": []
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Roadmap",
+      "item": [
+        {
+          "name": "Roadmap CRUD",
+          "item": [
+            {
+              "name": "Create Roadmap",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/roadmaps",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Web Development Roadmap\",\n  \"description\": \"Path to becoming a web developer\",\n  \"isTemplate\": false,\n  \"topics\": [\n    {\n      \"name\": \"HTML Basics\",\n      \"description\": \"Learn HTML fundamentals\",\n      \"order\": 1\n    }\n  ]\n}"
+                }
+              }
+            },
+            {
+              "name": "Get All Roadmaps",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/roadmaps",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Get Roadmap By ID",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/roadmaps/{{roadmapId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Update Roadmap",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/roadmaps/{{roadmapId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Roadmap Name\",\n  \"description\": \"Updated description\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Roadmap",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/roadmaps/{{roadmapId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Topic Management",
+          "item": [
+            {
+              "name": "Update Topic Status (PATCH)",
+              "request": {
+                "method": "PATCH",
+                "url": "{{baseUrl}}/api/roadmaps/{{roadmapId}}/topics/{{topicId}}/status",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"completed\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Topic Status (POST)",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/roadmaps/{{roadmapId}}/topics/{{topicId}}/status",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"completed\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Roadmap Skills",
+          "item": [
+            {
+              "name": "Add Roadmap Skill",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/skills/roadmap",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roadmapId\": \"{{roadmapId}}\",\n  \"skillId\": \"{{skillId}}\",\n  \"level\": 3\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Roadmap Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/roadmap/{{roadmapId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Update Roadmap Skill Level",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/skills/roadmap/{{roadmapId}}/skill/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"level\": 4\n}"
+                }
+              }
+            },
+            {
+              "name": "Remove Roadmap Skill",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/skills/roadmap/{{roadmapId}}/skill/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Topic Skills",
+          "item": [
+            {
+              "name": "Add Topic Skill",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/skills/topic",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"topicId\": \"{{topicId}}\",\n  \"skillId\": \"{{skillId}}\",\n  \"level\": 3\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Topic Skills",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/skills/topic/{{topicId}}",
+                "header": []
+              }
+            },
+            {
+              "name": "Update Topic Skill Level",
+              "request": {
+                "method": "PUT",
+                "url": "{{baseUrl}}/api/skills/topic/{{topicId}}/skill/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"level\": 4\n}"
+                }
+              }
+            },
+            {
+              "name": "Remove Topic Skill",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/skills/topic/{{topicId}}/skill/{{skillId}}",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Gmail Integration",
+      "item": [
+        {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "Get Gmail Auth URL",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/gmail/auth",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Gmail OAuth Callback",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/gmail/callback",
+                "query": [
+                  {
+                    "key": "code",
+                    "value": "{{gmailCode}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Check Gmail Status",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/gmail/status",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Disconnect Gmail",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/gmail/disconnect",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Email Management",
+          "item": [
+            {
+              "name": "Get Emails",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/gmail/emails",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Content Assistant",
+      "item": [
+        {
+          "name": "Content Types",
+          "item": [
+            {
+              "name": "Get Content Types",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/content-assistant/types",
+                "header": []
+              }
+            }
+          ]
+        },
+        {
+          "name": "Content Generation",
+          "item": [
+            {
+              "name": "Generate Content",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/content-assistant/generate",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contentType\": \"cover-letter\",\n  \"formData\": {\n    \"jobTitle\": \"Software Developer\",\n    \"company\": \"Tech Inc\",\n    \"skills\": [\"JavaScript\", \"React\"]\n  }\n}"
+                }
+              }
+            },
+            {
+              "name": "Stream Content (POST)",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/content-assistant/stream",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contentType\": \"resume\",\n  \"formData\": {\n    \"name\": \"John Doe\",\n    \"experience\": \"5 years\",\n    \"skills\": [\"JavaScript\", \"React\"]\n  }\n}"
+                }
+              }
+            },
+            {
+              "name": "Stream Content (GET)",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/content-assistant/stream",
+                "query": [
+                  {
+                    "key": "contentType",
+                    "value": "resume"
+                  },
+                  {
+                    "key": "formData",
+                    "value": "{\"name\":\"John Doe\",\"experience\":\"5 years\",\"skills\":[\"JavaScript\",\"React\"]}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI Agent",
+      "item": [
+        {
+          "name": "Conversation",
+          "item": [
+            {
+              "name": "Process Message",
+              "request": {
+                "method": "POST",
+                "url": "{{baseUrl}}/api/ai-agent/message",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"message\": \"Help me with my resume\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Conversation History",
+              "request": {
+                "method": "GET",
+                "url": "{{baseUrl}}/api/ai-agent/history",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "Clear Conversation History",
+              "request": {
+                "method": "DELETE",
+                "url": "{{baseUrl}}/api/ai-agent/history",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

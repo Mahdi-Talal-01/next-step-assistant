@@ -1,10 +1,16 @@
 import React from 'react';
-import { useAuthForm } from '../hooks/useAuthForm';
 import { ErrorMessage } from './ErrorMessage';
 import styles from '../Auth.module.css';
 
-export const LoginForm = () => {
-  const { error, loading, handleSubmit } = useAuthForm();
+export const LoginForm = ({ onSubmit, loading, error }) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    onSubmit({
+      email: formData.get('email'),
+      password: formData.get('password')
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -31,7 +37,7 @@ export const LoginForm = () => {
       <button type="submit" className={styles.submitButton} disabled={loading}>
         {loading ? 'Signing in...' : 'Sign In'}
       </button>
-      <ErrorMessage error={error} />
+      {error && <ErrorMessage error={error} />}
     </form>
   );
 }; 

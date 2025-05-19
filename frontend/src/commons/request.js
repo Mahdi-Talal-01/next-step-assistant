@@ -29,11 +29,21 @@ instance.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Check if it's a 401 error not related to Gmail endpoints
     if (error.response?.status === 401) {
-      // Handle unauthorized access
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
-      window.location.href = '/auth';
+      const url = error.config?.url || '';
+      
+      // Don't automatically log out for Gmail API failures
+      // This prevents auto-logout when Gmail authorization fails
+      if (!url.includes('/gmail/') && !url.includes('/oauth/')) {
+        console.log('Auth failure detected. Logging out user...');
+        // Handle unauthorized access
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+        window.location.href = '/auth';
+      } else {
+        console.log('Auth failure for Gmail API - not logging out user');
+      }
     }
     return Promise.reject(error);
   }

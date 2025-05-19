@@ -17,32 +17,6 @@ class ContentAssistantController {
 
       const { contentType, formData } = req.body;
 
-      // Validate request
-      if (!contentType || !formData) {
-        return res.status(400).json({
-          success: false,
-          message: "Content type and form data are required",
-        });
-      }
-
-      // List of supported content types
-      const supportedTypes = [
-        "jobDescription",
-        "emailReply",
-        "linkedinPost",
-        "blogPost",
-      ];
-
-      // Check if content type is supported
-      if (!supportedTypes.includes(contentType)) {
-        return res.status(400).json({
-          success: false,
-          message: `Unsupported content type: ${contentType}. Supported types: ${supportedTypes.join(
-            ", "
-          )}`,
-        });
-      }
-
       // Call service to generate content
       const generatedContent = await ContentAssistantService.generateContent(
         contentType,

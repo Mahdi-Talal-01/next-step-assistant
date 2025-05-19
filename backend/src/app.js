@@ -9,7 +9,7 @@ const { validateEnvironment } = require('./middleware/environmentValidator');
 const configureExpress = require('./config/express');
 const registerRoutes = require('./config/routes');
 const registerErrorHandlers = require('./config/errorHandlers');
-const { checkAndSetGoogleEnv } = require('../setup-env');
+const { checkAndSetGoogleEnv } = require('./config/setup-env.js');
 
 
 function initializeApp() {

@@ -156,7 +156,7 @@ jest.mock("jsonwebtoken", () => ({
     .mockReturnValue({ userId: "test-id", email: "test@example.com" }),
 }));
 // Mock UserController to directly use our mocked responses
-jest.mock("../../controllers/UserController", () => ({
+jest.mock("../../controllers/AuthController/UserAuthController", () => ({
   register: jest.fn((req, res) => {
     return res.status(201).json({
       success: true,

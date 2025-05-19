@@ -377,6 +377,46 @@ class JobRepository {
       throw error;
     }
   }
+
+  /**
+   * Check if a job with the same company and position exists
+   * @param {string} userId - The user ID
+   * @param {string} company - Company name
+   * @param {string} position - Job position
+   * @returns {Promise<boolean>} - True if exists, false otherwise
+   */
+  async jobExists(userId, company, position) {
+    try {
+      console.log(`Checking if job exists: ${company} - ${position} for user ${userId}`);
+      
+      // Normalize inputs for case-insensitive comparison
+      const normalizedCompany = company.toLowerCase().trim();
+      const normalizedPosition = position.toLowerCase().trim();
+      
+      const existingJobs = await prisma.job.findMany({
+        where: { 
+          userId,
+        },
+        select: {
+          id: true,
+          company: true,
+          position: true
+        }
+      });
+      
+      // Do case-insensitive comparison in JavaScript
+      const exists = existingJobs.some(job => 
+        job.company.toLowerCase().trim() === normalizedCompany && 
+        job.position.toLowerCase().trim() === normalizedPosition
+      );
+      
+      console.log(`Job exists check result: ${exists}`);
+      return exists;
+    } catch (error) {
+      console.error(`Error checking if job exists:`, error);
+      return false; // Default to false on error
+    }
+  }
 }
 
 module.exports = new JobRepository();

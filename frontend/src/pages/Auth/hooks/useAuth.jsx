@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     initializeAuth();
@@ -47,29 +48,52 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  const login = async (userData, authToken = null) => {
+  const login = async (userData) => {
+    setLoading(true);
+    setError(null);
     console.log("Logging in user...");
     try {
-      if (authToken) {
-        // OAuth login - use provided token and user data
-        setUser(userData);
-        setToken(authToken);
-        localStorage.setItem("access_token", authToken);
-        localStorage.setItem("user", JSON.stringify(userData));
+      const response = await authService.login(userData);
+      console.log("Login response in useAuth:", response);
+      if (response.token) {
+        setUser(response.user);
+        setToken(response.token);
+        console.log("Setting user in state:", response.user);
+        console.log("Setting token in state:", response.token);
+        localStorage.setItem("access_token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
       } else {
-        // Regular login - use login endpoint
-        const response = await authService.login(userData);
-        if (response.token) {
-          setUser(response.user);
-          setToken(response.token);
-          localStorage.setItem("access_token", response.token);
-          localStorage.setItem("user", JSON.stringify(response.user));
-        }
+        console.error("Token not found in login response:", response);
       }
+      return response;
     } catch (error) {
       console.error("Login error:", error);
-      clearAuth();
+      setError(error.message || "Login failed");
       throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (userData) => {
+    setLoading(true);
+    setError(null);
+    console.log("Registering user...");
+    try {
+      const response = await authService.register(userData);
+      if (response.token) {
+        setUser(response.user);
+        setToken(response.token);
+        localStorage.setItem("access_token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+      }
+      return response;
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError(error.message || "Registration failed");
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,7 +123,9 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     loading,
+    error,
     login,
+    register,
     logout,
     isAuthenticated,
   };
