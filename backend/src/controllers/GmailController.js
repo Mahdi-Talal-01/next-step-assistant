@@ -1,7 +1,8 @@
-const GmailService = require("../services/GmailService");
-const { TokenRepository } = require("../repositories/TokenRepository");
-const ResponseTrait = require("../traits/ResponseTrait");
-const jwt = require("jsonwebtoken");
+const GmailService = require('../services/GmailService/index.js');
+const { TokenRepository } = require('../repositories/TokenRepository.js');
+const ResponseTrait = require('../traits/ResponseTrait.js');
+const jwt = require('jsonwebtoken');
+const { add: jobHandler } = require('../queues/highConfidenceJobs.js');
 
 class GmailController {
   /**
@@ -9,7 +10,6 @@ class GmailController {
    * @param {object} req - Express request
    * @param {object} res - Express response
    */
-
   async getAuthUrl(req, res) {
     try {
       // Include the user ID in the state parameter
@@ -38,7 +38,6 @@ class GmailController {
    * @param {object} req - Express request
    * @param {object} res - Express response
    */
-
   async handleCallback(req, res) {
     try {
       const { code, state } = req.query;
@@ -88,7 +87,6 @@ class GmailController {
    * @param {object} req - Express request
    * @param {object} res - Express response
    */
-
   async checkAuthorization(req, res) {
     try {
       const tokens = await TokenRepository.getTokensByUserId(req.user.id);
@@ -126,16 +124,35 @@ class GmailController {
    * @param {object} res - Express response
    */
   async getEmails(req, res) {
+    let emails;
+
     try {
       const { maxResults, labelIds, q } = req.query;
-
       const options = {
-        maxResults: maxResults ? parseInt(maxResults, 10) : 20,
+        maxResults: maxResults ? parseInt(maxResults, 10) : 5,
         labelIds: labelIds ? labelIds.split(",") : ["INBOX"],
         q: q || "",
       };
 
-      const emails = await GmailService.listEmails(req.user.id, options);
+      // 1) Fetch & parse messages
+      emails = await GmailService.listEmails(req.user.id, options);
+      
+      // Log the structure of the first email for debugging
+      if (emails && emails.length > 0) {
+        console.log('\n=== First Email Structure ===');
+        console.log('Keys:', Object.keys(emails[0]));
+        console.log('Has isJobApplication:', 'isJobApplication' in emails[0]);
+        console.log('Has jobConfidenceScore:', 'jobConfidenceScore' in emails[0]);
+      }
+      
+      // emit job with userId
+      console.log('\n=== Sending emails to job handler ===');
+      console.log('Number of emails:', emails.length);
+      console.log('User ID:', req.user.id);
+      
+      jobHandler(emails, { userId: req.user.id });
+
+      // 2) Send the HTTP response immediately
       return ResponseTrait.success(res, emails);
     } catch (error) {
       console.error("Get Gmail emails error:", error);
@@ -143,7 +160,6 @@ class GmailController {
       if (error.message === "User has not authorized Gmail access") {
         return ResponseTrait.error(res, error.message, 401);
       }
-
       return ResponseTrait.error(res, "Failed to fetch emails");
     }
   }

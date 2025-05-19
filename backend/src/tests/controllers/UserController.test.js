@@ -1,15 +1,15 @@
-const UserController = require("../../controllers/UserController");
+const UserController = require("../../controllers/AuthController/UserAuthController");
 const userService = require("../../services/UserService");
 const ResponseTrait = require("../../traits/ResponseTrait");
-const RegisterRequest = require("../../requests/RegisterRequest");
-const LoginRequest = require("../../requests/LoginRequest");
+const RegisterRequest = require("../../requests/AuthRequest/RegisterRequest");
+const LoginRequest = require("../../requests/AuthRequest/LoginRequest");
 const { prisma } = require("../utils/db");
 
 // Mock dependencies
 jest.mock("../../services/UserService");
 jest.mock("../../traits/ResponseTrait");
-jest.mock("../../requests/RegisterRequest");
-jest.mock("../../requests/LoginRequest");
+jest.mock("../../requests/AuthRequest/RegisterRequest");
+jest.mock("../../requests/AuthRequest/LoginRequest");
 
 describe("UserController", () => {
   let req, res;
