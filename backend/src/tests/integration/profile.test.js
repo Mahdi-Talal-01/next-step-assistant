@@ -1,8 +1,8 @@
-const request = require("supertest");
-const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const path = require("path");
-const { promisify } = require("util");
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
 
 
 test.skip("Profile integration tests are skipped for now", () => {

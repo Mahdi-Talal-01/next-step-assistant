@@ -1,8 +1,8 @@
-const { PrismaClient } = require("@prisma/client");
-const roadmapRepository = require("../../repositories/RoadmapRepository");
+import { PrismaClient } from '@prisma/client';
+import roadmapRepository from '../../repositories/RoadmapRepository.js';
 
 // Mock Prisma client
-jest.mock("@prisma/client", () => {
+jest.mock('@prisma/client', () => {
   const mockPrismaClient = {
     roadmap: {
       create: jest.fn(),
@@ -52,12 +52,12 @@ describe("RoadmapRepository", () => {
         isTemplate: false,
         topics: [
           {
-            id: "client-generated-id", // This should be removed in the create
+            id: "client-generated-id",
             name: "Topic 1",
             status: "pending",
             resources: [
               {
-                id: "client-generated-resource-id", // This should be removed in the create
+                id: "client-generated-resource-id",
                 name: "Resource 1",
                 url: "https://example.com",
               },
@@ -87,15 +87,15 @@ describe("RoadmapRepository", () => {
         ],
       };
 
-      // Mock Prisma responses
+      // Mock Prisma response
       prisma.roadmap.create.mockResolvedValue(createdRoadmap);
 
       // Call the repository method
       const result = await roadmapRepository.create(roadmapData);
 
       // Assert
+      expect(result).toEqual(createdRoadmap);
       expect(prisma.roadmap.create).toHaveBeenCalledTimes(1);
-      // Verify the client-generated IDs are removed
       expect(prisma.roadmap.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -108,7 +108,6 @@ describe("RoadmapRepository", () => {
           include: expect.any(Object),
         })
       );
-      expect(result).toEqual(createdRoadmap);
     });
 
     it("should handle errors during roadmap creation", async () => {
@@ -125,9 +124,7 @@ describe("RoadmapRepository", () => {
       prisma.roadmap.create.mockRejectedValue(error);
 
       // Call and assert
-      await expect(roadmapRepository.create(roadmapData)).rejects.toThrow(
-        error
-      );
+      await expect(roadmapRepository.create(roadmapData)).rejects.toThrow(error);
       expect(prisma.roadmap.create).toHaveBeenCalledTimes(1);
     });
   });

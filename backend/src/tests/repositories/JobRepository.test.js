@@ -1,7 +1,7 @@
-const { PrismaClient } = require('@prisma/client');
-const JobRepository = require('../../repositories/JobRepository');
+import { PrismaClient } from '@prisma/client';
+import JobRepository from '../../repositories/JobRepository.js';
 
-// Mock the Prisma client
+// Mock Prisma client
 jest.mock('@prisma/client', () => {
   const mockPrismaClient = {
     job: {

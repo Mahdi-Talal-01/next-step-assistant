@@ -1,4 +1,4 @@
-const skillRepository = require("../repositories/skillRepository");
+import skillRepository from '../repositories/skillRepository.js';
 
 class SkillService {
   // Skill CRUD operations
@@ -319,4 +319,4 @@ class SkillService {
   }
 }
 
-module.exports = new SkillService();
+export default new SkillService();

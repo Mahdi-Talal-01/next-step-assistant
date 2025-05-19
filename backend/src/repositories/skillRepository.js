@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 class SkillRepository {
@@ -690,4 +690,4 @@ class SkillRepository {
     return ((recentTotal - olderTotal) / olderTotal) * 100;
   }
 }
-module.exports = new SkillRepository();
+export default new SkillRepository();

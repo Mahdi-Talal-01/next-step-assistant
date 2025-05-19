@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const userRepository = require('../repositories/UserRepository');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import userRepository from '../repositories/UserRepository.js';
 
 class UserService {
   constructor() {
@@ -65,4 +65,4 @@ class UserService {
   }
 }
 
-module.exports = new UserService(); 
+export default new UserService(); 

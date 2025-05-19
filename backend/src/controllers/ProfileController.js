@@ -1,7 +1,7 @@
-const ProfileService = require('../services/ProfileService');
-const ProfileRequest = require('../requests/ProfileRequest');
-const ResponseTrait = require('../traits/ResponseTrait');
-const fileUploadService = require('../services/FileUploadService');
+import ProfileService from '../services/ProfileService.js';
+import ProfileRequest from '../requests/ProfileRequest.js';
+import ResponseTrait from '../traits/ResponseTrait.js';
+import fileUploadService from '../services/FileUploadService.js';
 
 class ProfileController {
   async updateProfile(req, res) {
@@ -93,4 +93,4 @@ class ProfileController {
   }
 }
 
-module.exports = new ProfileController(); 
+export default new ProfileController(); 

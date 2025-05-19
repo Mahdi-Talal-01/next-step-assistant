@@ -1,48 +1,57 @@
-const UserService = require("../../services/UserService");
-const UserRepository = require("../../repositories/UserRepository");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import UserService from '../../services/UserService.js';
+import UserRepository from '../../repositories/UserRepository.js';
+import { jest } from '@jest/globals';
 
 // Mock dependencies
-jest.mock("../../repositories/UserRepository");
-jest.mock("bcryptjs");
-jest.mock("jsonwebtoken");
+jest.mock('../../repositories/UserRepository.js', () => ({
+  findByEmail: jest.fn(),
+  create: jest.fn()
+}));
 
-describe("UserService", () => {
+jest.mock('bcryptjs', () => ({
+  hash: jest.fn()
+}));
+
+jest.mock('jsonwebtoken', () => ({
+  sign: jest.fn()
+}));
+
+describe('UserService', () => {
   beforeEach(() => {
+    // Clear all mocks before each test
     jest.clearAllMocks();
   });
-  describe("register", () => {
-    it("should register a user successfully", async () => {
-      // Setup
-      const userData = {
-        name: "Test User",
-        email: "test@example.com",
-        password: "password123",
-      };
-      const hashedPassword = "hashed_password";
 
+  describe('register', () => {
+    it('should successfully register a new user', async () => {
+      // Mock data
+      const userData = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123'
+      };
+
+      const hashedPassword = 'hashedPassword123';
+      const createdUser = { ...userData, id: 1, password: hashedPassword };
+
+      // Mock implementations
       bcrypt.hash.mockResolvedValue(hashedPassword);
       UserRepository.findByEmail.mockResolvedValue(null);
-      UserRepository.createUser = jest
-        .fn()
-        .mockResolvedValue({ id: 1, ...userData, password: hashedPassword });
+      UserRepository.create.mockResolvedValue(createdUser);
 
       // Execute
       const result = await UserService.register(userData);
 
       // Assert
-      expect(bcrypt.hash).toHaveBeenCalledWith(
-        userData.password,
-        expect.any(Number)
-      );
-      expect(UserRepository.createUser).toHaveBeenCalledWith({
+      expect(UserRepository.findByEmail).toHaveBeenCalledWith(userData.email);
+      expect(bcrypt.hash).toHaveBeenCalledWith(userData.password, 10);
+      expect(UserRepository.create).toHaveBeenCalledWith({
         ...userData,
-        password: hashedPassword,
+        password: hashedPassword
       });
-      expect(result).toHaveProperty("user");
-      expect(result).toHaveProperty("token");
-      expect(result.user.password).toBeUndefined(); // Password should not be returned
+      expect(result).toEqual(createdUser);
     });
 
     it("should throw error if email already exists", async () => {

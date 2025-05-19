@@ -1,4 +1,4 @@
-const Joi = require("joi");
+import Joi from 'joi';
 
 /**
  * Validation schemas for content generation requests
@@ -191,4 +191,4 @@ class ContentAssistantValidation {
   }
 }
 
-module.exports = ContentAssistantValidation;
+export default ContentAssistantValidation;

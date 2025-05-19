@@ -1,10 +1,10 @@
-const request = require("supertest");
-const express = require("express");
-const userRoutes = require("../../routes/userRoutes");
-const userController = require("../../controllers/UserController");
+import request from 'supertest';
+import express from 'express';
+import userRoutes from '../../routes/userRoutes.js';
+import UserAuthController from '../../controllers/AuthController/UserAuthController.js';
 
-// Mock UserController methods
-jest.mock("../../controllers/UserController");
+// Mock UserAuthController methods
+jest.mock("../../controllers/AuthController/UserAuthController");
 describe("User Routes", () => {
   let app;
 
@@ -20,7 +20,7 @@ describe("User Routes", () => {
   describe("POST /register", () => {
     it("should route to the register controller method", async () => {
       // Setup mock implementation
-      userController.register.mockImplementation((req, res) => {
+      UserAuthController.register.mockImplementation((req, res) => {
         res.status(201).json({ success: true });
       });
 
@@ -34,14 +34,14 @@ describe("User Routes", () => {
         });
 
       // Assert controller was called
-      expect(userController.register).toHaveBeenCalled();
+      expect(UserAuthController.register).toHaveBeenCalled();
     });
   });
 
   describe("POST /login", () => {
     it("should route to the login controller method", async () => {
       // Setup mock implementation
-      userController.login.mockImplementation((req, res) => {
+      UserAuthController.login.mockImplementation((req, res) => {
         res.status(200).json({ success: true });
       });
 
@@ -51,7 +51,7 @@ describe("User Routes", () => {
         .send({ email: "test@example.com", password: "password" });
 
       // Assert controller was called
-      expect(userController.login).toHaveBeenCalled();
+      expect(UserAuthController.login).toHaveBeenCalled();
     });
   });
 });

@@ -1,4 +1,4 @@
-const Joi = require("joi");
+import Joi from 'joi';
 
 class BaseAuthRequest {
   static validate(req, schema) {
@@ -32,4 +32,4 @@ class BaseAuthRequest {
   }
 }
 
-module.exports = BaseAuthRequest;
+export default BaseAuthRequest;

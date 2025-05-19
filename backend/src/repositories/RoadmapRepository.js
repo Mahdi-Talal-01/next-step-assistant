@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Helper function to ensure IDs are strings
@@ -170,4 +170,4 @@ class RoadmapRepository {
     }
 }
 
-module.exports = new RoadmapRepository(); 
+export default new RoadmapRepository(); 

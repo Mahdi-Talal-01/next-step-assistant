@@ -1,4 +1,4 @@
-const BaseAuthRequest = require('./BaseAuthRequest');
+import BaseAuthRequest from './BaseAuthRequest.js';
 
 class RegisterRequest extends BaseAuthRequest {
   static get schema() {
@@ -39,4 +39,4 @@ class RegisterRequest extends BaseAuthRequest {
   }
 }
 
-module.exports = RegisterRequest; 
+export default RegisterRequest; 

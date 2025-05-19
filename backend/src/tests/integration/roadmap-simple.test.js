@@ -1,5 +1,5 @@
-const request = require("supertest");
-const jwt = require("jsonwebtoken");
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
 
 // Mock the auth middleware first
 jest.mock("../../middleware/auth", () => {
@@ -10,7 +10,7 @@ jest.mock("../../middleware/auth", () => {
 });
 
 // Import after mocking
-const app = require("../../app");
+import app from '../../app.js';
 
 // Define the base route prefix
 const BASE_ROUTE = "/api/roadmaps";

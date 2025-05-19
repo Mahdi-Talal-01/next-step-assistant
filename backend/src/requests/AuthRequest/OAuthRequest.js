@@ -1,4 +1,4 @@
-const BaseAuthRequest = require('./BaseAuthRequest');
+import BaseAuthRequest from './BaseAuthRequest.js';
 
 class OAuthRequest extends BaseAuthRequest {
   static get callbackSchema() {
@@ -20,4 +20,4 @@ class OAuthRequest extends BaseAuthRequest {
   }
 }
 
-module.exports = OAuthRequest; 
+export default OAuthRequest; 

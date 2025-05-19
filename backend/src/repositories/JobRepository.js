@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 /**
@@ -377,6 +377,44 @@ class JobRepository {
       throw error;
     }
   }
+
+  /**
+   * Check if a job already exists for a user
+   * @param {string} userId - The user ID
+   * @param {string} company - The company name
+   * @param {string} position - The job position
+   * @returns {Promise<boolean>} - True if job exists
+   */
+  async jobExists(userId, company, position) {
+    try {
+      // Use a simple query with lowercase conversions
+      const normalizedCompany = company.toLowerCase();
+      const normalizedPosition = position.toLowerCase();
+      
+      // Find jobs for this user
+      const jobs = await prisma.job.findMany({
+        where: {
+          userId
+        },
+        select: {
+          company: true,
+          position: true
+        }
+      });
+      
+      // Check case-insensitively in JavaScript
+      const exists = jobs.some(job => 
+        job.company.toLowerCase() === normalizedCompany && 
+        job.position.toLowerCase() === normalizedPosition
+      );
+      
+      return exists;
+    } catch (error) {
+      console.error("Error checking for existing job:", error);
+      // Return false instead of throwing to prevent job creation from failing
+      return false;
+    }
+  }
 }
 
-module.exports = new JobRepository();
+export default new JobRepository();

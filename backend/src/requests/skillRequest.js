@@ -1,4 +1,4 @@
-const Joi = require("joi");
+import Joi from 'joi';
 
 const skillSchema = Joi.object({
   name: Joi.string().required().min(2).max(100),
@@ -68,10 +68,10 @@ const validateTopicSkill = (req, res, next) => {
   next();
 };
 
-module.exports = {
+export { 
   validateSkill,
   validateUserSkill,
   validateJobSkill,
   validateRoadmapSkill,
   validateTopicSkill,
-};
+ };

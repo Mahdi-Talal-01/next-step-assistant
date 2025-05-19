@@ -1,6 +1,6 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 class FileUploadService {
   constructor() {
@@ -55,4 +55,4 @@ class FileUploadService {
   }
 }
 
-module.exports = new FileUploadService(); 
+export default new FileUploadService(); 

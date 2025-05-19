@@ -25,4 +25,4 @@ class AIAgentRequest {
   }
 }
 
-module.exports = AIAgentRequest;
+export default AIAgentRequest;

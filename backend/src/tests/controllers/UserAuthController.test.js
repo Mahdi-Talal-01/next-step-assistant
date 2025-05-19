@@ -1,9 +1,9 @@
-const UserController = require("../../controllers/UserController");
-const userService = require("../../services/UserService");
-const ResponseTrait = require("../../traits/ResponseTrait");
-const RegisterRequest = require("../../requests/RegisterRequest");
-const LoginRequest = require("../../requests/LoginRequest");
-const { prisma } = require("../utils/db");
+import UserController from "../../controllers/AuthController/UserAuthController";
+import userService from "../../services/UserService";
+import ResponseTrait from "../../traits/ResponseTrait";
+import RegisterRequest from "../../requests/RegisterRequest";
+import LoginRequest from "../../requests/LoginRequest";
+import { prisma } from "../utils/db";
 
 // Mock dependencies
 jest.mock("../../services/UserService");

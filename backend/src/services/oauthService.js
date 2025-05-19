@@ -1,6 +1,6 @@
-const { google } = require("googleapis");
-const dotenv = require("dotenv");
-const jwt = require("jsonwebtoken");
+import { google } from 'googleapis';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 dotenv.config();
 
 const REDIRECT_URL =
@@ -18,7 +18,7 @@ class OAuthService {
     const scopes = [
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
-      "https://www.googleapis.com/auth/gmail.readonly",
+      "https://mail.google.com/",
       "https://www.googleapis.com/auth/calendar.events",
       // 'https://www.googleapis.com/auth/gmail.metadata',
       "openid",
@@ -68,4 +68,4 @@ class OAuthService {
   }
 }
 
-module.exports = new OAuthService();
+export default new OAuthService();

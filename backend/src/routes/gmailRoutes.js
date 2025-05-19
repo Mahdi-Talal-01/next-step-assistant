@@ -1,7 +1,7 @@
-const express = require("express");
+import express from 'express';
 const router = express.Router();
-const GmailController = require("../controllers/GmailController");
-const auth = require("../middleware/auth");
+import GmailController from '../controllers/GmailController.js';
+import auth from '../middleware/auth.js';
 
 // Get Gmail authorization URL
 router.get("/auth", auth, GmailController.getAuthUrl);
@@ -18,4 +18,4 @@ router.delete("/disconnect", auth, GmailController.disconnect);
 // Get emails from Gmail
 router.get("/emails", auth, GmailController.getEmails);
 
-module.exports = router;
+export default router;

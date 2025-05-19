@@ -1,7 +1,7 @@
-const userService = require("../../services/UserService");
-const ResponseTrait = require("../../traits/ResponseTrait");
-const RegisterRequest = require("../../requests/AuthRequest/RegisterRequest");
-const LoginRequest = require("../../requests/AuthRequest/LoginRequest");
+import userService from '../../services/UserService.js';
+import ResponseTrait from '../../traits/ResponseTrait.js';
+import RegisterRequest from '../../requests/AuthRequest/RegisterRequest.js';
+import LoginRequest from '../../requests/AuthRequest/LoginRequest.js';
 
 class UserAuthController {
   async register(req, res) {
@@ -40,4 +40,4 @@ class UserAuthController {
   }
 }
 
-module.exports = new UserAuthController();
+export default new UserAuthController();

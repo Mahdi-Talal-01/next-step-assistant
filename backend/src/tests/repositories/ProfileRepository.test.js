@@ -1,8 +1,8 @@
-const { PrismaClient } = require("@prisma/client");
-const ProfileRepository = require("../../repositories/ProfileRepository");
+import { PrismaClient } from '@prisma/client';
+import ProfileRepository from '../../repositories/ProfileRepository.js';
 
 // Mock Prisma
-jest.mock("@prisma/client", () => {
+jest.mock('@prisma/client', () => {
   const mockPrismaClient = {
     profile: {
       update: jest.fn(),
@@ -13,6 +13,7 @@ jest.mock("@prisma/client", () => {
     PrismaClient: jest.fn(() => mockPrismaClient),
   };
 });
+
 describe("ProfileRepository", () => {
   let prisma;
 
@@ -64,9 +65,7 @@ describe("ProfileRepository", () => {
       prisma.profile.findUnique.mockRejectedValue(dbError);
 
       // Execute & Assert
-      await expect(ProfileRepository.getProfile(userId)).rejects.toThrow(
-        dbError
-      );
+      await expect(ProfileRepository.getProfile(userId)).rejects.toThrow(dbError);
     });
   });
 

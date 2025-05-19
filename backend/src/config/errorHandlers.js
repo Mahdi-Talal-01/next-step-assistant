@@ -5,7 +5,7 @@
  */
 
 // Import response trait for consistent response formatting
-const ResponseTrait = require("../traits/ResponseTrait");
+import ResponseTrait from '../traits/ResponseTrait.js';
 
 /**
  * Registers all error handling middleware with the Express application
@@ -27,10 +27,10 @@ function registerErrorHandlers(app) {
 
   // 404 handler for unmatched routes
   app.use((req, res) => {
-    sendErrorResponse(res, "Resource not found", 404);
+    ResponseTrait.sendErrorResponse(res, "Resource not found", 404);
   });
 
   return app;
 }
 
-module.exports = registerErrorHandlers;
+export default registerErrorHandlers;

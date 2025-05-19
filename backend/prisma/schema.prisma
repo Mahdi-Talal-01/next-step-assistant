@@ -11,120 +11,120 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  name          String?
-  password      String?   // Optional for OAuth users
-  avatar        String?
-  provider      String    @default("local") // "local" or "google"
-  providerId    String?   // Google ID for OAuth users
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  profile       Profile?
-  token         Token?    // One-to-one relation with Token
-  jobs          Job[]     // One-to-many relation with Job
-  roadmaps      Roadmap[] // One-to-many relation with Roadmap
-  skills        UserSkill[] // Many-to-many relation with Skill
-  messages      Message[] // One-to-many relation with Message
+  id         String      @id @default(uuid())
+  email      String      @unique
+  name       String?
+  password   String? // Optional for OAuth users
+  avatar     String?
+  provider   String      @default("local") // "local" or "google"
+  providerId String? // Google ID for OAuth users
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  profile    Profile?
+  token      Token? // One-to-one relation with Token
+  jobs       Job[] // One-to-many relation with Job
+  roadmaps   Roadmap[] // One-to-many relation with Roadmap
+  skills     UserSkill[] // Many-to-many relation with Skill
+  messages   Message[] // One-to-many relation with Message
 }
 
 model Profile {
-  id          String    @id @default(uuid())
-  userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id])
-  bio         String?
-  location    String?
-  phone       String?
-  linkedin    String?
-  github      String?
-  website     String?
-  resumeUrl   String?
-  resumeName  String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  bio        String?
+  location   String?
+  phone      String?
+  linkedin   String?
+  github     String?
+  website    String?
+  resumeUrl  String?
+  resumeName String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Token {
-  id          String    @id @default(uuid())
-  userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  accessToken String    @db.Text
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  accessToken  String   @db.Text
   refreshToken String?  @db.Text
-  expiryDate  BigInt?
-  provider    String    // OAuth provider (e.g., "google")
-  scope       String?   @db.Text
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  expiryDate   BigInt?
+  provider     String // OAuth provider (e.g., "google")
+  scope        String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Job {
-  id            String    @id @default(uuid())
-  userId        String    // Foreign key to User
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  company       String
-  position      String
-  location      String?
-  status        String    // "applied", "interview", "rejected", "offered", "accepted"
-  appliedDate   DateTime
-  lastUpdated   DateTime  @updatedAt
-  salary        Float?    // Changed from String? to Float?
-  jobType       String?   // "Full-time", "Part-time", "Contract", "Internship"
-  jobUrl        String?
-  notes         String?   @db.Text
-  stages        String?   @db.Text // Stored as JSON string
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  skills        JobSkill[] // Many-to-many relation with Skill
+  id          String     @id @default(uuid())
+  userId      String // Foreign key to User
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     String
+  position    String
+  location    String?
+  status      String // "applied", "interview", "rejected", "offered", "accepted"
+  appliedDate DateTime
+  lastUpdated DateTime   @updatedAt
+  salary      Float? // Changed from String? to Float?
+  jobType     String? // "Full-time", "Part-time", "Contract", "Internship"
+  jobUrl      String?
+  notes       String?    @db.Text
+  stages      String?    @db.Text // Stored as JSON string
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  skills      JobSkill[] // Many-to-many relation with Skill
 }
 
 model Roadmap {
-  id            String    @id @default(uuid())
-  userId        String    // Foreign key to User
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String         @id @default(uuid())
+  userId        String // Foreign key to User
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   title         String
   description   String
   icon          String
   color         String
-  progress      Int       @default(0)
+  progress      Int            @default(0)
   estimatedTime String
   difficulty    String
-  isTemplate    Boolean   @default(false) // Whether this is a template or user-created
+  isTemplate    Boolean        @default(false) // Whether this is a template or user-created
   topics        Topic[]
   skills        RoadmapSkill[] // Many-to-many relation with Skill
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Topic {
-  id          String    @id @default(uuid())
-  roadmapId   String
-  roadmap     Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-  name        String
-  status      String    // "completed", "in-progress", "pending"
-  resources   Resource[]
-  skills      TopicSkill[] // Many-to-many relation with Skill
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String       @id @default(uuid())
+  roadmapId String
+  roadmap   Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  name      String
+  status    String // "completed", "in-progress", "pending"
+  resources Resource[]
+  skills    TopicSkill[] // Many-to-many relation with Skill
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
 model Resource {
-  id          String    @id @default(uuid())
-  topicId     String
-  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  name        String
-  url         String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  topicId   String
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  name      String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // New Skill-related models
 model Skill {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  category    String    // e.g., "Programming", "Design", "Soft Skills"
+  id          String         @id @default(uuid())
+  name        String         @unique
+  category    String // e.g., "Programming", "Design", "Soft Skills"
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
   users       UserSkill[]
   jobs        JobSkill[]
   roadmaps    RoadmapSkill[]
@@ -132,64 +132,64 @@ model Skill {
 }
 
 model UserSkill {
-  id          String    @id @default(uuid())
-  userId      String
-  skillId     String
-  level       Int       @default(1) // Skill proficiency level (1-5)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  userId    String
+  skillId   String
+  level     Int      @default(1) // Skill proficiency level (1-5)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, skillId])
 }
 
 model JobSkill {
-  id          String    @id @default(uuid())
-  jobId       String
-  skillId     String
-  required    Boolean   @default(true) // Whether the skill is required or preferred
-  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  jobId     String
+  skillId   String
+  required  Boolean  @default(true) // Whether the skill is required or preferred
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([jobId, skillId])
 }
 
 model RoadmapSkill {
-  id          String    @id @default(uuid())
-  roadmapId   String
-  skillId     String
-  level       Int       @default(1) // Target skill level to achieve
-  roadmap     Roadmap   @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  roadmapId String
+  skillId   String
+  level     Int      @default(1) // Target skill level to achieve
+  roadmap   Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([roadmapId, skillId])
 }
 
 model TopicSkill {
-  id          String    @id @default(uuid())
-  topicId     String
-  skillId     String
-  level       Int       @default(1) // Target skill level for this topic
-  topic       Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  topicId   String
+  skillId   String
+  level     Int      @default(1) // Target skill level for this topic
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  skill     Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([topicId, skillId])
 }
 
 // AI Assistant Messages
 model Message {
-  id          String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  content     String    @db.Text
-  type        String    // "user" or "assistant"
-  timestamp   DateTime  @default(now())
-  metadata    String?   @db.Text // Optional JSON string for additional data
-} 
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  type      String // "user" or "assistant"
+  timestamp DateTime @default(now())
+  metadata  String?  @db.Text // Optional JSON string for additional data
+}

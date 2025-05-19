@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const userRepository = require('../repositories/UserRepository');
+import jwt from 'jsonwebtoken';
+import userRepository from '../repositories/UserRepository.js';
 
 const auth = async (req, res, next) => {
   try {
@@ -21,7 +21,7 @@ const auth = async (req, res, next) => {
         message: 'User not found'
       });
     }
-    console.log(user);
+    // console.log(user);
 
     req.user = user;
     next();
@@ -33,4 +33,4 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = auth; 
+export default auth; 

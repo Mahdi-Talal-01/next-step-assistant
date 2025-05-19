@@ -1,4 +1,4 @@
-const ProfileRequest = require("../../requests/ProfileRequest");
+import ProfileRequest from '../../requests/ProfileRequest.js';
 describe("ProfileRequest", () => {
   describe("validate", () => {
     it("should return isValid true for valid profile data", () => {

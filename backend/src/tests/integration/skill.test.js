@@ -1,5 +1,5 @@
-const request = require("supertest");
-const jwt = require("jsonwebtoken");
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
 
 // Mock the auth middleware first
 jest.mock("../../middleware/auth", () => {
@@ -13,8 +13,8 @@ jest.mock("../../middleware/auth", () => {
 jest.mock("../../repositories/skillRepository");
 
 // Import after mocking
-const app = require("../../app");
-const skillRepository = require("../../repositories/skillRepository");
+import app from '../../app.js';
+import skillRepository from '../../repositories/skillRepository.js';
 
 // Define the base route prefix
 const BASE_ROUTE = "/api/skills";

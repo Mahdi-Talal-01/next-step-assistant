@@ -1,6 +1,6 @@
-const express = require("express");
-const ContentAssistantController = require("../controllers/ContentAssistantController");
-const ContentAssistantValidation = require("../requests/ContentAssistantValidation");
+import express from 'express';
+import ContentAssistantController from '../controllers/ContentAssistantController.js';
+import ContentAssistantValidation from '../requests/ContentAssistantValidation.js';
 
 const router = express.Router();
 
@@ -48,4 +48,4 @@ router.post(
  */
 router.get("/stream", ContentAssistantController.streamContent);
 
-module.exports = router;
+export default router;

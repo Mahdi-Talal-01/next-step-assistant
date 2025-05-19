@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 class TokenRepository {
@@ -96,4 +96,4 @@ class TokenRepository {
   }
 }
 
-module.exports = { TokenRepository: new TokenRepository() };
+export default new TokenRepository();

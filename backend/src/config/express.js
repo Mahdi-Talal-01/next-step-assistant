@@ -3,10 +3,15 @@
  * Sets up Express middleware and basic configurations
  * Following Single Responsibility Principle
  */
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const ResponseTrait = require("../traits/ResponseTrait");
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import ResponseTrait from '../traits/ResponseTrait.js';
+
+// Get the directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Configures Express with middleware
@@ -62,4 +67,4 @@ function configureExpress(app) {
   return app;
 }
 
-module.exports = configureExpress;
+export default configureExpress;

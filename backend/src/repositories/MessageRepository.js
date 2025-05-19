@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from '@prisma/client';
 
 // Create a new PrismaClient instance with more detailed logging
 const prisma = new PrismaClient({
@@ -151,4 +151,4 @@ class MessageRepository {
   }
 }
 
-module.exports = new MessageRepository();
+export default new MessageRepository();

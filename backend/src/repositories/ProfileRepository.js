@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 class ProfileRepository {
@@ -144,4 +144,4 @@ class ProfileRepository {
   }
 }
 
-module.exports = new ProfileRepository();
+export default new ProfileRepository();

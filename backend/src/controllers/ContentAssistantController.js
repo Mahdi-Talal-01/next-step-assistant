@@ -1,4 +1,4 @@
-const ContentAssistantService = require("../services/ContentAssistantService");
+import ContentAssistantService from '../services/ContentAssistantService.js';
 
 class ContentAssistantController {
   /**
@@ -179,4 +179,4 @@ class ContentAssistantController {
     }
   }
 }
-module.exports = new ContentAssistantController();
+export default new ContentAssistantController();

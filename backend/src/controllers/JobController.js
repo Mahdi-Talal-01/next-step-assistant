@@ -1,6 +1,6 @@
-const JobRepository = require("../repositories/JobRepository");
-const skillRepository = require("../repositories/skillRepository");
-const ResponseTrait = require("../traits/ResponseTrait");
+import JobRepository from '../repositories/JobRepository.js';
+import skillRepository from '../repositories/skillRepository.js';
+import ResponseTrait from '../traits/ResponseTrait.js';
 
 /**
  * Controller for handling job-related requests
@@ -338,4 +338,4 @@ class JobController {
   }
 }
 
-module.exports = new JobController();
+export default new JobController();

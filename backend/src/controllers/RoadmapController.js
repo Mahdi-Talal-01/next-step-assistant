@@ -1,5 +1,5 @@
-const roadmapService = require("../services/RoadmapService");
-const ResponseTrait = require("../traits/ResponseTrait");
+import roadmapService from '../services/RoadmapService.js';
+import ResponseTrait from '../traits/ResponseTrait.js';
 
 class RoadmapController {
   async createRoadmap(req, res) {
@@ -92,4 +92,4 @@ class RoadmapController {
   }
 }
 
-module.exports = new RoadmapController();
+export default new RoadmapController();

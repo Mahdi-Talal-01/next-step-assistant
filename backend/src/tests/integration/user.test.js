@@ -1,7 +1,7 @@
-const request = require("supertest");
-const app = require("../../app");
-const { prisma } = require("../utils/db");
-const userService = require("../../services/UserService");
+import request from 'supertest';
+import app from '../../app.js';
+import { prisma } from '../utils/db.js';
+import userService from '../../services/UserService.js';
 // Mock the prisma client
 jest.mock("../utils/db", () => ({
   prisma: {

@@ -48,4 +48,4 @@ class ProfileRequest {
   }
 }
 
-module.exports = ProfileRequest; 
+export default ProfileRequest; 

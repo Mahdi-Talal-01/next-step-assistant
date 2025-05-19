@@ -1,5 +1,5 @@
-const RoadmapRequest = require("../../requests/RoadmapRequest");
-const ResponseTrait = require("../../traits/ResponseTrait");
+import RoadmapRequest from '../../requests/RoadmapRequest.js';
+import ResponseTrait from '../../traits/ResponseTrait.js';
 
 // Mock dependencies
 jest.mock("../../traits/ResponseTrait");

@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const oauthController = require('../controllers/oauthController');
+import oauthController from '../controllers/oauthController.js';
 
 // Route to initiate Google OAuth
 router.post('/google', oauthController.handleGoogleAuth);
@@ -15,4 +15,4 @@ router.get('/oauth', (req, res) => {
   res.redirect(`/api/auth/google/callback?${queryString}`);
 });
 
-module.exports = router; 
+export default router; 

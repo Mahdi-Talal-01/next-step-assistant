@@ -1,7 +1,7 @@
-const oauthService = require("../services/oauthService");
-const { PrismaClient } = require("@prisma/client");
-const jwt = require("jsonwebtoken");
-const { TokenRepository } = require("../repositories/TokenRepository");
+import oauthService from '../services/oauthService.js';
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import  TokenRepository  from '../repositories/TokenRepository.js';
 const prisma = new PrismaClient();
 
 class OAuthController {
@@ -142,4 +142,4 @@ class OAuthController {
   }
 }
 
-module.exports = new OAuthController();
+export default new OAuthController();

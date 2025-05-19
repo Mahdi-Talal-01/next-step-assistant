@@ -1,10 +1,10 @@
-const {
+import {
   validateSkill,
   validateUserSkill,
   validateJobSkill,
   validateRoadmapSkill,
   validateTopicSkill,
-} = require("../../requests/skillRequest");
+} from "../../requests/skillRequest";
 
 describe("Skill Request Validators", () => {
   // Setup common mock objects

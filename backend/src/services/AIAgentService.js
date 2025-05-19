@@ -1,5 +1,5 @@
-const axios = require("axios");
-const MessageRepository = require("../repositories/MessageRepository");
+import axios from 'axios';
+import MessageRepository from '../repositories/MessageRepository.js';
 
 class AIAgentService {
   /**
@@ -156,4 +156,4 @@ class AIAgentService {
   }
 }
 
-module.exports = new AIAgentService();
+export default new AIAgentService();

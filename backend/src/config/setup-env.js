@@ -1,5 +1,6 @@
 // This script sets environment variables for Google OAuth and other services
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Check if the environment has the required variables
 if (!process.env.GOOGLE_CLIENT_ID) {
@@ -31,8 +32,7 @@ if (!process.env.N8N_WEBHOOK_URL) {
 }
 
 // Export a function to check and set the variables
-module.exports = {
-  checkAndSetGoogleEnv: () => {
+export const checkAndSetGoogleEnv = () => {
     // These logs will help troubleshoot environment variable issues
     console.log('Google OAuth Environment Variables:');
     console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID ? process.env.GOOGLE_CLIENT_ID.substring(0, 20) + '...' : 'MISSING');
@@ -52,4 +52,3 @@ module.exports = {
       process.env.GOOGLE_AUTH_REDIRECT_URL
     );
   }
-}; 

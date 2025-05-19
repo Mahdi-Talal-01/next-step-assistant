@@ -1,8 +1,8 @@
-const express = require("express");
+import express from 'express';
 const router = express.Router();
-const ProfileController = require("../controllers/ProfileController");
-const auth = require("../middleware/auth");
-const fileUploadService = require("../services/FileUploadService");
+import ProfileController from '../controllers/ProfileController.js';
+import auth from '../middleware/auth.js';
+import fileUploadService from '../services/FileUploadService.js';
 
 // Get profile
 router.get("/", auth, ProfileController.getProfile);
@@ -27,4 +27,4 @@ router.delete("/cv", auth, ProfileController.deleteCV);
 // Get all user data (profile, roadmap, skills, applications)
 router.get("/all-data", auth, ProfileController.getAllUserData);
 
-module.exports = router;
+export default router;

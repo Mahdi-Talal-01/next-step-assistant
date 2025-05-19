@@ -1,4 +1,4 @@
-const OpenAI = require("openai");
+import OpenAI from 'openai';
 
 class ContentAssistantService {
   constructor() {
@@ -384,4 +384,4 @@ Balance informative content with an engaging style appropriate for the target au
   }
 }
 
-module.exports = new ContentAssistantService();
+export default new ContentAssistantService();

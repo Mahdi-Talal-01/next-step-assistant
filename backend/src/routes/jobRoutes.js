@@ -1,7 +1,7 @@
-const express = require("express");
+import express from 'express';
 const router = express.Router();
-const JobController = require("../controllers/JobController");
-const auth = require("../middleware/auth");
+import JobController from '../controllers/JobController.js';
+import auth from '../middleware/auth.js';
 
 // All job routes require authentication
 router.use(auth);
@@ -40,4 +40,4 @@ router.put("/:jobId/skills/:skillId", JobController.updateJobSkill);
 // Remove a skill from a job
 router.delete("/:jobId/skills/:skillId", JobController.removeJobSkill);
 
-module.exports = router;
+export default router;

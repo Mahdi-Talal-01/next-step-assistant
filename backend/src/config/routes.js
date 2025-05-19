@@ -1,13 +1,13 @@
 // Import all route modules
-const userRoutes = require("../routes/userRoutes");
-const profileRoutes = require("../routes/profileRoutes");
-const oauthRoutes = require("../routes/oauthRoutes");
-const gmailRoutes = require("../routes/gmailRoutes");
-const jobRoutes = require("../routes/jobRoutes");
-const roadmapRoutes = require("../routes/roadmap");
-const skillRoutes = require("../routes/skillRoutes");
-const contentAssistantRoutes = require("../routes/contentAssistantRoutes");
-const aiAgentRoutes = require("../routes/aiAgentRoutes");
+import userRoutes from '../routes/userRoutes.js';
+import profileRoutes from '../routes/profileRoutes.js';
+import oauthRoutes from '../routes/oauthRoutes.js';
+import gmailRoutes from '../routes/gmailRoutes.js';
+import jobRoutes from '../routes/jobRoutes.js';
+import roadmapRoutes from '../routes/roadmap.js';
+import skillRoutes from '../routes/skillRoutes.js';
+import contentAssistantRoutes from '../routes/contentAssistantRoutes.js';
+import aiAgentRoutes from '../routes/aiAgentRoutes.js';
 
 /**
  * Registers all API routes with the Express application
@@ -32,4 +32,4 @@ function registerRoutes(app) {
   return app;
 }
 
-module.exports = registerRoutes;
+export default registerRoutes;

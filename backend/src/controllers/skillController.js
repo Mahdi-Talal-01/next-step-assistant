@@ -1,6 +1,6 @@
-const skillService = require("../services/skillService");
-const ResponseTrait = require("../traits/ResponseTrait");
-const skillRepository = require("../repositories/skillRepository");
+import skillService from '../services/skillService.js';
+import ResponseTrait from '../traits/ResponseTrait.js';
+import skillRepository from '../repositories/skillRepository.js';
 
 class SkillController {
   // Skill CRUD operations
@@ -561,4 +561,4 @@ class SkillController {
   }
 }
 
-module.exports = new SkillController();
+export default new SkillController();

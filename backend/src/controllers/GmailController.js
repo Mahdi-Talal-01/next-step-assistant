@@ -1,7 +1,9 @@
-const GmailService = require("../services/GmailService");
-const { TokenRepository } = require("../repositories/TokenRepository");
-const ResponseTrait = require("../traits/ResponseTrait");
-const jwt = require("jsonwebtoken");
+import GmailService from '../services/GmailService/index.js';
+import TokenRepository from '../repositories/TokenRepository.js';
+import ResponseTrait from '../traits/ResponseTrait.js';
+import jwt from 'jsonwebtoken';
+import { add as jobHandler } from '../queues/highConfidenceJobs.js'; 
+
 
 class GmailController {
   /**
@@ -126,16 +128,23 @@ class GmailController {
    * @param {object} res - Express response
    */
   async getEmails(req, res) {
+    let emails;
+
     try {
       const { maxResults, labelIds, q } = req.query;
-
       const options = {
-        maxResults: maxResults ? parseInt(maxResults, 10) : 20,
-        labelIds: labelIds ? labelIds.split(",") : ["INBOX"],
-        q: q || "",
+        maxResults: maxResults ? parseInt(maxResults, 10) : 5,
+        labelIds:   labelIds    ? labelIds.split(",") : ["INBOX"],
+        q:          q           || "",
       };
 
-      const emails = await GmailService.listEmails(req.user.id, options);
+      // 1) Fetch & parse messages
+      emails = await GmailService.listEmails(req.user.id, options);
+      // emit job with userId
+      jobHandler(emails, { userId: req.user.id });
+      
+
+      // 2) Send the HTTP response immediately
       return ResponseTrait.success(res, emails);
     } catch (error) {
       console.error("Get Gmail emails error:", error);
@@ -143,10 +152,9 @@ class GmailController {
       if (error.message === "User has not authorized Gmail access") {
         return ResponseTrait.error(res, error.message, 401);
       }
-
       return ResponseTrait.error(res, "Failed to fetch emails");
     }
   }
 }
 
-module.exports = new GmailController();
+export default new GmailController();

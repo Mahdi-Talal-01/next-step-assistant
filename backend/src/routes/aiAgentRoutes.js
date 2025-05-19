@@ -1,7 +1,7 @@
-const express = require("express");
+import express from 'express';
 const router = express.Router();
-const AIAgentController = require("../controllers/AIAgentController");
-const auth = require("../middleware/auth");
+import AIAgentController from '../controllers/AIAgentController.js';
+import auth from '../middleware/auth.js';
 
 // Process a message with the AI agent
 router.post("/message", auth, AIAgentController.processMessage);
@@ -12,4 +12,4 @@ router.get("/history", auth, AIAgentController.getConversationHistory);
 // Clear all conversation history
 router.delete("/history", auth, AIAgentController.clearUserMessages);
 
-module.exports = router; 
+export default router; 

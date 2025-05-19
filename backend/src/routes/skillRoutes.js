@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const skillController = require('../controllers/skillController');
-const { validateSkill, validateUserSkill, validateJobSkill, validateRoadmapSkill, validateTopicSkill } = require('../requests/skillRequest');
-const auth = require('../middleware/auth');
+import skillController from '../controllers/skillController.js';
+import { validateSkill, validateUserSkill, validateJobSkill, validateRoadmapSkill, validateTopicSkill } from '../requests/skillRequest.js';
+import auth from '../middleware/auth.js';
 
 // Skill CRUD routes
 router.post('/', auth, validateSkill, skillController.createSkill);
@@ -57,4 +57,4 @@ router.get('/analytics/top/growing', skillController.getTopGrowingSkills);
 router.get('/analytics/top/paying', skillController.getTopPayingSkills);
 router.get('/analytics/top/demanded', skillController.getMostDemandedSkills);
 
-module.exports = router; 
+export default router; 

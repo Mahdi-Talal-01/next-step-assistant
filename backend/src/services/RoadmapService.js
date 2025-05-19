@@ -1,5 +1,5 @@
-const roadmapRepository = require("../repositories/RoadmapRepository");
-const { PrismaClient } = require('@prisma/client');
+import roadmapRepository from '../repositories/RoadmapRepository.js';
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Helper function to ensure IDs are strings
@@ -88,4 +88,4 @@ class RoadmapService {
   }
 }
 
-module.exports = new RoadmapService();
+export default new RoadmapService();

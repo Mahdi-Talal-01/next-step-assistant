@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const roadmapController = require('../controllers/RoadmapController');
-const authMiddleware = require('../middleware/auth');
-const RoadmapRequest = require('../requests/RoadmapRequest');
+import roadmapController from '../controllers/RoadmapController.js';
+import authMiddleware from '../middleware/auth.js';
+import RoadmapRequest from '../requests/RoadmapRequest.js';
 
 // Apply auth middleware to all routes
 router.use(authMiddleware);
@@ -27,4 +27,4 @@ router.patch('/:roadmapId/topics/:topicId/status', RoadmapRequest.validateTopicS
 // Alternative POST route for topic status update (for browsers that don't support PATCH)
 router.post('/:roadmapId/topics/:topicId/status', RoadmapRequest.validateTopicStatus, roadmapController.updateTopicStatus);
 
-module.exports = router;
+export default router;

@@ -44,4 +44,4 @@ class ResponseTrait {
   }
 }
 
-module.exports = ResponseTrait; 
+export default ResponseTrait; 

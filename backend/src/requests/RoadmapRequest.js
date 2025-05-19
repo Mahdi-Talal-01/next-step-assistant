@@ -1,4 +1,4 @@
-const ResponseTrait = require("../traits/ResponseTrait");
+import ResponseTrait from '../traits/ResponseTrait.js';
 
 class RoadmapRequest {
     static validateCreate(req, res, next) {
@@ -184,4 +184,4 @@ class RoadmapRequest {
     }
 }
 
-module.exports = RoadmapRequest; 
+export default RoadmapRequest; 

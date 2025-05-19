@@ -1,4 +1,4 @@
-const ProfileRepository = require('../repositories/ProfileRepository');
+import ProfileRepository from '../repositories/ProfileRepository.js';
 
 class ProfileService {
   async updateProfile(userId, profileData) {
@@ -68,4 +68,4 @@ class ProfileService {
 }
 
 
-module.exports = new ProfileService(); 
+export default new ProfileService(); 

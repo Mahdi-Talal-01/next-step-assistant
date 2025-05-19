@@ -1,7 +1,7 @@
-const ProfileService = require("../services/ProfileService");
-const ResponseTrait = require("../traits/ResponseTrait");
-const AIAgentService = require("../services/AIAgentService");
-const AIAgentRequest = require("../requests/AIAgentRequest");
+import ProfileService from '../services/ProfileService.js';
+import ResponseTrait from '../traits/ResponseTrait.js';
+import AIAgentService from '../services/AIAgentService.js';
+import AIAgentRequest from '../requests/AIAgentRequest.js';
 
 class AIAgentController {
   /**
@@ -118,4 +118,4 @@ class AIAgentController {
   }
 }
 
-module.exports = new AIAgentController();
+export default new AIAgentController();

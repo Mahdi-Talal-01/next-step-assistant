@@ -1,9 +1,9 @@
-const oauthService = require("../services/oauthService");
-const { PrismaClient } = require("@prisma/client");
-const jwt = require("jsonwebtoken");
-const { TokenRepository } = require("../../repositories/TokenRepository");
+import oauthService from '../services/oauthService.js';
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
+import { TokenRepository } from '../../repositories/TokenRepository.js';
 const prisma = new PrismaClient();
-const ResponseTrait = require("../../traits/ResponseTrait");
+import ResponseTrait from '../../traits/ResponseTrait.js';
 
 class OAuthController {
   async handleGoogleAuth(req, res) {
@@ -137,4 +137,4 @@ class OAuthController {
   }
 }
 
-module.exports = new OAuthController();
+export default new OAuthController();
