@@ -10,15 +10,15 @@ class OAuthController {
     try {
       // Check if required environment variables are set
       if (!process.env.GOOGLE_CLIENT_ID) {
-        return ResponseTrait.sendErrorResponse(
+        return ResponseTrait.error(
           res,
           "Missing GOOGLE_CLIENT_ID environment variable",
           500
         );
-      }     
+      }
 
       if (!process.env.GOOGLE_CLIENT_SECRET) {
-        return ResponseTrait.sendErrorResponse(
+        return ResponseTrait.error(
           res,
           "Missing GOOGLE_CLIENT_SECRET environment variable",
           500
@@ -29,11 +29,11 @@ class OAuthController {
       return res.json({ url });
     } catch (error) {
       console.error("Google auth error:", error);
-      return res.status(500).json({
-        error: "Failed to initiate Google authentication",
-        message: error.message,
-        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
-      });
+      return ResponseTrait.error(
+        res,
+        "Failed to initiate Google authentication",
+        500
+      );
     }
   }
 
@@ -41,9 +41,7 @@ class OAuthController {
     try {
       const { code } = req.query;
       if (!code) {
-        return res
-          .status(400)
-          .json({ error: "Authorization code is required" });
+        return ResponseTrait.badRequest(res, "Authorization code is required");
       }
 
       // Get tokens from Google
@@ -130,7 +128,9 @@ class OAuthController {
     } catch (error) {
       console.error("Google callback error:", error);
       const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-      res.redirect(`${frontendUrl}/auth?error=Authentication failed`);
+      // Optionally, you can also log the error in the backend
+      // Instead of redirecting, you can send a JSON error response if this is an API endpoint
+      return ResponseTrait.error(res, "Authentication failed", 500);
     }
   }
 }

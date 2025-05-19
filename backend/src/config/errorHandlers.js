@@ -17,17 +17,16 @@ function registerErrorHandlers(app) {
   app.use((err, req, res, next) => {
     console.error("Application error:", err.stack);
 
-    ResponseTrait.sendErrorResponse(
+    ResponseTrait.error(
       res,
       err.message || "Something went wrong!",
-      err.statusCode || 500,
-      process.env.NODE_ENV === "development" ? err.stack : null
+      err.statusCode || 500
     );
   });
 
   // 404 handler for unmatched routes
   app.use((req, res) => {
-    sendErrorResponse(res, "Resource not found", 404);
+    ResponseTrait.notFound(res, "Resource not found");
   });
 
   return app;
