@@ -98,7 +98,7 @@ jobs:
           script: |
             cd ~
             # Inject your .env.staging from GitHub Secrets
-            echo "${{ secrets.ENV_STAGING }}" > .env.staging
+            echo "${{ secrets.ENV_STAGING }}" > .env
 
             # Pull new images and restart
             docker compose -f docker-compose.staging.yml pull
