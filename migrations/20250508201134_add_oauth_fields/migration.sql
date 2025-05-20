@@ -1,16 +1,16 @@
 /*
   Warnings:
 
-  - The primary key for the `profile` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - You are about to drop the column `avatar` on the `profile` table. All the data in the column will be lost.
-  - The primary key for the `user` table will be changed. If it partially fails, the table could be left without primary key constraint.
+  - The primary key for the `Profile` table will be changed. If it partially fails, the table could be left without primary key constraint.
+  - You are about to drop the column `avatar` on the `Profile` table. All the data in the column will be lost.
+  - The primary key for the `User` table will be changed. If it partially fails, the table could be left without primary key constraint.
 
 */
 -- DropForeignKey
-ALTER TABLE `profile` DROP FOREIGN KEY `Profile_userId_fkey`;
+ALTER TABLE `Profile` DROP FOREIGN KEY `Profile_userId_fkey`;
 
 -- AlterTable
-ALTER TABLE `profile` DROP PRIMARY KEY,
+ALTER TABLE `Profile` DROP PRIMARY KEY,
     DROP COLUMN `avatar`,
     MODIFY `id` VARCHAR(191) NOT NULL,
     MODIFY `userId` VARCHAR(191) NOT NULL,
@@ -18,7 +18,7 @@ ALTER TABLE `profile` DROP PRIMARY KEY,
     ADD PRIMARY KEY (`id`);
 
 -- AlterTable
-ALTER TABLE `user` DROP PRIMARY KEY,
+ALTER TABLE `User` DROP PRIMARY KEY,
     ADD COLUMN `avatar` VARCHAR(191) NULL,
     ADD COLUMN `provider` VARCHAR(191) NOT NULL DEFAULT 'local',
     ADD COLUMN `providerId` VARCHAR(191) NULL,

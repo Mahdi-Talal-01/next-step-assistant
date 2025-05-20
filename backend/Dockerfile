@@ -2,18 +2,22 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install required dependencies for Prisma
 RUN apk add --no-cache openssl
 
-COPY package.json ./
+# Install dependencies
+COPY package*.json ./
+RUN npm install --production
 
-RUN npm install || (echo "npm install failed" && exit 1)
-
+# Copy all source
 COPY . .
 
-RUN npx prisma generate || (echo "prisma generate failed" && exit 1)
+# Generate Prisma client
+RUN npx prisma generate
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 3000
 
-# Use start for production
-CMD ["npm", "start"]
+# Use entrypoint
+ENTRYPOINT ["entrypoint.sh"]

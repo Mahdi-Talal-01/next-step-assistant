@@ -9,9 +9,13 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "db:test:push": "dotenv -e .env.test -- npx prisma db push",
+    "db:test:push": "dotenv -e .env -- npx prisma db push",
     "db:test:seed": "dotenv -e .env.test -- node prisma/seed.js",
-    "db:test:studio": "dotenv -e .env.test -- npx prisma studio"
+    "db:test:studio": "dotenv -e .env.test -- npx prisma studio",
+    "migrate": "prisma migrate deploy",
+    "migrate:dev": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.10.2",

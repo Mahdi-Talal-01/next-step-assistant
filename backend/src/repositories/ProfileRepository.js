@@ -4,11 +4,54 @@ const prisma = new PrismaClient();
 class ProfileRepository {
   async updateProfile(userId, profileData) {
     try {
+      // Separate user data from profile data
+      const { name, title, ...rest } = profileData;
+      
+      // Filter out any fields that don't exist in the Profile model
+      const validProfileFields = {
+        bio: rest.bio,
+        location: rest.location,
+        phone: rest.phone,
+        linkedin: rest.linkedin,
+        github: rest.github,
+        website: rest.website,
+        resumeUrl: rest.resumeUrl,
+        resumeName: rest.resumeName
+      };
+
+      // Remove undefined fields
+      Object.keys(validProfileFields).forEach(key => 
+        validProfileFields[key] === undefined && delete validProfileFields[key]
+      );
+      
+      // Update profile data
       const profile = await prisma.profile.update({
         where: { userId },
-        data: profileData,
+        data: validProfileFields,
       });
-      return profile;
+
+      // If name is provided, update the user data as well
+      if (name) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { name },
+        });
+      }
+
+      // Get the updated profile with user data
+      const updatedProfile = await prisma.profile.findUnique({
+        where: { userId },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      return updatedProfile;
     } catch (error) {
       throw error;
     }

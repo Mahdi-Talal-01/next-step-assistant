@@ -1,5 +1,15 @@
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+
+// Initialize Prisma client with proper connection handling
+let prisma;
+
+// Handle connection issues gracefully
+try {
+  prisma = new PrismaClient();
+} catch (error) {
+  console.error('Failed to initialize Prisma client:', error);
+  throw new Error('Database connection failed');
+}
 
 class UserRepository {
   async createUser(userData) {
@@ -19,6 +29,7 @@ class UserRepository {
       });
       return user;
     } catch (error) {
+      console.error('Error creating user:', error);
       throw error;
     }
   }
@@ -33,6 +44,7 @@ class UserRepository {
       });
       return user;
     } catch (error) {
+      console.error('Error finding user by email:', error);
       throw error;
     }
   }
@@ -47,6 +59,7 @@ class UserRepository {
       });
       return user;
     } catch (error) {
+      console.error('Error finding user by ID:', error);
       throw error;
     }
   }
