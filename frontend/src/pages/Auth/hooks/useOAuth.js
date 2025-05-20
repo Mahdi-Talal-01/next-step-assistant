@@ -12,7 +12,7 @@ export const useOAuth = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await fetch('http://15.236.226.177:3000/api/auth/google', {
+      const response = await fetch('http://localhost:3000/api/auth/google', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

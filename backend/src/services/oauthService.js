@@ -5,7 +5,7 @@ dotenv.config();
 
 const REDIRECT_URL =
   process.env.GOOGLE_AUTH_REDIRECT_URL ||
-  "http://15.236.226.177:3000/api/auth/google/callback";
+  "http://localhost:3000/api/auth/google/callback";
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
