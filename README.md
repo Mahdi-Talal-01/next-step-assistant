@@ -31,8 +31,9 @@
 <!-- Project Highlights -->
 <img src="./readme/title4.svg"/>
 
-### Key Features
+
 ![System Flowchart](./readme/demo/project_highlights.png)
+### Key Features
 - **Intelligent Job Tracking & Management**
 
 - **Smart Email Intelligence Center**
@@ -81,10 +82,14 @@
 
 ### Testing & Validation
 
-|                         Unit Testing                          |                         Integration Testing                         |                         E2E Testing                         |
-| :-----------------------------------------------------------: | :-----------------------------------------------------------------: | :---------------------------------------------------------: |
-| ![Unit Testing](<./readme/testings/unit%20testing%20(2).png>) | ![Integration Testing](./readme/testings/Integration%20testing.png) | ![E2E Testing](<./readme/testings/2e2%20testing%20(1).png>) |
+#### Unit Testing  
+![Unit Testing](./readme/testings/unit%20testing%20(2).png)
 
+#### Integration Testing  
+![Integration Testing](./readme/testings/Integration%20testing.png)
+
+#### E2E Testing  
+![E2E Testing](./readme/testings/2e2%20testing%20(1).png)
 <br><br>
 
 <!-- AI -->
