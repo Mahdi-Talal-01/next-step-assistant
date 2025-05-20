@@ -16,13 +16,11 @@
 
 ![ER Diagram](./readme/system-design/ER%20Diagram.png)
 
-#### Backend Components
 
-![Backend Components](./readme/system-design/Backend%20Component%20Diagram.png)
 
-#### Frontend Architecture
+#### System components
 
-![Frontend Architecture](./readme/system-design/Frontend%20Component%20Diagram.png)
+![Frontend Architecture](./readme/system-design/system_components.png)
 
 #### System Flowchart
 
@@ -34,40 +32,19 @@
 <img src="./readme/title4.svg"/>
 
 ### Key Features
-
+![System Flowchart](./readme/demo/project_highlights.png)
 - **Intelligent Job Tracking & Management**
-
-  - Automated email detection for job applications, interviews, and rejections
-  - Visual timeline of application journey with automated milestone tracking
 
 - **Smart Email Intelligence Center**
 
-  - Secure OAuth Gmail integration with privacy-first data handling
-  - AI-powered classification of career-relevant communications
-
 - **Data-Driven Skills Analytics**
-
-  - Real-time market trend analysis with demand forecasting
-  - Personalized gap analysis between your skills and market requirements
 
 - **AI-Powered Career Development Hub**
 
-  - Customized learning roadmaps based on your career goals and current skills
-  - Curated resource recommendations from trusted learning platforms
-
 - **Content Creation Assistant**
-
-  - Professional LinkedIn post generator optimized for engagement
-  - Smart email response drafting with tone and intent customization
-
 - **AI Career Strategist**
-
-  - Personalized career path recommendations based on your profile
-  - Resume enhancement with industry-specific keyword optimization
-
 - **Seamless User Experience**
-  - Intuitive, responsive dashboard that adapts to your workflow
-  - Cross-device synchronization for on-the-go career management
+
 
 ### User Screens (Mobile)
 
