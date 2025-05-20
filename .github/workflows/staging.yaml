@@ -79,7 +79,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
       - name: Copy docker-compose.staging.yml to EC2
         uses: appleboy/scp-action@v1
         with:
@@ -97,10 +96,16 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd ~
-            # Inject your .env.staging from GitHub Secrets
+
+            # Write staging env into .env so Compose picks it up
             echo "${{ secrets.ENV_STAGING }}" > .env
 
-            # Pull new images and restart
-            docker compose -f docker-compose.staging.yml pull
+            # Shut down existing services
             docker compose -f docker-compose.staging.yml down
+
+            # Remove old backend image (ignore errors if not present)
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/nextstep:latest || true
+
+            # Pull fresh images and start
+            docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml up -d
