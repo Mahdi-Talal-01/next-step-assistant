@@ -46,17 +46,27 @@
 - **Seamless User Experience**
 
 
-### User Screens (Mobile)
-
-|              Login screen               |             Register screen              |                 Dashboard                 |
-| :-------------------------------------: | :--------------------------------------: | :---------------------------------------: |
-| ![Landing](./readme/demo/1440x1024.png) | ![Register](./readme/demo/1440x1024.png) | ![Dashboard](./readme/demo/1440x1024.png) |
 
 ### Admin Screens (Web)
 
-|               Job Analytics               |              User Management               |
+|               Sign Up               |              User Profile               |
 | :---------------------------------------: | :----------------------------------------: |
-| ![Analytics](./readme/demo/1440x1024.png) | ![Management](./readme/demo/1440x1024.png) |
+| ![Signup](./readme/demo/signup-ezgif.com-video-to-gif-converter.gif) | ![Profile](./readme/demo/Profile-ezgif.com-speed.gif) |
+
+|               Job Email Tracker               |              Applications Jobs               |
+| :---------------------------------------: | :----------------------------------------: |
+| ![Analytics](./readme/demo/Emailtracker-ezgif.com-optimize.gif) | ![Applications](./readme/demo/Applications-ezgif.com-optimize.gif) |
+
+|               Content Assistan Linkedin Post               |              Content Assistan JobDescription               |
+| :---------------------------------------: | :----------------------------------------: |
+| ![Analytics](./readme/demo/LinkedinPost-ezgif.com-video-to-gif-converter.gif) | ![Management](./readme/demo/JobDescription-ezgif.com-video-to-gif-converter.gif) |
+
+|               AI Agent                |              Skills Analatics               |
+| :---------------------------------------: | :----------------------------------------: |
+| ![AI Agent](./readme/demo/Aiagent-ezgif.com-optimize.gif) | ![Skills](./readme/demo/skilltracker-ezgif.com-optimize.gif) |
+
+
+
 
 <br><br>
 
