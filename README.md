@@ -31,8 +31,9 @@
 <!-- Project Highlights -->
 <img src="./readme/title4.svg"/>
 
-### Key Features
+
 ![System Flowchart](./readme/demo/project_highlights.png)
+### Key Features
 - **Intelligent Job Tracking & Management**
 
 - **Smart Email Intelligence Center**
