@@ -48,7 +48,14 @@
 
 
 
-### Admin Screens (Web)
+### User Screens (Web)
+| Landing Page                            | Landing page2                       |
+| --------------------------------------- | ------------------------------------- |
+| ![Landing Page](./readme/AI-images/landing.png) | ![Landing Page](./readme/AI-images/landing-1.png) |
+
+| Dashboard                            | Ai agent                       |
+| --------------------------------------- | ------------------------------------- |
+| ![Landing Page](./readme/AI-images/Dashboard.png) | ![Login Page](./readme/AI-images/Ai-agent.png) |
 
 |               Sign Up               |              User Profile               |
 | :---------------------------------------: | :----------------------------------------: |
@@ -195,4 +202,6 @@ Our deployment pipeline leverages GitHub Actions for CI/CD, Docker for container
 - **Secrets & Configuration:** All sensitive data and environment variables are injected securely via GitHub Secrets during the CI/CD process.
 
 This architecture ensures automated, reliable, and scalable deployments for both backend and frontend services.
-### API Documentation
+#### Postman API Documentation
+
+- You can check the full API documentation using this [link](https://documenter.getpostman.com/view/33828343/2sB2qZE2ty).
