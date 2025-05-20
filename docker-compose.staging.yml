@@ -3,7 +3,11 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
+    # load DB_PASSWORD / DB_NAME from .env.staging
+    env_file:
+      - .env.staging
     environment:
+      # now populated from DB_PASSWORD / DB_NAME
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE:       ${DB_NAME}
     ports:
@@ -20,6 +24,9 @@ services:
     image: mahditalaldev/nextstep:latest
     ports:
       - "3000:3000"
+    # load all your app vars
+    env_file:
+      - .env.staging
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - JWT_SECRET=${JWT_SECRET}
@@ -28,10 +35,7 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - CORS_ORIGIN=${CORS_ORIGIN}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - N8N_WEBHOOK_Test_URL=${N8N_WEBHOOK_Test_URL}
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL}
-    env_file:
-      - .env.staging
     depends_on:
       db:
         condition: service_healthy
