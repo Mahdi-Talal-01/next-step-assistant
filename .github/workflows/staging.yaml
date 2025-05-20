@@ -1,4 +1,4 @@
-name: deploy to staging
+name: Deploy to Staging
 
 on:
   push:
@@ -9,7 +9,8 @@ jobs:
   Build-and-Push-Backend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -17,7 +18,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build & push backend image
+      - name: Build & Push Backend Image
         working-directory: backend
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/nextstep:latest .
@@ -34,19 +35,21 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Inject API URL into frontend .env
+      - name: Configure .env for Staging
         working-directory: frontend
         run: |
           sed -i "s|VITE_API_URL=.*|VITE_API_URL=http://${{ secrets.EC2_HOST_STAGING }}:3000|g" .env.example
           cp .env.example .env
 
-      - run: npm install
+      - name: Install Dependencies
         working-directory: frontend
+        run: npm install
 
-      - run: npm run build
+      - name: Build Frontend
         working-directory: frontend
+        run: npm run build
 
-      - name: Copy build to EC2
+      - name: Copy Frontend Build to EC2
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.EC2_HOST_STAGING }}
@@ -55,7 +58,7 @@ jobs:
           source: "frontend/dist"
           target: "/home/${{ secrets.EC2_USER }}/frontend/dist"
 
-      - name: Deploy build to S3
+      - name: Upload Build to S3
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST_STAGING }}
@@ -74,18 +77,19 @@ jobs:
       - Build-and-Push-Backend
       - Build-Frontend-And-Upload-S3
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Copy compose + env to EC2
+      - name: Copy docker-compose.staging.yml to EC2
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.EC2_HOST_STAGING }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: "docker-compose.staging.yml,.env.staging"
+          source: "docker-compose.staging.yml"
           target: "/home/${{ secrets.EC2_USER }}"
 
-      - name: Deploy on EC2 via Docker Compose
+      - name: Deploy via Docker Compose
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST_STAGING }}
@@ -93,6 +97,10 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd ~
+            # Inject your .env.staging from GitHub Secrets
+            echo "${{ secrets.ENV_STAGING }}" > .env.staging
+
+            # Pull new images and restart
             docker compose -f docker-compose.staging.yml pull
             docker compose -f docker-compose.staging.yml down
             docker compose -f docker-compose.staging.yml up -d
