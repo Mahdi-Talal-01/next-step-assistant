@@ -82,9 +82,7 @@ jobs:
           host: ${{ secrets.EC2_HOST_STAGING }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
-          source: |
-            - docker-compose.staging.yml
-            - .env.staging
+          source: "docker-compose.staging.yml,.env.staging"
           target: "/home/${{ secrets.EC2_USER }}"
 
       - name: Deploy on EC2 via Docker Compose
