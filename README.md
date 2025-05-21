@@ -97,6 +97,11 @@
 
 #### E2E Testing  
 ![E2E Testing](./readme/testings/2e2%20testing%20(1).png)
+
+### Validations :
+| Base Auth Request                            | OAuth Validation page2                       |
+| --------------------------------------- | ------------------------------------- |
+| ![Base Auth Request ](./readme/testings/BaseAuthRequest.png) | ![OAuth Validation](./readme/testings/OAuth-validation.png) |
 <br><br>
 
 <!-- AI -->
